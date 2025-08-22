@@ -462,7 +462,7 @@
 
                     // Αποστολή εντολής για ανάγνωση δεδομένων
                     statusText.textContent = 'Ανάγνωση δεδομένων...';
-                    await sendCommand('Bluetooth.println(JSON.stringify(ew.apps.itag.state.def.store))\n');
+                    await sendCommand('Bluetooth.println(JSON.stringify(ew.apps.itag.state.def))\n');
 
                 }
                 catch (error) {
@@ -477,7 +477,7 @@
 
                 try {
                     statusText.textContent = 'Ανάγνωση δεδομένων...';
-                    await sendCommand('Bluetooth.println(JSON.stringify(ew.apps.itag.state.def.store))\n');
+                    await sendCommand('Bluetooth.println(JSON.stringify(ew.apps.itag.state.def))\n');
                 }
                 catch (error) {
                     console.error('Σφάλμα ανανέωσης:', error);
@@ -727,13 +727,13 @@
                 // Αποστολή εντολών στο Espruino για ενημέρωση
                 try {
                     // Ενημέρωση ονόματος
-                    await sendCommand(`ew.apps.itag.state.def.store.find(cat => cat.id === "${editingCatId}").name = "${newName}";\n`);
+                    await sendCommand(`ew.apps.itag.state.def.find(cat => cat.id === "${editingCatId}").name = "${newName}";\n`);
 
                     // Ενημέρωση silent τιμής
-                    await sendCommand(`ew.apps.itag.state.def.store.find(cat => cat.id === "${editingCatId}").silent = ${newSilent};\n`);
+                    await sendCommand(`ew.apps.itag.state.def.find(cat => cat.id === "${editingCatId}").silent = ${newSilent};\n`);
 
                     // Αποθήκευση αλλαγών
-                    await sendCommand('require("Storage").write("itag.state.json", ew.apps.itag.state.def.store);\n');
+                    await sendCommand('require("Storage").write("itag.state.json", ew.apps.itag.state.def);\n');
 
                     statusText.textContent = 'Οι αλλαγές αποθηκεύτηκαν επιτυχώς';
                 }

@@ -65,7 +65,7 @@ ew.face[0] = {
         if (ew.is.UIpri) { ew.notify.alert("error", ew.notify.log.error[0], 1, 1); return; }
         //"ram";
 
-        if (ew.apps.itag.state.def.dev.length === 0) {
+        if (ew.apps.itag.state.dev.length === 0) {
 
             //this.scan();
             return;
@@ -74,18 +74,18 @@ ew.face[0] = {
         g.fillRect({ x: 0, y: 180, x2: 250, y2: 280, });
 
         // graph the bar
-        if (ew.apps.itag.state.def.dev.length > 1) {
-            let v = this.graph(ew.apps.itag.state.def.dev, this.data.lastPosition, 0, this.data.key);
+        if (ew.apps.itag.state.dev.length > 1) {
+            let v = this.graph(ew.apps.itag.state.dev, this.data.lastPosition, 0, this.data.key);
             this.info(v[0], v[1].split(" ")[0], v[2]);
         }
-        else if (ew.apps.itag.state.def.dev.length === 1)
-            this.info(ew.apps.itag.state.def.dev[0].rssi, ew.apps.itag.state.def.dev[0].id.split(" ")[0]);
+        else if (ew.apps.itag.state.dev.length === 1)
+            this.info(ew.apps.itag.state.dev[0].rssi, ew.apps.itag.state.dev[0].id.split(" ")[0]);
 
         // set the bar control
-        ew.sys.TC.val = { cur: this.data.lastPosition, dn: 0, up: ew.apps.itag.state.def.dev.length - 1, tmp: 0, reverce: 0, loop: this.data.loop };
+        ew.sys.TC.val = { cur: this.data.lastPosition, dn: 0, up: ew.apps.itag.state.dev.length - 1, tmp: 0, reverce: 0, loop: this.data.loop };
         ew.UI.c.tcBar = (a, b) => {
             //"ram";
-            let v = this.graph(ew.apps.itag.state.def.dev, b, 1, this.data.key);
+            let v = this.graph(ew.apps.itag.state.dev, b, 1, this.data.key);
             if (!v) { return; }
             g.flip();
 

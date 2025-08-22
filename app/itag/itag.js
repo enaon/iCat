@@ -6,21 +6,22 @@ ew.apps.itag = {
         lost: 0,
         alert: 0,
         ble: { scan: 0, next: 0, gatt: {} },
-        def: { store:[], batt:{}, dev: [] },
+        def: [],
+        dev: []
     },
 scan: function() {
     // Αρχικοποίηση deviceMap αν δεν υπάρχει
-    if (!ew.apps.itag.state.def.deviceMap) {
-        ew.apps.itag.state.def.deviceMap = {};
+    if (!ew.apps.itag.state.deviceMap) {
+        ew.apps.itag.state.deviceMap = {};
     }
     
     // Αρχικοποίηση store αν δεν υπάρχει
-    if (!ew.apps.itag.state.def.store) {
-        ew.apps.itag.state.def.store = [];
+    if (!ew.apps.itag.state.def) {
+        ew.apps.itag.state.def = [];
     }
 
-    var deviceMap = ew.apps.itag.state.def.deviceMap;
-    var store = ew.apps.itag.state.def.store;
+    var deviceMap = ew.apps.itag.state.deviceMap;
+    var store = ew.apps.itag.state.def;
 
     // Ρυθμίσεις σάρωσης
     NRF.setScan(function(device) {
@@ -57,7 +58,7 @@ scan: function() {
             if (device.name) deviceObj.name = device.name;
 
             // Προσθήκη νέας συσκευής
-            ew.apps.itag.state.def.dev.push(deviceObj);
+            ew.apps.itag.state.dev.push(deviceObj);
             deviceMap[device.id] = deviceObj;
             
             // Προσθήκη νέου αντικειμένου στο store ΜΟΝΟ αν δεν υπάρχει
@@ -86,8 +87,8 @@ scan: function() {
             var now = Date.now();
             
             // Ενημέρωση κατάστασης συσκευών
-            for (var i = 0; i < ew.apps.itag.state.def.dev.length; i++) {
-                var device = ew.apps.itag.state.def.dev[i];
+            for (var i = 0; i < ew.apps.itag.state.dev.length; i++) {
+                var device = ew.apps.itag.state.dev[i];
                 if (now - device.lastSeen < maxOfflineTime) {
                     device.live = true;
                 } else {
@@ -97,13 +98,13 @@ scan: function() {
             }
 
             // Αφαίρεση συσκευών που είναι offline για πολύ καιρό
-            for (var i = ew.apps.itag.state.def.dev.length - 1; i >= 0; i--) {
-                var device = ew.apps.itag.state.def.dev[i];
+            for (var i = ew.apps.itag.state.dev.length - 1; i >= 0; i--) {
+                var device = ew.apps.itag.state.dev[i];
                 if (device.offlineCount > 50) {
                     // Διαγραφή από deviceMap
                     delete deviceMap[device.id];
                     // Διαγραφή από τον πίνακα συσκευών
-                    ew.apps.itag.state.def.dev.splice(i, 1);
+                    ew.apps.itag.state.dev.splice(i, 1);
                     
                     /*
                     // Διαγραφή από το store
@@ -117,7 +118,7 @@ scan: function() {
                 }
             }
 
-            var liveCount = ew.apps.itag.state.def.dev.filter(function(d) { return d.live; }).length;
+            var liveCount = ew.apps.itag.state.dev.filter(function(d) { return d.live; }).length;
             if (ew.face.appCurr === "itag_scan") ew.face[0].bar();
             else if  (ew.face.appCurr === "itag_connect") ew.face.go("itag_scan",0);
 
@@ -207,5 +208,9 @@ stopScan: function() {
     }
 
 };
+if (require('Storage').readJSON('ew.json', 1).itag)
+    ew.apps.itag.state.def = require('Storage').readJSON('ew.json', 1).itag;
+
+
 
 //ew.apps.itag.scan();

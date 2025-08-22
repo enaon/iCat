@@ -12,7 +12,7 @@ ew.apps.itag={
             var deviceMap = {};
 
             // Ορίζουμε όλα τα υπάρχοντα devices ως offline
-            ew.apps.itag.state.def.dev.forEach(function(device, index) {
+            ew.apps.itag.state.dev.forEach(function(device, index) {
                 deviceMap[device.id] = index;
                 device.live = false;
             });
@@ -30,18 +30,18 @@ ew.apps.itag={
                         live: true
                     };
                     if (device.name) deviceObj.name = device.name;
-                    ew.apps.itag.state.def.dev.push(deviceObj);
+                    ew.apps.itag.state.dev.push(deviceObj);
                 }
                 else {
                     // Υπάρχουσα συσκευή
-                    ew.apps.itag.state.def.dev[existingIndex].rssi = device.rssi;
-                    ew.apps.itag.state.def.dev[existingIndex].live = true;
+                    ew.apps.itag.state.dev[existingIndex].rssi = device.rssi;
+                    ew.apps.itag.state.dev[existingIndex].live = true;
                 }
             }
 
             // Προαιρετικό: Αφαίρεση συσκευών που είναι offline για πολύ καιρό
             var maxOfflineTime = 20; // μέγιστος αριθμός scans που επιτρέπεται να είναι offline
-            ew.apps.itag.state.def.dev = ew.apps.itag.state.def.dev.filter(function(device) {
+            ew.apps.itag.state.dev = ew.apps.itag.state.dev.filter(function(device) {
                 if (device.live) {
                     device.offlineCount = 0; // reset counter
                     return true;
@@ -53,16 +53,16 @@ ew.apps.itag={
             });
 
            /* // Ταξινόμηση: live devices πρώτα, μετά με βάση RSSI
-            ew.apps.itag.state.def.dev.sort(function(a, b) {
+            ew.apps.itag.state.dev.sort(function(a, b) {
                 //if (a.live !== b.live) return b.live - a.live;
                 return b.rssi - a.rssi;
             });
             */
-            //ew.face[0].data.fields = ew.apps.itag.state.def.dev.length;
+            //ew.face[0].data.fields = ew.apps.itag.state.dev.length;
             if ( ew.face.appCurr === "itag") ew.face[0].bar();
 
-            var liveCount = ew.apps.itag.state.def.dev.filter(function(d) { return d.live; }).length;
-            //print("Devices: " + liveCount + " online, " + (ew.apps.itag.state.def.dev.length - liveCount) + " offline");
+            var liveCount = ew.apps.itag.state.dev.filter(function(d) { return d.live; }).length;
+            //print("Devices: " + liveCount + " online, " + (ew.apps.itag.state.dev.length - liveCount) + " offline");
 
             setTimeout(function() {
                 if (ew.apps.itag.state.ble.scan)
