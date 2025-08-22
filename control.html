@@ -89,6 +89,11 @@
             color: var(--color-on-surface);
         }
 
+        .header-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
         .status {
             display: flex;
             align-items: center;
@@ -310,6 +315,11 @@
                 flex-direction: column;
                 gap: 4px;
             }
+            
+            .header-buttons {
+                flex-direction: column;
+                gap: 5px;
+            }
         }
     </style>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
@@ -320,12 +330,18 @@
     <div class="container">
         <header>
             <h1><i class="fas fa-cat"></i> Cat Tracker</h1>
-            <div>
+            <div class="header-buttons">
                 <button id="connectBtn" class="btn">
                     <i class="fas fa-bluetooth-b"></i> Σύνδεση
                 </button>
-                <button id="refreshBtn" class="btn" style="display:none; margin-left:10px;">
+                <button id="refreshBtn" class="btn" style="display:none;">
                     <i class="fas fa-sync"></i> Ανανέωση
+                </button>
+                <button id="exportBtn" class="btn btn-secondary" style="display:none;">
+                    <i class="fas fa-download"></i> Export
+                </button>
+                <button id="importBtn" class="btn btn-secondary" style="display:none;">
+                    <i class="fas fa-upload"></i> Import
                 </button>
             </div>
         </header>
@@ -371,11 +387,16 @@
         </div>
     </div>
 
+    <input type="file" id="importFile" accept=".json" style="display: none;">
+
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             // Στοιχεία DOM
             const connectBtn = document.getElementById('connectBtn');
             const refreshBtn = document.getElementById('refreshBtn');
+            const exportBtn = document.getElementById('exportBtn');
+            const importBtn = document.getElementById('importBtn');
+            const importFile = document.getElementById('importFile');
             const statusDot = document.getElementById('statusDot');
             const statusText = document.getElementById('statusText');
             const catList = document.getElementById('catList');
@@ -423,6 +444,18 @@
                 }
             });
 
+            exportBtn.addEventListener('click', function() {
+                exportData();
+            });
+
+            importBtn.addEventListener('click', function() {
+                importFile.click();
+            });
+
+            importFile.addEventListener('change', function(e) {
+                handleImport(e.target.files[0]);
+            });
+
             // Σύνδεση με συσκευή
             async function connectToDevice() {
                 try {
@@ -453,6 +486,8 @@
                     statusText.textContent = 'Συνδεδεμένοι με ' + currentDevice.name;
                     connectBtn.innerHTML = '<i class="fas fa-bluetooth-b"></i> Αποσύνδεση';
                     refreshBtn.style.display = 'inline-block';
+                    exportBtn.style.display = 'inline-block';
+                    importBtn.style.display = 'inline-block';
 
                     currentDevice.addEventListener('gattserverdisconnected', onDisconnected);
 
@@ -482,6 +517,118 @@
                 catch (error) {
                     console.error('Σφάλμα ανανέωσης:', error);
                     statusText.textContent = 'Σφάλμα ανανέωσης: ' + error.message;
+                }
+            }
+
+            // Εξαγωγή δεδομένων
+            function exportData() {
+                if (catsData.length === 0) {
+                    alert('Δεν υπάρχουν δεδομένα για εξαγωγή');
+                    return;
+                }
+
+                // Δημιουργία αντικειμένου με τα δεδομένα για εξαγωγή
+                const exportData = {
+                    cats: catsData,
+                    timestamp: new Date().toISOString(),
+                    version: '1.0'
+                };
+
+                // Δημιουργία JSON string
+                const jsonString = JSON.stringify(exportData, null, 2);
+                
+                // Δημιουργία blob και λήψη URL
+                const blob = new Blob([jsonString], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                
+                // Δημιουργία link για λήψη
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `cat_tracker_export_${new Date().toISOString().slice(0, 10)}.json`;
+                document.body.appendChild(a);
+                a.click();
+                
+                // Καθαρισμός
+                setTimeout(() => {
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                }, 100);
+
+                statusText.textContent = 'Τα δεδομένα εξήχθησαν επιτυχώς';
+            }
+
+            // Εισαγωγή δεδομένων
+            function handleImport(file) {
+                if (!file) return;
+
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    try {
+                        const importedData = JSON.parse(e.target.result);
+                        
+                        if (!importedData.cats || !Array.isArray(importedData.cats)) {
+                            throw new Error('Μη έγκυρη μορφή αρχείου');
+                        }
+
+                        // Ενημέρωση localStorage με τα εισαγόμενα δεδομένα
+                        const savedCats = {};
+                        const savedSilent = {};
+                        
+                        importedData.cats.forEach(cat => {
+                            if (cat.name && cat.name !== "Unknown" && cat.name !== "Αδέσποτη") {
+                                savedCats[cat.id] = cat.name;
+                            }
+                            if (cat.silent !== undefined) {
+                                savedSilent[cat.id] = cat.silent;
+                            }
+                        });
+
+                        localStorage.setItem('catNames', JSON.stringify(savedCats));
+                        localStorage.setItem('catSilent', JSON.stringify(savedSilent));
+
+                        // Ενημέρωση Espruino αν είναι συνδεδεμένοι
+                        if (isConnected) {
+                            updateEspruinoWithImportedData(importedData.cats);
+                        } else {
+                            statusText.textContent = 'Τα δεδομένα εισήχθησαν. Συνδεθείτε για ενημέρωση της συσκευής.';
+                        }
+
+                        alert('Τα δεδομένα εισήχθησαν επιτυχώς!');
+                    } catch (error) {
+                        console.error('Σφάλμα εισαγωγής:', error);
+                        alert('Σφάλμα κατά την εισαγωγή: ' + error.message);
+                    }
+                };
+                reader.readAsText(file);
+            }
+
+            // Ενημέρωση Espruino με εισαγόμενα δεδομένα
+            async function updateEspruinoWithImportedData(importedCats) {
+                if (!isConnected) return;
+
+                try {
+                    statusText.textContent = 'Ενημέρωση συσκευής με εισαγόμενα δεδομένα...';
+
+                    // Ενημέρωση κάθε γάτας στο Espruino
+                    for (const cat of importedCats) {
+                        if (cat.name && cat.name !== "Unknown" && cat.name !== "Αδέσποτη") {
+                            await sendCommand(`ew.apps.itag.state.def.find(c => c.id === "${cat.id}").name = "${cat.name}";\n`);
+                        }
+                        if (cat.silent !== undefined) {
+                            await sendCommand(`ew.apps.itag.state.def.find(c => c.id === "${cat.id}").silent = ${cat.silent};\n`);
+                        }
+                    }
+
+                    // Αποθήκευση αλλαγών
+                    await sendCommand('require("Storage").write("itag.state.json", ew.apps.itag.state.def);\n');
+                    
+                    // Ανανέωση δεδομένων
+                    await refreshData();
+                    
+                    statusText.textContent = 'Η συσκευή ενημερώθηκε με τα εισαγόμενα δεδομένα';
+                } catch (error) {
+                    console.error('Σφάλμα ενημέρωσης συσκευής:', error);
+                    statusText.textContent = 'Σφάλμα ενημέρωσης συσκευής: ' + error.message;
                 }
             }
 
@@ -550,6 +697,8 @@
                 statusText.textContent = 'Αποσυνδεθήκατε από τη συσκευή';
                 connectBtn.innerHTML = '<i class="fas fa-bluetooth-b"></i> Σύνδεση';
                 refreshBtn.style.display = 'none';
+                exportBtn.style.display = 'none';
+                importBtn.style.display = 'none';
 
                 // Καθαρισμός των μεταβλητών σύνδεσης
                 currentDevice = null;
