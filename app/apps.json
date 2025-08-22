@@ -1,0 +1,120 @@
+[
+
+	{ "id": "ew_init",
+		"name": "init",
+		"icon": "../icon.png",
+		"version":"2.71",
+		"description": "init and watchdog. ",
+		"tags": "magic3",
+		"type":"core",
+	    "needsFeatures":["magic3"],
+		"storage": [
+			{"name":".bootrst","url":"../init.js"}
+		]
+	},	
+		{ "id": "ew_display",
+		"name": "display driver",
+		"icon": "../icon.png",
+		"version":"2.71",
+		"description": "lcd driver",
+		"tags": "magic3",
+		"type":"core",
+	    "needsFeatures":["magic3"],
+		"storage": [
+			{"name":"ew_display","url":"../lcd_magic_16.js"}
+		]
+	},
+	{ "id": "ew_handler",
+		"name": "Handler",
+		"icon": "../icon.png",
+		"version":"2.71",
+		"description": "handlers ",
+		"tags": "magic3",
+	    "needsFeatures":["magic3"],
+		"storage": [
+			{"name":"ew_handler","url":"../handler/handler.js"},
+			{"name":"ew_handler_face","url":"../handler/handler_face.js"},
+			{"name":"ew_handler_notify","url":"../handler/handler_notify.js"},
+			{"name":"ew_handler_set","url":"../handler/handler_set.js"},
+			{"name":"ew_handler_btn","url":"../handler/handler_btn.js"},
+			{"name":"ew_handler_conn","url":"../handler/handler_conn.js"},
+			{"name":"ew_handler_touch","url":"../handler/handler_touch.js"},
+			{"name":"ew_handler_touch_716","url":"../handler/handler_touch_716.js"},
+			{"name":"ew_handler_touch_816","url":"../handler/handler_touch_816.js"},
+			{"name":"ew_handler_acc_SC7A20","url":"../handler/handler_acc_SC7A20.js"}
+		]
+	},
+	{ "id": "ew_UI",
+		"name": "UI support",
+		"icon": "../icon.png",
+		"version":"2.71",
+		"description": "UI",
+		"tags": "magic3",
+		"type":"core",
+		"readme": "README.md",
+	    "needsFeatures":["magic3"],
+		"storage": [
+			{"name":"C:ew_UI","url":"../UI/ui.js"},
+			{"name":"C:ew_icons","url":"../UI/icons.js"}
+		]
+	},
+	{ "id": "ew_settings",
+		"name": "Settings",
+		"icon": "../icon.png",
+		"version":"2.71",
+		"description": "Settings face",
+		"tags": "magic3",
+		"type":"clock",
+		"readme": "README.md",
+	    "needsFeatures":["magic3"],
+		"storage": [
+			{"name":"ew_f_settings","url":"../settings/settings.js"},
+			{"name":"ew_f_set_set","url":"../settings/set_set.js"},
+			{"name":"ew_f_set_apps","url":"../settings/set_apps.js"},
+			{"name":"ew_f_set_theme","url":"../settings/set_theme.js"},
+			{"name":"ew_f_set_dash","url":"../settings/set_dash.js"}
+		]
+	},
+	
+	{ "id": "ew_logger",
+		"name": "logger",
+		"icon": "../icon.png",
+		"version":"2.71",
+		"description": "logger",
+		"tags": "magic3",
+	    "needsFeatures":["magic3"],
+		"storage": [
+			{"name":"ew_logger_kitty","url":"../logger/logger_kitty.js"},
+			{"name":"ew_logger_battery","url":"../logger/logger_battery.js"},
+			{"name":"ew_f_view_activity","url":"../logger/f_view_activity.js"},
+			{"name":"ew_f_view_battery","url":"../logger/f_view_battery.js"},
+			{"name":"ew_f_view_cycles","url":"../logger/f_view_cycles.js"}	
+		]
+	},
+	{ "id": "ew_clock",
+		"name": "clock",
+		"icon": "../icon.png",
+		"version":"2.71",
+		"description": "clock",
+		"tags": "magic3",
+	    "needsFeatures":["magic3"],
+		"storage": [
+			{"name":"ew_f_main","url":"../clock/clock.js"}	
+		]
+	},
+	{ "id": "ew_itag",
+		"name": "itag",
+		"icon": "../icon.png",
+		"version":"2.71",
+		"description": "itag",
+		"tags": "magic3",
+	    "needsFeatures":["magic3"],
+		"storage": [
+			{"name":"ew_a_itag","url":"../itag/itag.js"},
+			{"name":"ew_f_itag_scan","url":"../itag/f_itag_scan.js"},
+			{"name":"ew_f_itag_connect","url":"../itag/f_itag_connect.js"}	
+
+		]
+	}
+
+]

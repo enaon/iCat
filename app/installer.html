@@ -1,0 +1,26 @@
+<html>
+  <head>
+    <link rel="stylesheet" href="../Loader/css/spectre.min.css">
+  </head>
+  <body>
+
+    <p><button id="upload" class="btn btn-primary">Upload</button></p>
+	<h6>This proccess will erase your device</h6>
+	<h7></h7>
+	<h7>Connect to the Litter Box, then press upload button,</h7>
+	<h7>and wait for the files to upload.</h7>
+	<h6></h6>
+	<h6>Press the "Disconnect" button, after the last file has finished uploading, to start using Litter Box.</h6>
+
+    <script src="../Loader/core/lib/customize.js"></script>
+    <script>
+      // When the 'upload' button is clicked...
+      document.getElementById("upload").addEventListener("click", function() {
+        //var app = `{name:"eucLight"} `;
+        var app = `{} `;
+		  window.postMessage(app);
+      });
+
+    </script>
+  </body>
+</html>
