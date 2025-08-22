@@ -1,324 +1,772 @@
- <!DOCTYPE html>
-<html>
+<!DOCTYPE html>
+<html lang="el">
+
 <head>
-  <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=0.9">
-  <title>K.I.T.T.Y app</title>
-  <link rel="apple-touch-icon" sizes="180x180" href="Loader/img/apple-touch-icon.png">
-  <link rel="icon" type="image/png" sizes="32x32" href="Loader/img/favicon1-32x32.png">
-  <link rel="icon" type="image/png" sizes="16x16" href="Loader/img/favicon1-16x16.png">
-  <link rel="manifest" href="Loader/app.webmanifest">
-  <link rel="mask-icon" href="img/safari-pinned-tab.svg" color="#332F2E">
-  <meta name="apple-mobile-web-app-title" content="K.I.T.T.Y">
-  <meta name="application-name" content="K.I.T.T.Y app">
-  <meta name="msapplication-TileColor" content="#12141A">
-  <meta name="theme-color" content="#12141A">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cat Tracker</title>
+    <style>
+        :root {
+            --color-primary: #BB86FC;
+            --color-primary-variant: #3700B3;
+            --color-secondary: #03DAC6;
+            --color-background: #121212;
+            --color-surface: #1E1E1E;
+            --color-error: #CF6679;
+            --color-on-primary: #000000;
+            --color-on-secondary: #000000;
+            --color-on-background: #FFFFFF;
+            --color-on-surface: #FFFFFF;
+            --color-on-error: #000000;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Roboto', sans-serif;
+        }
+
+        body {
+            background-color: var(--color-background);
+            color: var(--color-on-background);
+            min-height: 100vh;
+            padding: 16px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        h1 {
+            font-size: 24px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        h1 i {
+            color: var(--color-primary);
+        }
+
+        .btn {
+            background-color: var(--color-primary);
+            color: var(--color-on-primary);
+            border: none;
+            border-radius: 20px;
+            padding: 10px 20px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .btn:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn-secondary {
+            background-color: var(--color-surface);
+            color: var(--color-on-surface);
+        }
+
+        .status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 24px;
+            padding: 12px 16px;
+            background-color: var(--color-surface);
+            border-radius: 12px;
+            font-size: 14px;
+        }
+
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background-color: var(--color-error);
+        }
+
+        .status-dot.connected {
+            background-color: #4CAF50;
+        }
+
+        .cat-list {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 16px;
+        }
+
+        .cat-card {
+            background-color: var(--color-surface);
+            border-radius: 16px;
+            padding: 16px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .cat-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background-color: var(--color-primary-variant);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: var(--color-on-primary);
+        }
+
+        .cat-info {
+            flex: 1;
+        }
+
+        .cat-name {
+            font-size: 18px;
+            font-weight: 500;
+            margin-bottom: 4px;
+        }
+
+        .cat-details {
+            font-size: 14px;
+            opacity: 0.7;
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .battery {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .location {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .last-seen {
+            font-size: 12px;
+            opacity: 0.7;
+            margin-top: 4px;
+        }
+
+        .edit-btn {
+            background: none;
+            border: none;
+            color: var(--color-primary);
+            cursor: pointer;
+            font-size: 18px;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background-color: var(--color-surface);
+            border-radius: 16px;
+            padding: 24px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-title {
+            font-size: 20px;
+            font-weight: 500;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            color: var(--color-on-surface);
+            font-size: 24px;
+            cursor: pointer;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 14px;
+            opacity: 0.8;
+        }
+
+        input,
+        select {
+            width: 100%;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background-color: rgba(255, 255, 255, 0.05);
+            color: var(--color-on-surface);
+            font-size: 16px;
+        }
+
+        .toggle-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .toggle-label {
+            margin-bottom: 0;
+        }
+
+        .modal-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            opacity: 0.7;
+        }
+
+        .empty-state i {
+            font-size: 48px;
+            margin-bottom: 16px;
+            color: var(--color-primary);
+        }
+
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            padding: 20px;
+        }
+
+        .loading-spinner {
+            width: 24px;
+            height: 24px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: var(--color-primary);
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        @media (max-width: 600px) {
+            .cat-details {
+                flex-direction: column;
+                gap: 4px;
+            }
+        }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 
-<body style="width:device-width;height:750px">
-  <link href="tinydash.css" rel="stylesheet">
-  <script src="tinydash.js"></script>
-  <script>
-    var connection = { char: {} };
-    var myService = 0xffa0; // fill in a service you're looking for here
-    var myCharacteristic = 0xffa1; // fill in a characteristic from the service here
-    function connect() {
-      elements.modal.remove();
-      navigator.bluetooth.requestDevice({
-          filters: [{ namePrefix: 'eL-' }],
-          optionalServices: [myService],
-          acceptAllDevices: false
-        })
-        .then(device => {
-          //console.log("found :"+device.name);
-          elements.status.setValue(`CONNECTING`);
-          elements.log.log(`found ${device.name}`);
-          device.addEventListener('gattserverdisconnected', onDisconnected);
-          return device.gatt.connect();
-        })
-        .then(server => server.getPrimaryService(myService))
-        .then(service => service.getCharacteristics())
-        .then(characteristic => { for (c in characteristic) { connection.char[c] = characteristic[c]; } })
-        .then(_ => connection.char[0].startNotifications())
-        .then(subscribeToChanges)
-        .then(_ => connection.char[1].startNotifications())
-        .then(subscribeToChanges)
-        .then(_ => {
-          //console.log("connected to device :"+1 );
-          connection.write = function(v) {
-            const encoder = new TextEncoder('utf-8');
-            const data = encoder.encode(v);
-            connection.char[0].writeValue(data).then(function() {
-              console.log("send :" + data);
-            }).catch(function(error) {
-              console.error('send failed!', error);
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-cat"></i> Cat Tracker</h1>
+            <div>
+                <button id="connectBtn" class="btn">
+                    <i class="fas fa-bluetooth-b"></i> Σύνδεση
+                </button>
+                <button id="refreshBtn" class="btn" style="display:none; margin-left:10px;">
+                    <i class="fas fa-sync"></i> Ανανέωση
+                </button>
+            </div>
+        </header>
+
+        <div class="status">
+            <div class="status-dot" id="statusDot"></div>
+            <span id="statusText">Δεν έχετε συνδεθεί με Espruino</span>
+        </div>
+
+        <div id="catList" class="cat-list">
+            <div class="empty-state">
+                <i class="fas fa-cat"></i>
+                <p>Δεν υπάρχουν καταχωρημένες γάτες. Συνδεθείτε για να εμφανιστούν τα δεδομένα.</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Επεξεργασία γάτας</h2>
+                <button class="close-btn">&times;</button>
+            </div>
+            <div class="form-group">
+                <label for="catName">Όνομα γάτας</label>
+                <input type="text" id="catName" placeholder="Πληκτρολογήστε το όνομα">
+            </div>
+            <div class="form-group">
+                <label for="catId">ID iTag (μη επεξεργάσιμο)</label>
+                <input type="text" id="catId" disabled>
+            </div>
+            <div class="form-group">
+                <label for="catSilent">Λειτουργία σιγή</label>
+                <select id="catSilent">
+                    <option value="0">Ενεργό (false)</option>
+                    <option value="1">Σιγή (true)</option>
+                </select>
+            </div>
+            <div class="modal-actions">
+                <button id="saveCatBtn" class="btn">Αποθήκευση</button>
+                <button id="cancelEditBtn" class="btn btn-secondary">Ακύρωση</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Στοιχεία DOM
+            const connectBtn = document.getElementById('connectBtn');
+            const refreshBtn = document.getElementById('refreshBtn');
+            const statusDot = document.getElementById('statusDot');
+            const statusText = document.getElementById('statusText');
+            const catList = document.getElementById('catList');
+            const editModal = document.getElementById('editModal');
+            const catNameInput = document.getElementById('catName');
+            const catIdInput = document.getElementById('catId');
+            const catSilentInput = document.getElementById('catSilent');
+            const saveCatBtn = document.getElementById('saveCatBtn');
+            const cancelEditBtn = document.getElementById('cancelEditBtn');
+            const closeBtn = document.querySelector('.close-btn');
+
+            let isConnected = false;
+            let currentDevice = null;
+            let uartService = null;
+            let uartRxCharacteristic = null;
+            let uartTxCharacteristic = null;
+            let catsData = [];
+            let editingCatId = null;
+            let dataBuffer = '';
+
+            // UUIDs για την UART υπηρεσία του Espruino
+            const UART_SERVICE_UUID = '6e400001-b5a3-f393-e0a9-e50e24dcca9e';
+            const UART_RX_CHARACTERISTIC_UUID = '6e400002-b5a3-f393-e0a9-e50e24dcca9e';
+            const UART_TX_CHARACTERISTIC_UUID = '6e400003-b5a3-f393-e0a9-e50e24dcca9e';
+
+            // Έλεγχος αν το Web Bluetooth είναι διαθέσιμο
+            if (!navigator.bluetooth) {
+                statusText.textContent = 'Το Web Bluetooth δεν υποστηρίζεται από αυτό το browser';
+                connectBtn.disabled = true;
+            }
+
+            // Εκκίνηση Web Bluetooth
+            connectBtn.addEventListener('click', function() {
+                if (isConnected) {
+                    disconnectDevice();
+                }
+                else {
+                    connectToDevice();
+                }
             });
-          }
-        })
-        .then(_ => {
-          //setTime
-          let d = new Date();
-          let tz = d.getTimezoneOffset() / -60
-          connection.write("16=" + d.getTime().toString());
-          setTimeout(function() {
-            connection.write("17=" + tz);
-          }, 500);
-          console.log('done');
-        })
-        .catch(error => { console.error(error);
-          elements.status.setValue("");
-          elements.modalBlank.replaceWith(elements.modal); });
-    }
 
-    function onDisconnected(event) {
-      const device = event.target;
-      //console.log(`Device ${device.name} is disconnected.`);
-      elements.log.log(`Device ${device.name} is disconnected.`);
-      elements.modalBlank.replaceWith(elements.modal);
-      //connect();
-    }
+            refreshBtn.addEventListener('click', function() {
+                if (isConnected) {
+                    refreshData();
+                }
+            });
 
-    function subscribeToChanges(characteristic) {
-      //console.log("sub :",characteristic);
-      characteristic.oncharacteristicvaluechanged = handleData;
-    }
-    //
-    var sandType = { 1: "betonite", 2: "silicone", 3: "nonstick", 4: "tofu" };
-    var cache = { lt: 0, dt: -1, au: -1, bs: -1, ps: -1, db: -1, ac: -1, ad: -1, pb: -1, pos: 45, cb: -1, pbv: -1, sp: -1, ss: -1, pwr: 0, busy: -1 };
+            // Σύνδεση με συσκευή
+            async function connectToDevice() {
+                try {
+                    statusText.textContent = 'Αναζήτηση συσκευών Bluetooth...';
 
-    function handleData(event) {
-      // get the data buffer from the meter:
-      var buf = new Uint8Array(event.target.value);
-      const decoder = new TextDecoder();
-      const str = decoder.decode(event.target.value);
-      const id = str.split("=")[0];
-      const val = str.split("=")[1];
-      if (event.target.uuid.startsWith("0000ffa1"))
-        elements.log.log(Date().toString().split(' ')[4] + ":" + str);
-      else if (event.target.uuid.startsWith("0000ffa2")) {
-        if (id == "dt") elements[id].setValue(val);
-        else if (id.startsWith("v")) elements[id].setValue(Number(val).toFixed(2) + " V");
-        else if (id == "pp") {
-          cache.pp = val;
-          if (!cache.pwr) elements[id].setValue(Number(val));
-        }
-        else if (id == "pwr") {
-          if (Number(val) && cache.pwr != 1) {
-            cache.pwr = 1;
-            elements.status.setValue("ON");
-            elements.pp.replaceWith(elements.pos);
-            elements.pos.setValue(cache.pos);
-          }
-          else if (!Number(val) && cache.pwr != 0) {
-            cache.pwr = 0;
-            elements.status.setValue("IDLE");
-            elements.pos.replaceWith(elements.pp);
-          }
-          elements.pwr.setValue(Number(val));
-        }
-        else if (id == "busy") {
-          if (Number(val) && cache.busy != 1) {
-            cache.busy = 1;
-            elements.status.setValue("BUSY");
-            elements.he.replaceWith(elements.ps);
-            elements.clean.replaceWith(elements.abort);
-          }
-          else if (!Number(val) && cache.busy != 0) {
-            cache.busy = 0;
-            elements.status.setValue(120 < cache.pp ? "ON" : "IDLE");
-            elements.ps.replaceWith(elements.he);
-            elements.abort.replaceWith(elements.clean);
-          }
-        }
-        else if (id == "db") return;
-        else {
-          elements[id].setValue(Number(val));
-          cache[id] = val;
-        }
-      }
-    }
-    // Set up the controls we see on the screen
-    var data = [];
-    for (var i = 0; i < 100; i++) data.push(Math.cos(i / 10));
-    var elements = {
-      //header
-      heading: TD.label({ x: 0, y: 10, width: 400, height: 60, label: "" }),
-      dt: TD.value({ x: 5, y: 10, width: 100, height: 40, label: "", value: 0 }),
-      //right dash
-      pos: TD.gauge({ x: 0, y: 70, width: 230, height: 220, label: "BALL POSITION", value: 0, min: 0, max: 205 }),
-      pp: TD.gauge({ x: 0, y: 70, width: 230, height: 220, label: "BATTERY PERCENTAGE", value: 0, min: 0, max: 100 }),
-      ps: TD.toggle({ x: 0, y: 290, width: 230, height: 60, label: "PAUSE", value: "0", onchange: function(el, v) { connection.write(80 + v); } }),
-      he: TD.label({ x: 0, y: 290, width: 230, height: 60, label: "" }),
-      //left dash
-      rtod: TD.value({ x: 230, y: 50, width: 170, height: 55, label: "TODAY", value: "0" }),
-      rtot: TD.value({ x: 230, y: 105, width: 170, height: 55, label: "TOTAL", value: "0" }),
-      lt: TD.value({ x: 230, y: 160, width: 170, height: 55, label: "LITRES", value: "0" }),
-      vp: TD.value({ x: 230, y: 215, width: 170, height: 60, label: "VOLT", value: "0" }),
-      //controller
-      vc: TD.value({ x: 230, y: 270, width: 170, height: 80, label: "DSD6", value: 0 }),
-      //lcd 
-      hb: TD.label({ x: 0, y: 360, width: 400, height: 70, label: "" }),
-      status: TD.value({ x: 100, y: 360, width: 200, height: 60, label: "", value: "0" }),
-      //midle
-      heading_more1: TD.label({ x: 0, y: 440, width: 195, height: 260, label: "" }),
-      heading_more2: TD.label({ x: 205, y: 440, width: 195, height: 260, label: "" }),
-      //manual clean
-      abort: TD.button({
-        x: 0,
-        y: 480,
-        width: 195,
-        height: 90,
-        color: 555,
-        label: "",
-        value: 0,
-        name: "button",
-        glyph: "ABORT",
-        onchange: function(el, v) {
-          if (v) connection.write(18);
-          elements.status.setValue(`ABORTING`);
-        }
-      }),
-      clean: TD.button({
-        x: 0,
-        y: 480,
-        width: 195,
-        height: 90,
-        color: 555,
-        label: "",
-        value: 0,
-        name: "button",
-        glyph: "CLEAN",
-        onchange: function(el, v) {
-          if (v) connection.write(12);
-        }
-      }),
-      //manual empty
-      em: TD.button({
-        x: 205,
-        y: 480,
-        width: 195,
-        height: 70,
-        label: "",
-        value: 0,
-        name: "button",
-        glyph: "EMPTY",
-        onchange: function(el, v) {
-          if (v) connection.write(13);
-        }
-      }),
-      //settings
-      //auto clean on-off
-      ac: TD.toggle({ x: 0, y: 460, width: 195, height: 80, label: "AUTO", value: 0, name: "Toggle", onchange: function(el, v) { connection.write(70 + v); } }),
-      //auto clean delay
-      ad: TD.value({ x: 0, y: 540, width: 195, height: 80, label: "DELAY", value: "1", min: 1, step: 1, max: 9, onchange: function(el, v) { connection.write(60 + v); } }),
-      //uvc light trigger
-      au: TD.toggle({ x: 0, y: 620, width: 195, height: 80, label: "UVC", value: 0, name: "Toggle", onchange: function(el, v) { connection.write(50 + v); } }),
-      //patern mode 
-      sp: TD.value({
-        x: 205,
-        y: 460,
-        width: 195,
-        height: 80,
-        label: "MODE",
-        value: 1,
-        min: 1,
-        step: 1,
-        max: 3,
-        onchange: function(el, v) {
-          elements.pn.setValue(sandType[v]);
-          connection.write(40 + v);
-        }
-      }),
-      //patern name
-      pn: TD.value({ x: 205, y: 540, width: 195, height: 80, label: "", value: "0" }),
-      //patern speed
-      ss: TD.value({ x: 205, y: 620, width: 195, height: 80, label: "SPEED", value: 5, min: 1, step: 1, max: 9, onchange: function(el, v) { connection.write(30 + v); } }),
-      //more
-      more1: TD.label({ x: 0, y: 0, width: 0, height: 0, label: "" }),
-      more2: TD.label({ x: 0, y: 0, width: 0, height: 0, label: "" }),
-      more3: TD.label({ x: 0, y: 0, width: 0, height: 0, label: "" }),
-      more4: TD.label({ x: 0, y: 0, width: 0, height: 0, label: "" }),
-      //on-off
-      pwr: TD.toggle({
-        x: 0,
-        y: 580,
-        width: 195,
-        height: 70,
-        label: "LIGHT",
-        value: 0,
-        name: "button",
-        onchange: function(el, v) {
-          connection.write(11);
-        }
-      }),
-      //footer
-      //set
-      settings: TD.toggle({
-        x: 0,
-        y: 710,
-        width: 195,
-        height: 75,
-        label: "SET",
-        value: 0,
-        name: "Toggle",
-        onchange: function(el, v) {
-          if (v == 1) {
-            elements.pwr.replaceWith(elements.ac);
-            elements.em.replaceWith(elements.ad);
-            elements.more1.replaceWith(elements.au);
-            elements.more2.replaceWith(elements.sp);
-            elements.more3.replaceWith(elements.pn);
-            elements.more4.replaceWith(elements.ss);
-          }
-          else {
-            elements.log.log("Settings Saved");
-            connection.write(19);
-            elements.ac.replaceWith(elements.pwr);
-            elements.ad.replaceWith(elements.em);
-            elements.au.replaceWith(elements.more1);
-            elements.sp.replaceWith(elements.more2);
-            elements.pn.replaceWith(elements.more3);
-            elements.ss.replaceWith(elements.more4);
-          }
-        }
-      }),
-      //log
-      db: TD.toggle({
-        x: 205,
-        y: 710,
-        width: 195,
-        height: 75,
-        label: "DBG",
-        value: 0,
-        name: "Toggle",
-        onchange: function(el, v) {
-          if (v) {
-            elements.logBlank.replaceWith(elements.log);
-          }
-          else
-            elements.log.replaceWith(elements.logBlank);
-        }
-      }),
-      log: TD.log({ x: 0, y: 800, width: 400, height: 400, id: 5, label: "Console output", text: "K.I.T.T.Y" }),
-      logBlank: TD.label({ x: 1, y: 1, width: 1, height: 1, label: "" }),
-      //modal
-      modal: TD.modal({ x: 0, y: 10, width: 395, height: 460, label: "Click to connect", onchange: connect }),
-      modalBlank: TD.label({ x: 0, y: 0, width: 0, height: 0, label: "" }),
-    }
-    elements.log.log("Version 1.0");
-    for (var i in elements)
-      document.body.appendChild(elements[i]);
-    elements.log.replaceWith(elements.logBlank);
-    elements.ac.replaceWith(elements.pwr);
-    elements.ad.replaceWith(elements.em);
-    elements.au.replaceWith(elements.more1);
-    elements.sp.replaceWith(elements.more2);
-    elements.pn.replaceWith(elements.more3);
-    elements.ss.replaceWith(elements.more4);
-    elements.pn.setValue(sandType[1]);
-    elements.status.setValue("");
-  </script>
+                    currentDevice = await navigator.bluetooth.requestDevice({
+                        filters: [{ namePrefix: 'eW' }],
+                        optionalServices: [UART_SERVICE_UUID]
+                    });
+
+                    if (!currentDevice) {
+                        statusText.textContent = 'Δεν επιλέχθηκε συσκευή';
+                        return;
+                    }
+
+                    statusText.textContent = 'Σύνδεση με ' + currentDevice.name + '...';
+                    const server = await currentDevice.gatt.connect();
+
+                    uartService = await server.getPrimaryService(UART_SERVICE_UUID);
+                    uartRxCharacteristic = await uartService.getCharacteristic(UART_RX_CHARACTERISTIC_UUID);
+                    uartTxCharacteristic = await uartService.getCharacteristic(UART_TX_CHARACTERISTIC_UUID);
+
+                    await uartTxCharacteristic.startNotifications();
+                    uartTxCharacteristic.addEventListener('characteristicvaluechanged', handleUartData);
+
+                    isConnected = true;
+                    statusDot.classList.add('connected');
+                    statusText.textContent = 'Συνδεδεμένοι με ' + currentDevice.name;
+                    connectBtn.innerHTML = '<i class="fas fa-bluetooth-b"></i> Αποσύνδεση';
+                    refreshBtn.style.display = 'inline-block';
+
+                    currentDevice.addEventListener('gattserverdisconnected', onDisconnected);
+
+                    // Μικρή καθυστέρηση πριν την πρώτη εντολή
+                    statusText.textContent = 'Προετοιμασία...';
+                    await new Promise(resolve => setTimeout(resolve, 1500));
+
+                    // Αποστολή εντολής για ανάγνωση δεδομένων
+                    statusText.textContent = 'Ανάγνωση δεδομένων...';
+                    await sendCommand('Bluetooth.println(JSON.stringify(ew.apps.itag.state.def.store))\n');
+
+                }
+                catch (error) {
+                    console.error('Σφάλμα σύνδεσης:', error);
+                    statusText.textContent = 'Σφάλμα σύνδεσης: ' + error.message;
+                }
+            }
+
+            // Ανανέωση δεδομένων
+            async function refreshData() {
+                if (!isConnected) return;
+
+                try {
+                    statusText.textContent = 'Ανάγνωση δεδομένων...';
+                    await sendCommand('Bluetooth.println(JSON.stringify(ew.apps.itag.state.def.store))\n');
+                }
+                catch (error) {
+                    console.error('Σφάλμα ανανέωσης:', error);
+                    statusText.textContent = 'Σφάλμα ανανέωσης: ' + error.message;
+                }
+            }
+
+            // Αποστολή εντολής μέσω UART
+            async function sendCommand(command) {
+                if (!uartRxCharacteristic) {
+                    console.error("Δεν υπάρχει σύνδεση UART");
+                    return;
+                }
+
+                try {
+                    console.log("Αποστολή εντολής:", command);
+                    const encoder = new TextEncoder();
+                    const data = encoder.encode(command);
+                    await uartRxCharacteristic.writeValue(data);
+                    console.log("Εντολή αποσταλεί επιτυχώς");
+                }
+                catch (error) {
+                    console.error("Σφάλμα αποστολής εντολής:", error);
+                }
+            }
+
+            // Χειρισμός εισερχόμενων δεδομένων από UART
+            function handleUartData(event) {
+                const value = event.target.value;
+                const decoder = new TextDecoder();
+                const data = decoder.decode(value);
+
+                dataBuffer += data;
+
+                // Έλεγχος αν έχουμε λάβει πλήρη JSON απάντηση
+                try {
+                    // Προσπαθούμε να βρούμε JSON στο buffer
+                    const jsonStart = dataBuffer.indexOf('[');
+                    const jsonEnd = dataBuffer.lastIndexOf(']');
+
+                    if (jsonStart >= 0 && jsonEnd > jsonStart) {
+                        const jsonString = dataBuffer.substring(jsonStart, jsonEnd + 1);
+                        const jsonData = JSON.parse(jsonString);
+
+                        // Επεξεργασία των δεδομένων
+                        processRetrievedData(jsonData);
+
+                        // Καθαρισμός buffer
+                        dataBuffer = '';
+                    }
+                }
+                catch (e) {
+                    // Αγνοούμε σφάλματα ανάλυσης JSON (ίσως τα δεδομένα δεν είναι ακόμα πλήρη)
+                    console.log('Λήψη δεδομένων:', data);
+                }
+            }
+
+            // Αποσύνδεση από συσκευή
+            function disconnectDevice() {
+                if (currentDevice && currentDevice.gatt.connected) {
+                    currentDevice.gatt.disconnect();
+                }
+                onDisconnected();
+            }
+
+            // Χειρισμός αποσύνδεσης
+            function onDisconnected() {
+                isConnected = false;
+                statusDot.classList.remove('connected');
+                statusText.textContent = 'Αποσυνδεθήκατε από τη συσκευή';
+                connectBtn.innerHTML = '<i class="fas fa-bluetooth-b"></i> Σύνδεση';
+                refreshBtn.style.display = 'none';
+
+                // Καθαρισμός των μεταβλητών σύνδεσης
+                currentDevice = null;
+                uartService = null;
+                uartRxCharacteristic = null;
+                uartTxCharacteristic = null;
+                dataBuffer = '';
+            }
+
+            // Επεξεργασία των δεδομένων που ελήφθησαν από το Espruino
+            function processRetrievedData(data) {
+                if (data && Array.isArray(data)) {
+                    catsData = data;
+
+                    // Φόρτωση από localStorage αν υπάρχουν αποθηκευμένα ονόματα
+                    const savedCats = JSON.parse(localStorage.getItem('catNames') || '{}');
+                    const savedSilent = JSON.parse(localStorage.getItem('catSilent') || '{}');
+
+                    // Ενημέρωση των ονομάτων και silent τιμών από το localStorage
+                    catsData.forEach(cat => {
+                        if (savedCats[cat.id]) {
+                            cat.name = savedCats[cat.id];
+                        }
+                        else if (!cat.name || cat.name === "Unknown") {
+                            cat.name = "Αδέσποτη";
+                        }
+
+                        if (savedSilent[cat.id] !== undefined) {
+                            cat.silent = savedSilent[cat.id];
+                        }
+                    });
+
+                    renderCatList();
+                    statusText.textContent = 'Βρέθηκαν ' + catsData.length + ' γάτες';
+                }
+                else {
+                    statusText.textContent = 'Μη έγκυρα δεδομένα από το Espruino';
+                    console.error('Μη έγκυρα δεδομένα:', data);
+                }
+            }
+
+            // Απόδοση λίστας γατών
+            function renderCatList() {
+                if (catsData.length === 0) {
+                    catList.innerHTML = `
+                        <div class="empty-state">
+                            <i class="fas fa-cat"></i>
+                            <p>Δεν βρέθηκαν δεδομένα iTag. Βεβαιωθείτε ότι το Espruino εκτελεί το σωστό script.</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                catList.innerHTML = '';
+
+                catsData.forEach(cat => {
+                    const lastSeen = new Date(cat.lastseen);
+                    const now = new Date();
+                    const diffMs = now - lastSeen;
+                    const diffMins = Math.floor(diffMs / 60000);
+
+                    let locationStatus = 'Σε βόλτα';
+                    let locationIcon = 'fa-walking';
+                    if (diffMins < 5) {
+                        locationStatus = 'Στο σπίτι';
+                        locationIcon = 'fa-house';
+                    }
+
+                    const batteryIcon = cat.batt > 70 ? 'fa-battery-full' :
+                        cat.batt > 40 ? 'fa-battery-half' : 'fa-battery-quarter';
+
+                    const silentStatus = cat.silent ? 'Σιγή (true)' : 'Ενεργό (false)';
+                    const silentIcon = cat.silent ? 'fa-volume-mute' : 'fa-volume-up';
+
+                    const catCard = document.createElement('div');
+                    catCard.className = 'cat-card';
+                    catCard.innerHTML = `
+                        <div class="cat-icon">
+                            <i class="fas fa-cat"></i>
+                        </div>
+                        <div class="cat-info">
+                            <div class="cat-name">${cat.name}</div>
+                            <div class="cat-details">
+                                <div class="battery">
+                                    <i class="fas ${batteryIcon}"></i>
+                                    <span>${cat.batt}%</span>
+                                </div>
+                                <div class="location">
+                                    <i class="fas ${locationIcon}"></i>
+                                    <span>${locationStatus}</span>
+                                </div>
+                                <div class="silent">
+                                    <i class="fas ${silentIcon}"></i>
+                                    <span>${silentStatus}</span>
+                                </div>
+                            </div>
+                            <div class="last-seen">
+                                Τελευταία είδην: ${formatTimeDiff(diffMins)}
+                            </div>
+                        </div>
+                        <button class="edit-btn" data-id="${cat.id}">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                    `;
+
+                    catList.appendChild(catCard);
+                });
+
+                // Προσθήκη event listeners για τα κουμπιά επεξεργασίας
+                document.querySelectorAll('.edit-btn').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const catId = this.getAttribute('data-id');
+                        openEditModal(catId);
+                    });
+                });
+            }
+
+            // Μορφοποίηση χρονικού διαστήματος
+            function formatTimeDiff(mins) {
+                if (mins < 1) return 'τώρα';
+                if (mins < 60) return `${mins} λεπτά πριν`;
+                const hours = Math.floor(mins / 60);
+                if (hours < 24) return `${hours} ώρες πριν`;
+                const days = Math.floor(hours / 24);
+                return `${days} μέρες πριν`;
+            }
+
+            // Άνοιγμα modal επεξεργασίας
+            function openEditModal(catId) {
+                const cat = catsData.find(c => c.id === catId);
+                if (!cat) return;
+
+                editingCatId = catId;
+                catIdInput.value = catId;
+                catNameInput.value = cat.name;
+                catSilentInput.value = cat.silent ? "1" : "0";
+
+                editModal.style.display = 'flex';
+            }
+
+            // Κλείσιμο modal
+            function closeEditModal() {
+                editModal.style.display = 'none';
+                editingCatId = null;
+                catNameInput.value = '';
+                catIdInput.value = '';
+                catSilentInput.value = '0';
+            }
+
+            // Αποθήκευση αλλαγών
+            async function saveCatName() {
+                if (!editingCatId) return;
+
+                const newName = catNameInput.value.trim();
+                const newSilent = catSilentInput.value === "1";
+
+                if (!newName) return;
+
+                // Ενημέρωση στο catsData
+                const catIndex = catsData.findIndex(c => c.id === editingCatId);
+                if (catIndex !== -1) {
+                    catsData[catIndex].name = newName;
+                    catsData[catIndex].silent = newSilent;
+                }
+
+                // Αποθήκευση στο localStorage
+                const savedCats = JSON.parse(localStorage.getItem('catNames') || '{}');
+                savedCats[editingCatId] = newName;
+                localStorage.setItem('catNames', JSON.stringify(savedCats));
+
+                const savedSilent = JSON.parse(localStorage.getItem('catSilent') || '{}');
+                savedSilent[editingCatId] = newSilent;
+                localStorage.setItem('catSilent', JSON.stringify(savedSilent));
+
+                // Αποστολή εντολών στο Espruino για ενημέρωση
+                try {
+                    // Ενημέρωση ονόματος
+                    await sendCommand(`ew.apps.itag.state.def.store.find(cat => cat.id === "${editingCatId}").name = "${newName}";\n`);
+
+                    // Ενημέρωση silent τιμής
+                    await sendCommand(`ew.apps.itag.state.def.store.find(cat => cat.id === "${editingCatId}").silent = ${newSilent};\n`);
+
+                    // Αποθήκευση αλλαγών
+                    await sendCommand('require("Storage").write("itag.state.json", ew.apps.itag.state.def.store);\n');
+
+                    statusText.textContent = 'Οι αλλαγές αποθηκεύτηκαν επιτυχώς';
+                }
+                catch (error) {
+                    console.error('Σφάλμα αποστολής εντολών:', error);
+                    statusText.textContent = 'Σφάλμα αποστολής εντολών: ' + error.message;
+                }
+
+                // Επανάληψη απόδοσης λίστας
+                renderCatList();
+                closeEditModal();
+            }
+
+            // Event listeners για modal
+            closeBtn.addEventListener('click', closeEditModal);
+            cancelEditBtn.addEventListener('click', closeEditModal);
+            saveCatBtn.addEventListener('click', saveCatName);
+
+            // Κλείσιμο modal με κλικ έξω από το περιεχόμενο
+            editModal.addEventListener('click', function(e) {
+                if (e.target === editModal) {
+                    closeEditModal();
+                }
+            });
+
+            // Κλείσιμο modal με πλήκρο Escape
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape' && editModal.style.display === 'flex') {
+                    closeEditModal();
+                }
+            });
+        });
+    </script>
 </body>
 
 </html>
