@@ -59,7 +59,7 @@ ew.face[0] = {
         }, 1000, this);
     },
 
-    info: function(rssi, id, name) {
+    info: function(rssi, id, name, offlineCount) {
         //"ram";
         g.setCol(0, 15);
         g.fillRect({ x: 0, y: 60, x2: 235, y2: 180, r: 10 });
@@ -73,15 +73,18 @@ ew.face[0] = {
         // units
         g.setFont("Teletext10x18Ascii");
         g.drawString("dBm", 125 + l - g.stringWidth("dBm") / 2, 127);
+        
+        g.setCol(1, 0);
+        if (offlineCount) 
+            g.drawString("OFFLINE: "+offlineCount, 120 - g.stringWidth("OFFLINE: "+offlineCount) / 2, 156);
 
         //name
         if (name)
             ew.UI.btn.c2l("main", "_headerS", 6, name, "", 15, 0, 1.5);
         else {
             // id
-            g.setCol(1, 0);
             //g.setFont("LECO1976Regular22");
-            g.drawString(id, 120 - g.stringWidth(id) / 2, 156);
+            if (!offlineCount) g.drawString(id, 120 - g.stringWidth(id) / 2, 156);
             // name
             ew.UI.btn.c2l("main", "_headerS", 6, "New itag", "", 15, 0, 1.5);
         }
@@ -113,7 +116,7 @@ ew.face[0] = {
             if (ew.tid.barDo) clearTimeout(ew.tid.barDo);
             //ew.tid.barDo = setTimeout((v) => {
                 ew.tid.barDo = 0;
-                this.info(v[0], v[1].split(" ")[0], this.catName(v[1]));
+                this.info(v[0], v[1].split(" ")[0], this.catName(v[1]),v[3] );
             //}, 25, v);
         };
         ew.temp.bar = 1;
@@ -145,7 +148,8 @@ ew.face[0] = {
         // graph the bar
         if (ew.apps.itag.state.dev.length) {
             let v = this.graph(ew.apps.itag.state.dev, this.data.lastPosition, 0, this.data.key);
-            this.info(v[0], v[1].split(" ")[0], this.catName(v[1]));
+            //print("v",v);
+            this.info(v[0], v[1].split(" ")[0], this.catName(v[1]),v[3]);
         }
     },
     graph: function(data, pos, update, focus) {
@@ -158,7 +162,8 @@ ew.face[0] = {
         const fields = ew.apps.itag.state.dev.length;
         const margin = 15;
         const bw = width / fields;
-        
+        if (!data[pos]) return;
+
         // get scale
         let scale = 0;
         //for (let i in data)
@@ -224,7 +229,7 @@ ew.face[0] = {
             g.drawRect(margin + 2 + (pos * bw) + bw - 2, bottom - ((100 - Math.abs(data[pos][value])) * scale), margin + 2 + (pos * bw), bottom);
             }
         }
-        return [data[pos].rssi, data[pos].id, data[pos].name];
+        return [data[pos].rssi, data[pos].id, data[pos].name, data[pos].offlineCount];
     },
     clear: function(o) {
         ew.temp.bar = 0; /*TC.removeAllListeners();*/
