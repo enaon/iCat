@@ -1,15 +1,15 @@
 {
-    "name": "K.I.T.T.Y loader",
-    "short_name": "K.I.T.T.Y ",
-    "description": "K.I.T.T.Y Loader",
+    "name": "iCat loader",
+    "short_name": "iCat ",
+    "description": "iCat Loader",
     "icons": [
         {
-            "src": "img/android-chrome-kitty-192.png",
+            "src": "img/android-chrome-iCat-192.png",
             "sizes": "192x192",
             "type": "image/png"
         },
         {
-            "src": "img/android-chrome-kitty-512.png",
+            "src": "img/android-chrome-iCat-512.png",
             "sizes": "512x512",
             "type": "image/png"
         }
@@ -17,6 +17,6 @@
     "theme_color": "#332F2E",
     "background_color": "#332F2E",
     "display": "standalone",
-    "start_url": "https://enaon.github.io/K.I.T.T.Y/loader.html",
-    "scope": "https://enaon.github.io/K.I.T.T.Y/loader.html"
+    "start_url": "https://enaon.github.io/iCat/loader.html",
+    "scope": "https://enaon.github.io/iCat/loader.html"
 }
