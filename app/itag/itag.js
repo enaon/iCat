@@ -144,8 +144,8 @@ ew.apps.itag = {
             ew.apps.itag.tid = 0 }
         ew.apps.itag.state.ble.id = c;
         ew.apps.itag.stopScan();
-        NRF.connect(c, { minInterval: 7.5, maxInterval: 15 }).then(function(ga) {
-            //NRF.connect(c).then(function(ga) {
+        //NRF.connect(c, { minInterval: 7.5, maxInterval: 15 }).then(function(ga) {
+        NRF.connect(c).then(function(ga) {
             ew.apps.itag.state.ble.gatt = ga;
             console.log("getting service...");
             ga.device.on('gattserverdisconnected', function(reason) {

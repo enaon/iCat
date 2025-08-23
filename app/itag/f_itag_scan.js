@@ -111,10 +111,10 @@ ew.face[0] = {
 
             // call info
             if (ew.tid.barDo) clearTimeout(ew.tid.barDo);
-            ew.tid.barDo = setTimeout((v) => {
+            //ew.tid.barDo = setTimeout((v) => {
                 ew.tid.barDo = 0;
                 this.info(v[0], v[1].split(" ")[0], this.catName(v[1]));
-            }, 25, v);
+            //}, 25, v);
         };
         ew.temp.bar = 1;
 
@@ -141,7 +141,7 @@ ew.face[0] = {
     update:function() {
         g.setCol(0, 0);
         g.fillRect({ x: 0, y: 185, x2: 250, y2: 280, });
-
+        ew.sys.TC.val = { cur: this.data.lastPosition, dn: 0, up: ew.apps.itag.state.dev.length - 1, tmp: 0, reverce: 0, loop: this.data.loop };
         // graph the bar
         if (ew.apps.itag.state.dev.length) {
             let v = this.graph(ew.apps.itag.state.dev, this.data.lastPosition, 0, this.data.key);
