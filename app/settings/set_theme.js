@@ -23,7 +23,7 @@ ew.UI.c.main._2x3=(i)=>{
 	if (i==3){
 		ew.sys.buzz.nav(ew.sys.buzz.type.ok);
 		let f=16<ew.face.appRoot[0].length?ew.face.appRoot[0].substr(0,16).toUpperCase()+"..":ew.face.appRoot[0].toUpperCase();
-		ew.UI.btn.ntfy(1,3,0,"_bar",6,"TIMEOUT",f,15,6,1);
+		ew.UI.btn.ntfy(1,3,0,"_bar",6,"TIMEOUT",f ,15,6,1);
 		ew.temp.bar=1;
 		ew.sys.TC.val={cur:3,dn:3,up:100,tmp:0};
 		ew.UI.c.tcBar=(a,b)=>{ 

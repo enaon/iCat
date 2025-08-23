@@ -14,7 +14,7 @@ ew.face[0] = {
     run: false,
     offms: (ew.def.off[ew.face.appCurr]) ? ew.def.off[ew.face.appCurr] : 60000,
     init: function(o) {
-      
+        ew.def.off[ew.face.appCurr]=this.offms;
         // UI control Start
         ew.UI.c.start(1, 1);
         ew.UI.btn.c2l("main", "_main", 6, "WAIT", "", 15, 0, 0.9);

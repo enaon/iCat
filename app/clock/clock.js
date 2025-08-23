@@ -3,7 +3,7 @@
 ew.UI.nav.next.replaceWith(()=>{
 	ew.sys.buzz.nav(ew.sys.buzz.type.ok);
 	if (ew.UI.ntid) {clearTimeout(ew.UI.ntid);ew.UI.ntid=0;}
-	ew.face.go("itag_scan",0);
+	ew.face.go("itag-scan",0);
 });
 ew.UI.nav.back.replaceWith(()=>{
 	ew.sys.buzz.nav(ew.sys.buzz.type.ok);

@@ -85,8 +85,8 @@ ew.apps.itag = {
         });
 
         // Εάν δεν υπάρχει ήδη offline checker, τον δημιουργούμε
-        if (!ew.apps.itag.state.def.offlineChecker) {
-            ew.apps.itag.state.def.offlineChecker = setInterval(function() {
+        if (!ew.apps.itag.state.offlineChecker) {
+            ew.apps.itag.state.offlineChecker = setInterval(function() {
                 var maxOfflineTime = 6000; // 6 δευτερόλεπτα offline
                 var now = Date.now();
 
@@ -124,19 +124,17 @@ ew.apps.itag = {
                 }
 
                 var liveCount = ew.apps.itag.state.dev.filter(function(d) { return d.live; }).length;
-                if (ew.face.appCurr === "itag_scan") ew.face[0].bar();
-                else if (ew.face.appCurr === "itag_connect") ew.face.go("itag_scan", 0);
+                if (ew.face.appCurr === "itag-scan") ew.face[0].update();
+                else if (ew.face.appCurr === "itag-connect") ew.face.go("itag-scan", 0);
 
             }, 1000); // Έλεγχος κάθε 1 δευτερόλεπτα
         }
     },
-
-    // Συνάρτηση για να σταματήσει την σάρωση και τον offline checker
     stopScan: function() {
         NRF.setScan(); // Stop σάρωσης
-        if (ew.apps.itag.state.def.offlineChecker) {
-            clearInterval(ew.apps.itag.state.def.offlineChecker);
-            ew.apps.itag.state.def.offlineChecker = undefined;
+        if (ew.apps.itag.state.offlineChecker) {
+            clearInterval(ew.apps.itag.state.offlineChecker);
+            ew.apps.itag.state.offlineChecker = undefined;
         }
         ew.apps.itag.state.ble.scan = false;
     },
@@ -162,7 +160,7 @@ ew.apps.itag = {
                     //ew.apps.itag.tid=setTimeout(()=>{ew.apps.itag.conn(ew.apps.itag.state.ble.id)},1500);  
                     //return;
                 }
-                if (ew.face.appCurr === "itag_connect") ew.face.go("itag_scan", 0);
+                if (ew.face.appCurr === "itag-connect") ew.face.go("itag-scan", 0);
                 if (ew.apps.itag.state.ble.next) {
                     ew.apps.itag.conn(ew.apps.itag.state.ble.next);
                     ew.notify.alert("info", { title: "CONNECTING", body: "" }, 0, 0);
@@ -172,6 +170,8 @@ ew.apps.itag = {
             });
             return ga.getPrimaryService(0xffe0);
         }).then(function(service) {
+            if (ew.face.appCurr === "itag-scan") ew.face.go("itag-connect", 0);
+
             console.log("getting characteristic...");
             ew.apps.itag.state.ble.ser_sil = service;
             return service.getCharacteristic(0xffe1);
@@ -187,7 +187,6 @@ ew.apps.itag = {
         }).then(function(characteristic) {
             console.log("got silence characteristic");
             ew.apps.itag.state.ble.silence = characteristic;
-            //characteristic.writeValue(0);
             return ew.apps.itag.state.ble.gatt.getPrimaryService(0x1802);
         }).then(function(service) {
             console.log("got alert service");
@@ -202,10 +201,10 @@ ew.apps.itag = {
         }).then(function(characteristic) {
             console.log("got battery characteristic");
             ew.apps.itag.state.ble.battery = characteristic;
-            //ew.apps.itag.state.def.batt[ew.apps.itag.state.ble.id]=characteristic.readValue(); 
+            return characteristic.readValue(); 
+         }).then(function(d) {
+             console.log("Got battery value:", JSON.stringify(d.buffer));
             if (!ew.apps.itag.state.lost) ew.apps.itag.state.ble.silence.writeValue(0);
-            if (ew.face.appCurr === "itag_scan") ew.face.go("itag_connect", 0);
-
         }).catch(function(e) {
             console.log("catch Error: " + e);
             if (e === "ERR 0x12 (CONN_COUNT)")

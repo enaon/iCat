@@ -27,7 +27,7 @@
 	{ "id": "ew_handler",
 		"name": "Handler",
 		"icon": "../icon.png",
-		"version":"2.71",
+		"version":"2.72",
 		"description": "handlers ",
 		"tags": "magic3",
 	    "needsFeatures":["magic3"],
@@ -61,7 +61,7 @@
 	{ "id": "ew_settings",
 		"name": "Settings",
 		"icon": "../icon.png",
-		"version":"2.71",
+		"version":"2.73",
 		"description": "Settings face",
 		"tags": "magic3",
 		"type":"clock",
@@ -94,7 +94,7 @@
 	{ "id": "ew_clock",
 		"name": "clock",
 		"icon": "../icon.png",
-		"version":"2.71",
+		"version":"2.72",
 		"description": "clock",
 		"tags": "magic3",
 	    "needsFeatures":["magic3"],
@@ -105,14 +105,15 @@
 	{ "id": "ew_itag",
 		"name": "itag",
 		"icon": "../icon.png",
-		"version":"2.74",
+		"version":"2.76",
 		"description": "itag",
 		"tags": "magic3",
 	    "needsFeatures":["magic3"],
 		"storage": [
 			{"name":"ew_a_itag","url":"../itag/itag.js"},
-			{"name":"ew_f_itag_scan","url":"../itag/f_itag_scan.js"},
-			{"name":"ew_f_itag_connect","url":"../itag/f_itag_connect.js"}	
+			{"name":"ew_f_itag-scan","url":"../itag/f_itag_scan.js"},
+			{"name":"ew_f_itag-dev","url":"../itag/f_itag_dev.js"},
+			{"name":"ew_f_itag-connect","url":"../itag/f_itag_connect.js"}	
 
 		]
 	}
