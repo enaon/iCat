@@ -16,7 +16,7 @@ ew.face[0] = {
     init: function(o) {
         ew.def.off[ew.face.appCurr]=this.offms;
         // name
-        ew.UI.btn.c2l("main", "_headerS", 6, this.getVal("name") , "", 15, 0, 1.5);
+        ew.UI.btn.c2l("main", "_header", 6, this.getVal("name") , "", 15, 0, 1.5);
         
         if (!ew.apps.itag.state.connected)
             ew.UI.btn.ntfy(1,10,0,"_bar",6,"CONNECTING","" ,0,15); 
@@ -45,11 +45,11 @@ ew.face[0] = {
        
         // values
         let l = g.stringWidth(batt) / 2;
-        g.drawString(batt, 120 - l, 95);
+        g.drawString(batt, 120 - l, 85);
 
         // units
         g.setFont("Teletext10x18Ascii");
-        g.drawString("%", 140 + l - g.stringWidth("%") / 2, 125);
+        g.drawString("%", 140 + l - g.stringWidth("%") / 2, 115);
 
         // id
         g.setCol(1, 14);
@@ -94,7 +94,9 @@ ew.face[0] = {
                 ew.apps.itag.state.ble.alert.writeValue(ew.apps.itag.state.alert?1:0);
             }
             if (i==5 || i==6){
+                if (ew.def.info) ew.UI.btn.ntfy(1,1,0,"_bar",6,"DISCONNECTING","" ,0,15); 
                 ew.apps.itag.state.ble.gatt.disconnect();
+                
             }
         };
     },
