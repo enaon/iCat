@@ -61,7 +61,7 @@
 	{ "id": "ew_settings",
 		"name": "Settings",
 		"icon": "../icon.png",
-		"version":"2.80",
+		"version":"2.81",
 		"description": "Settings face",
 		"tags": "magic3",
 		"type":"clock",

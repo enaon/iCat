@@ -26,7 +26,9 @@ ew.face[0].d1 = function() {
 	ew.UI.ele.ind(1, 3, 0);
 	ew.UI.c.start(1, 0);
 	ew.UI.ele.fill("_main", 9, 0);
+	
 	ew.UI.btn.img("main", "_2x3", 1, ew.def.cli ? "bt" : "plane", "BT", 15, ew.def.cli ? 4 : 1);
+	g.drawImage((ew.def.rfTX == -4) ? E.toArrayBuffer(atob("EyCBAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAfAAPgAEQACIABEAAiAARAAIgAHz74=")) : (ew.def.rfTX == 0) ? E.toArrayBuffer(atob("EyCBAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD4ADEABiAAxAfYgPsQEWICLEBFiAixARYgIsQHz74=")) : E.toArrayBuffer(atob("EyCBAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA+AARAAIgAEQD6IDFEBiiAxRfYovsUUWKKLFFFiiixRRYoosUXz74=")), 55, 65);	
 	ew.UI.btn.img("main", "_2x3", 2, "themes", "FACE", 15, 6);
 	ew.UI.btn.img("main", "_2x3", 3, "bri", ew.def.bri, 15, 6, 1);
 	ew.UI.btn.img("main", "_2x3", 4, ew.def.buzz ? "buzzOn" : "buzzOff", "BUZZ", ew.def.buzz ? 15 : 3, ew.def.buzz ? 4 : 1);
