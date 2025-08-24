@@ -145,8 +145,8 @@ ew.apps.itag = {
             ew.apps.itag.tid = 0; }
         ew.apps.itag.stopScan();
         NRF.connect(c, { 
-        minInterval: (-95 < ew.apps.itag.state.dev.find(item => item.id === c).rssi)?20:50, 
-        maxInterval: (-95 < ew.apps.itag.state.dev.find(item => item.id === c).rssi)?150:200
+        minInterval: (-95 < ew.apps.itag.state.dev.find(item => item.id === c).rssi)?50:50, 
+        maxInterval: (-95 < ew.apps.itag.state.dev.find(item => item.id === c).rssi)?400:400
         }).then(function(ga) {
         //NRF.connect(c).then(function(ga) {
             ew.apps.itag.state.ble.gatt = ga;
