@@ -658,7 +658,7 @@
 
                     // Ελέγχουμε και αποθηκεύουμε
                     await sendCommand('if (ew.apps.itag.state.def && ew.apps.itag.state.def.length > 0) { \n');
-                    await sendCommand('  require("Storage").write("itag.state.json", ew.apps.itag.state.def);\n');
+                    //await sendCommand('  require("Storage").write("itag.state.json", ew.apps.itag.state.def);\n');
                     await sendCommand('  Bluetooth.println("Αποθηκεύτηκαν " + ew.apps.itag.state.def.length + " γάτες");\n');
                     await sendCommand('} else {\n');
                     await sendCommand('  Bluetooth.println("Σφάλμα: Ο πίνακας είναι άδειος");\n');
@@ -924,7 +924,7 @@
                     await sendCommand(`ew.apps.itag.state.def.find(cat => cat.id === "${editingCatId}").silent = ${newSilent};\n`);
 
                     // Αποθήκευση αλλαγών
-                    await sendCommand('require("Storage").write("itag.state.json", ew.apps.itag.state.def);\n');
+                    //await sendCommand('require("Storage").write("itag.state.json", ew.apps.itag.state.def);\n');
 
                     statusText.textContent = 'Οι αλλαγές αποθηκεύτηκαν επιτυχώς';
                 }

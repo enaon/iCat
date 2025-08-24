@@ -69,9 +69,9 @@ ew.apps.itag = {
                         var storeDevice = {
                             id: device.id,
                             name: "Unknown",
-                            batt: 0, // Προεπιλεγμένη τιμή
+                            batt: 100,  
                             lastseen: now,
-                            silent: 0, // Προεπιλεγμένη τιμή
+                            silent: 1,  
                             alert: 0
                         };
                         store.push(storeDevice);
@@ -223,10 +223,11 @@ ew.apps.itag = {
             if (ew.face.appCurr === "itag-connect") ew.face.go("itag-connect", 0);
             
         }).catch(function(e) {
-            if (ew.apps.itag.dbg) console.log("catch Error: " + e);
+            if (ew.apps.itag.dbg) console.log("itag: catch Error: " + e);
             if (e === "ERR 0x12 (CONN_COUNT)"){
                 if (ew.face.appCurr === "itag-connect") ew.UI.btn.ntfy(1,1.5,0,"_bar",6,"MAX 2","CONNECTIONS",13,15); 
             }else {
+                if (ew.apps.itag.dbg) console.log("itag: disconnected");
                 //if (ew.face.appCurr === "itag-connect") ew.UI.btn.ntfy(1,1.5,0,"_bar",6,"DISCONNECTING","",0,15); 
                 ew.apps.itag.state.ble.gatt.disconnect();
             }

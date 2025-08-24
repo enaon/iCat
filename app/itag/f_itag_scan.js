@@ -2,7 +2,7 @@
 
 ew.UI.nav.next.replaceWith(() => {
     ew.sys.buzz.nav(ew.sys.buzz.type.ok);
-     ew.face.go("itag-dev", 0);
+    ew.face.go("itag-dev", 0);
 });
 ew.UI.nav.back.replaceWith(() => {
     ew.sys.buzz.nav(ew.sys.buzz.type.ok);
@@ -15,13 +15,13 @@ ew.face[0] = {
     run: false,
     offms: (ew.def.off[ew.face.appCurr]) ? ew.def.off[ew.face.appCurr] : 60000,
     init: function(o) {
-        ew.def.off[ew.face.appCurr]=this.offms;
+        ew.def.off[ew.face.appCurr] = this.offms;
         if (ew.apps.itag.state.ble.gatt.connected) {
             ew.face.go("itag-connect", 0);
             return;
         }
-        if (ew.face.appPrev==="itag-dev") this.started=1
-		ew.UI.ele.ind(1,2,0,2);
+        if (ew.face.appPrev === "itag-dev") this.started = 1
+        ew.UI.ele.ind(1, 2, 0, 2);
 
         this.data.key = "rssi";
         // UI control Start
@@ -30,17 +30,20 @@ ew.face[0] = {
         ew.UI.c.end();
 
         // button hander
-        ew.UI.c.main._main = (i) => {
-            ew.sys.buzz.nav(ew.sys.buzz.type.ok);
-            if (ew.apps.itag.state.ble.gatt.connected) {
-                if (ew.apps.itag.state.dev[this.data.lastPosition].id != ew.apps.itag.state.ble.gatt.device.id)
-                    ew.apps.itag.state.ble.next = ew.apps.itag.state.dev[this.data.lastPosition].id
-                ew.apps.itag.state.ble.gatt.disconnect()
-                ew.notify.alert("info", { body: "DISCONNECTING", title: ew.apps.itag.state.ble.gatt.device.id.split(" ")[0] }, 0, 0);
+        ew.UI.c.main._main = (i,l) => {
+            if (ew.face[0].dbg) console.log("button: ", i);
+            if (l) {
+                ew.sys.buzz.nav(ew.sys.buzz.type.ok);
+                if (ew.apps.itag.state.ble.gatt.connected) {
+                    if (ew.apps.itag.state.dev[this.data.lastPosition].id != ew.apps.itag.state.ble.gatt.device.id)
+                        ew.apps.itag.state.ble.next = ew.apps.itag.state.dev[this.data.lastPosition].id
+                    ew.apps.itag.state.ble.gatt.disconnect()
+                    ew.notify.alert("info", { body: "DISCONNECTING", title: ew.apps.itag.state.ble.gatt.device.id.split(" ")[0] }, 0, 0);
 
+                }
+                else
+                    ew.apps.itag.conn(ew.apps.itag.state.dev[this.data.lastPosition].id);
             }
-            else
-                ew.apps.itag.conn(ew.apps.itag.state.dev[this.data.lastPosition].id);
         };
 
         this.bar();
@@ -73,10 +76,10 @@ ew.face[0] = {
         // units
         g.setFont("Teletext10x18Ascii");
         g.drawString("dBm", 125 + l - g.stringWidth("dBm") / 2, 127);
-        
+
         g.setCol(1, 0);
-        if (offlineCount) 
-            g.drawString("OFFLINE: "+offlineCount, 120 - g.stringWidth("OFFLINE: "+offlineCount) / 2, 156);
+        if (offlineCount)
+            g.drawString("OFFLINE: " + offlineCount, 120 - g.stringWidth("OFFLINE: " + offlineCount) / 2, 156);
 
         //name
         if (name)
@@ -115,8 +118,8 @@ ew.face[0] = {
             // call info
             if (ew.tid.barDo) clearTimeout(ew.tid.barDo);
             //ew.tid.barDo = setTimeout((v) => {
-                ew.tid.barDo = 0;
-                this.info(v[0], v[1].split(" ")[0], this.catName(v[1]),v[3] );
+            ew.tid.barDo = 0;
+            this.info(v[0], v[1].split(" ")[0], this.catName(v[1]), v[3]);
             //}, 25, v);
         };
         ew.is.slide = 1;
@@ -134,7 +137,7 @@ ew.face[0] = {
             ew.UI.btn.c2l("main", "_main", 6, "WAIT", "", 15, 1, 2);
             if (!this.started && ew.def.info) {
                 ew.UI.btn.ntfy(1, 1.5, 0, "_bar", 6, "ITAG", "SCANNER", 15, 1);
-                setTimeout(()=>{ew.face[0].started = 1;},1000);
+                setTimeout(() => { ew.face[0].started = 1; }, 1000);
             }
             return;
         }
@@ -142,7 +145,7 @@ ew.face[0] = {
         this.update();
     },
 
-    update:function() {
+    update: function() {
         if (ew.is.bar) return;
 
         g.setCol(0, 0);
@@ -152,7 +155,7 @@ ew.face[0] = {
         if (ew.apps.itag.state.dev.length) {
             let v = this.graph(ew.apps.itag.state.dev, this.data.lastPosition, 0, this.data.key);
             //print("v",v);
-            this.info(v[0], v[1].split(" ")[0], this.catName(v[1]),v[3]);
+            this.info(v[0], v[1].split(" ")[0], this.catName(v[1]), v[3]);
         }
     },
     graph: function(data, pos, update, focus) {
@@ -210,12 +213,12 @@ ew.face[0] = {
 
         // first draw
         else {
-            
+
             //if (!this.started && ew.def.info) {
             //    ew.UI.btn.ntfy(1, 1.5, 0, "_bar", 6, "ITAG", "SCANNER", 15, 1);
-             //   setTimeout(()=>{ew.face[0].started = 1;},1000);
+            //   setTimeout(()=>{ew.face[0].started = 1;},1000);
             //}else{
-            
+
             // dot highlight current
             g.setCol(1, 14);
             if (1 < fields) g.fillRect(margin + 2 + (pos * bw) + bw - 2, bottom - height + 0, margin + 2 + (pos * bw), bottom - height + 5);

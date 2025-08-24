@@ -44,11 +44,11 @@ ew.face[0] = {
         g.setCol(1, 4);
         g.setFont("LECO1976Regular22", 3);
         let l = g.stringWidth(batt) / 2;
-        g.drawString(batt, 100 - l, 95);
+        g.drawString(batt, 120 - l, 95);
 
         // units
         g.setFont("Teletext10x18Ascii");
-        g.drawString("%", 125 + l - g.stringWidth("%") / 2, 127);
+        g.drawString("%", 140 + l - g.stringWidth("%") / 2, 127);
 
         // id
         g.setCol(1, 0);
@@ -137,10 +137,12 @@ ew.face[0] = {
         // get scale
         let scale =0;
         for (let i in data)
-           if (scale <  Math.abs(data[i][value]) - 0) scale =  Math.abs(data[i][value]);
-        
+           if (scale <  data[i][value] - 0) scale =  data[i][value];
+        print("scale1", scale)
         scale =(height - (bottom / 10)) / ((scale) ? scale : 1);
 
+
+        print("scale2", scale)
         let limits = 1;//data[pos].live
 
         if (update) {
@@ -157,21 +159,21 @@ ew.face[0] = {
             // style 1
             if (this.data.style) {
                 // bar - clear previus 
-                g.setCol(1, limits ? 4 : 13);
-                g.fillRect(margin + 2 + (this.data.lastPosition * bw) + bw - 2, bottom - ((100 - Math.abs(data[this.data.lastPosition][value])) * scale), margin + 2 + (this.data.lastPosition * bw), bottom);
+                g.setCol(1, limits ? 1 : 2);
+                g.fillRect(margin + 2 + (this.data.lastPosition * bw) + bw - 2, bottom - (data[this.data.lastPosition][value]  * scale), margin + 2 + (this.data.lastPosition * bw), bottom);
                 // bar - highlight current
-                g.setCol(1, 14);
-                g.fillRect(margin + 2 + (pos * bw) + bw - 2, bottom - ((100 - Math.abs(data[pos][value])) * scale), margin + 2 + (pos * bw), bottom);
+                g.setCol(1, 4);
+                g.fillRect(margin + 2 + (pos * bw) + bw - 2, bottom - (data[pos][value] * scale), margin + 2 + (pos * bw), bottom);
             }
             // style 0
             else {
                 //limits color coding
-                g.setCol(1, limits ? 4 : 13);
+                g.setCol(1, limits ? 4 : 2);
                 // bar - clear previus
-                g.drawRect(margin + 2 + (this.data.lastPosition * bw) + bw - 2, bottom - ((100 - Math.abs(data[this.data.lastPosition][value])) * scale), margin + 2 + (this.data.lastPosition * bw), bottom);
+                g.drawRect(margin + 2 + (this.data.lastPosition * bw) + bw - 2, bottom - (data[this.data.lastPosition][value] * scale), margin + 2 + (this.data.lastPosition * bw), bottom);
                 // bar - highlight current 
-                g.setCol(1, 14);
-                g.drawRect(margin + 2 + (pos * bw) + bw - 2, bottom - ((100 - Math.abs(data[pos][value])) * scale), margin + 2 + (pos * bw), bottom);
+                g.setCol(1, 4);
+                g.drawRect(margin + 2 + (pos * bw) + bw - 2, bottom - ( data[pos][value] * scale), margin + 2 + (pos * bw), bottom);
             }
 
             this.data.lastPosition = pos;
@@ -188,12 +190,12 @@ ew.face[0] = {
             for (let i in data) {
                 if (fields < i) break;
                 limits = 1;//data[i].live;
-                g.setCol(1, limits ? 4 : 13);
-                g.fillRect(margin + 2 + (i * bw) + bw - 2, bottom - ((100 - Math.abs(data[i][value])) * scale), margin + 2 + (i * bw), bottom);
+                g.setCol(1, limits ? 1 : 2);
+                g.fillRect(margin + 2 + (i * bw) + bw - 2, bottom - (data[i][value] * scale), margin + 2 + (i * bw), bottom);
             }
             // bar - highlight curent
-            g.setCol(1, 14);
-            g.drawRect(margin + 2 + (pos * bw) + bw - 2, bottom - ((100 - Math.abs(data[pos][value])) * scale), margin + 2 + (pos * bw), bottom);
+            g.setCol(1, 4);
+            g.fillRect(margin + 2 + (pos * bw) + bw - 2, bottom - (data[pos][value] * scale), margin + 2 + (pos * bw), bottom);
 
         }
         //g.flip();

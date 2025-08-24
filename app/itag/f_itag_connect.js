@@ -45,11 +45,11 @@ ew.face[0] = {
        
         // values
         let l = g.stringWidth(batt) / 2;
-        g.drawString(batt, 100 - l, 95);
+        g.drawString(batt, 120 - l, 95);
 
         // units
         g.setFont("Teletext10x18Ascii");
-        g.drawString("%", 100 + 10 + l - g.stringWidth("%") / 2, 125);
+        g.drawString("%", 140 + l - g.stringWidth("%") / 2, 125);
 
         // id
         g.setCol(1, 0);
@@ -85,7 +85,7 @@ ew.face[0] = {
 
         // bar handler
         ew.UI.c.bar._bar = (i) => {
-            
+            if (ew.face[0].dbg) console.log("button: ",i);
             ew.sys.buzz.nav(ew.sys.buzz.type.ok);
             if (i==4){
                 ew.apps.itag.state.alert=1-ew.apps.itag.state.alert;
