@@ -19,7 +19,7 @@ ew.face[0] = {
         ew.UI.btn.c2l("main", "_headerS", 6, this.getVal("name") , "", 15, 0, 1.5);
         
         if (!ew.apps.itag.state.connected)
-            ew.UI.btn.ntfy(1,5,0,"_bar",6,"CONNECTING","" ,0,15); 
+            ew.UI.btn.ntfy(1,10,0,"_bar",6,"CONNECTING","" ,0,15); 
 
         else this.bar();
         this.info(this.getVal("batt"),ew.apps.itag.state.ble.id.split(" ")[0] )
