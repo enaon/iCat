@@ -32,10 +32,10 @@ ew.face[0].d1 = function() {
 	ew.UI.btn.img("main", "_2x3", 2, "themes", "FACE", 15, 6);
 	ew.UI.btn.img("main", "_2x3", 3, "bri", ew.def.bri, 15, 6, 1);
 	ew.UI.btn.img("main", "_2x3", 4, ew.def.buzz ? "buzzOn" : "buzzOff", "BUZZ", ew.def.buzz ? 15 : 3, ew.def.buzz ? 4 : 1);
-
 	//ew.UI.btn.img("main", "_2x3", 4, ew.def.buzz ? "buzzOn" : "buzzOff", "BUZZ", ew.def.buzz ? 15 : 3, ew.def.buzz ? 4 : 1);
+	ew.UI.btn.img("main", "_2x3", 5, "wakeScreen", "WAKE", ew.def.acc ?15:3, ew.def.acc ?4:1);
 	ew.UI.btn.img("main", "_2x3", 6, "power", "PWR", 15, 6);
-	ew.UI.btn.img("main", "_2x3", 5, "info", "ABOUT", 15, 6);
+	//ew.UI.btn.img("main", "_2x3", 5, "info", "ABOUT", 15, 6);
 	ew.UI.c.end();
 	//
 	ew.UI.c.main._2x3 = (i, l) => {
@@ -88,6 +88,16 @@ ew.face[0].d1 = function() {
 			if (ew.def.info) ew.UI.btn.ntfy(1, 0, 0, "_bar", 6, "HAPTIC", ew.def.buzz ? "ENABLED" : "DISABED", 0, 15);
 			ew.UI.btn.img("main", "_2x3", 4, ew.def.buzz ? "buzzOn" : "buzzOff", "SCRN", ew.def.buzz ? 15 : 3, ew.def.scrn ? 4 : 1);
 		}
+		else if (i == 5) {
+			ew.sys.buzz.nav(ew.sys.buzz.type.ok);
+			ew.def.acc = 1 - ew.def.acc;
+			if (ew.def.info) ew.UI.btn.ntfy(1, 0, 0, "_bar", 6, "WAKE ON TWIST", ew.def.acc ? "ENABLED" : "DISABED", 0, 15);
+			ew.UI.btn.img("main", "_2x3", 5, "wakeScreen", "WAKE", ew.def.acc ?15:3, ew.def.acc ?4:1);
+			if (ew.def.acc) ew.sys.acc.on();
+			else ew.sys.acc.off();
+			
+		}
+		
 		else if (i == 6) {
 			ew.sys.buzz.nav(ew.sys.buzz.type.ok);
 			ew.is.bar=1;
@@ -104,7 +114,7 @@ ew.face[0].d1 = function() {
 					ew.apps.kitty.call.sleep("deep");
 			};
 		}
-		else if (i == 5) {
+		/*else if (i == 5) {
 			ew.sys.buzz.nav(ew.sys.buzz.type.ok);
 			ew.UI.btn.ntfy(0, 10, 1, "_bar", 6, "", "", 15, 0);
 			ew.UI.c.start(1, 1);
@@ -143,6 +153,7 @@ ew.face[0].d1 = function() {
 			}, 500);
 
 		}
+		*/
 	};
 };
 
