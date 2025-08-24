@@ -32,9 +32,9 @@ ew.face[0] = {
         return device ? device[val] : null; 
     },
     info: function(batt, id) {
-        g.setCol(0, 15);
+        g.setCol(0, 1);
         g.fillRect({ x: 0, y: 60, x2: 235, y2: 180, r: 10 });
-        g.setCol(1, 4);
+        g.setCol(1, 15);
         g.setFont("LECO1976Regular22", 3);
 
         if (!ew.apps.itag.state.connected){
@@ -52,7 +52,7 @@ ew.face[0] = {
         g.drawString("%", 140 + l - g.stringWidth("%") / 2, 125);
 
         // id
-        g.setCol(1, 0);
+        g.setCol(1, 14);
         //g.setFont("LECO1976Regular22");
         g.drawString(id, 120 - g.stringWidth(id) / 2, 156); //
         
