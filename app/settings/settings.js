@@ -17,7 +17,7 @@ ew.face[0] = {
 	},
 	bar:function(){
 		if (ew.is.UIpri) { ew.notify.alert("error",ew.notify.log.error[0], 1, 1);return;}
-		ew.temp.bar=0;
+		ew.is.slide=0;
 		ew.UI.c.start(0,1);
 		this.ref();
 		ew.UI.c.end();
@@ -57,7 +57,7 @@ ew.face[0] = {
 		ew.UI.btn.img("bar","_bar",3,"dash",0,ew.face[0].page=="dash1"||ew.face[0].page=="dash2"?11:2,0);
 	},
 	clear : function(o){
-		ew.temp.bar=0;/*TC.removeAllListeners();*/if (this.tid) clearTimeout(this.tid);this.tid=0;return true;
+		ew.is.slide=0;/*TC.removeAllListeners();*/if (this.tid) clearTimeout(this.tid);this.tid=0;return true;
 	},
 	off: function(o){
 		g.off();this.clear(o);

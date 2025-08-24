@@ -1,7 +1,7 @@
 //itag scan viewer
 
 ew.UI.nav.next.replaceWith(() => {
-    ew.sys.buzz.nav(ew.sys.buzz.type.na);
+    ew.sys.buzz.nav(ew.sys.buzz.type.ok);
      ew.face.go("itag-dev", 0);
 });
 ew.UI.nav.back.replaceWith(() => {
@@ -102,7 +102,7 @@ ew.face[0] = {
     bar: function() {
         if (ew.is.UIpri) { ew.notify.alert("error", ew.notify.log.error[0], 1, 1); return; }
         //"ram";
-
+        if (ew.is.bar) return;
 
         // set the bar control
         ew.sys.TC.val = { cur: this.data.lastPosition, dn: 0, up: ew.apps.itag.state.dev.length - 1, tmp: 0, reverce: 0, loop: this.data.loop };
@@ -119,7 +119,7 @@ ew.face[0] = {
                 this.info(v[0], v[1].split(" ")[0], this.catName(v[1]),v[3] );
             //}, 25, v);
         };
-        ew.temp.bar = 1;
+        ew.is.slide = 1;
 
         // reset UI control, bar only
         ew.UI.c.start(0, 1);
@@ -138,10 +138,13 @@ ew.face[0] = {
             }
             return;
         }
+        g.flip();
         this.update();
     },
 
     update:function() {
+        if (ew.is.bar) return;
+
         g.setCol(0, 0);
         g.fillRect({ x: 0, y: 185, x2: 250, y2: 280, });
         ew.sys.TC.val = { cur: this.data.lastPosition, dn: 0, up: ew.apps.itag.state.dev.length - 1, tmp: 0, reverce: 0, loop: this.data.loop };
@@ -208,10 +211,10 @@ ew.face[0] = {
         // first draw
         else {
             
-            if (!this.started && ew.def.info) {
-                ew.UI.btn.ntfy(1, 1.5, 0, "_bar", 6, "ITAG", "SCANNER", 15, 1);
-                setTimeout(()=>{ew.face[0].started = 1;},1000);
-            }else{
+            //if (!this.started && ew.def.info) {
+            //    ew.UI.btn.ntfy(1, 1.5, 0, "_bar", 6, "ITAG", "SCANNER", 15, 1);
+             //   setTimeout(()=>{ew.face[0].started = 1;},1000);
+            //}else{
             
             // dot highlight current
             g.setCol(1, 14);
@@ -227,12 +230,12 @@ ew.face[0] = {
             // bar - highlight curent
             g.setCol(1, 14);
             g.drawRect(margin + 2 + (pos * bw) + bw - 2, bottom - ((100 - Math.abs(data[pos][value])) * scale), margin + 2 + (pos * bw), bottom);
-            }
+            //}
         }
         return [data[pos].rssi, data[pos].id, data[pos].name, data[pos].offlineCount];
     },
     clear: function(o) {
-        ew.temp.bar = 0; /*TC.removeAllListeners();*/
+        ew.is.slide = 0; /*TC.removeAllListeners();*/
         if (this.tid) clearTimeout(this.tid);
         this.tid = 0;
         ew.apps.itag.stopScan();

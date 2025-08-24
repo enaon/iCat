@@ -96,7 +96,7 @@ ew.face[0] = {
                 this.info(v[0], v[1].split(" ")[0], v[2]);
             }, 25, v);
         };
-        ew.temp.bar = 1;
+        ew.is.slide = 1;
 
         // reset UI control, bar only
         ew.UI.c.start(0, 1);
@@ -110,7 +110,7 @@ ew.face[0] = {
 
     
     clear: function(o) {
-        ew.temp.bar = 0; /*TC.removeAllListeners();*/
+        ew.is.slide = 0; /*TC.removeAllListeners();*/
         if (this.tid) clearTimeout(this.tid);
         this.tid = 0;
         return true;

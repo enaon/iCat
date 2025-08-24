@@ -36,7 +36,7 @@ ew.sys.TC = {
 			if (ew.sys.TC.dbg) print("touch input:", tp);
 			if (ew.face.pageCurr >= 0) {
 				ew.face.off();
-				if (ew.temp.bar) {
+				if (ew.is.slide) {
 					if (180 < (((tp[5] & 0x0F) << 8) | tp[6])) {
 						if (!ew.sys.TC.tid) {
 							ew.sys.TC.tid = setInterval(function() {
@@ -74,7 +74,7 @@ ew.sys.TC = {
 	},
 	bar: function() {
 		var tp = i2c.readFrom(0x15, 7);
-		if (ew.temp.bar && 180 < (((tp[5] & 0x0F) << 8) | tp[6])) {
+		if (ew.is.slide && 180 < (((tp[5] & 0x0F) << 8) | tp[6])) {
 			if (tp[2]) {
 				if (this.st) {
 					this.st = 0;
@@ -108,7 +108,7 @@ ew.sys.TC = {
 				this.st = 1;
 			}
 		}
-		else if (!ew.temp.bar) {
+		else if (!ew.is.slide) {
 			if (ew.sys.TC.tid) clearInterval(ew.sys.TC.tid);
 			ew.sys.TC.st = 1;
 			ew.sys.TC.tid = 0;

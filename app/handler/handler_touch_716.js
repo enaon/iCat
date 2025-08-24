@@ -21,7 +21,7 @@ ew.sys.TC = {
 		if (tp == Uint8Array(7) || (tp[3] == 64 && this.st)) return;
 		if (this.dbg) console.log("TC dbg: tp,this.st :",tp,this.st);
 
-		if (ew.temp.bar) {
+		if (ew.is.slide) {
 			if (180 < (((tp[5] & 0x0F) << 8) | tp[6])) {
 				if (this.dbg) print("TC dbg: touch input in bar:", tp);
 

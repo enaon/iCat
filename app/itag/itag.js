@@ -139,76 +139,97 @@ ew.apps.itag = {
         ew.apps.itag.state.ble.scan = false;
     },
     conn: function(c) {
-        ew.notify.alert("info", { title: "CONNECTING", body: "" }, 0, 0);
-        if (ew.apps.itag.tid) { clearTimeout(ew.apps.itag.tid);
-            ew.apps.itag.tid = 0 }
         ew.apps.itag.state.ble.id = c;
+        if (ew.face.appCurr === "itag-scan") ew.face.go("itag-connect", 0);
+        if (ew.apps.itag.tid) { clearTimeout(ew.apps.itag.tid);
+            ew.apps.itag.tid = 0; }
         ew.apps.itag.stopScan();
-        //NRF.connect(c, { minInterval: 7.5, maxInterval: 15 }).then(function(ga) {
-        NRF.connect(c).then(function(ga) {
+        NRF.connect(c, { minInterval: 7.5, maxInterval: (-80 < ew.apps.itag.state.dev.find(item => item.id === c).rssi)?30:400
+        }).then(function(ga) {
+        //NRF.connect(c).then(function(ga) {
             ew.apps.itag.state.ble.gatt = ga;
-            console.log("getting service...");
+            if (ew.apps.itag.dbg) console.log("getting service...");
             ga.device.on('gattserverdisconnected', function(reason) {
-                console.log("disconnected: " + reason);
-                if (reason === 62) {
-                    ew.notify.alert("info", { title: "ERROR 62", body: "" }, 0, 0);
-                    //ew.apps.itag.tid=setTimeout(()=>{ew.apps.itag.conn(ew.apps.itag.state.ble.id)},1500);  
+                ew.apps.itag.state.connected=0;
+                if (ew.apps.itag.dbg) console.log("disconnected: " + reason);
+                if (reason === 62 && ew.face.appCurr === "itag-connect") {
+                   ew.UI.btn.ntfy(1,2,0,"_bar",6,"TOO FAR","",15,13); 
                 }
-                if (reason === 8) {
-                    ew.notify.alert("info", { title: "LOST 8", title: "body" }, 0, 0);
-                    //ew.apps.itag.state.ble.gatt.disconnect();
-                    //ew.apps.itag.tid=setTimeout(()=>{ew.apps.itag.conn(ew.apps.itag.state.ble.id)},1500);  
-                    //return;
+                if (reason === 8 && ew.face.appCurr === "itag-connect") {
+                    ew.UI.btn.ntfy(1,2,0,"_bar",6,"LOST","",15,13); 
                 }
-                if (ew.face.appCurr === "itag-connect") ew.face.go("itag-scan", 0);
+                else if ( ew.face.appCurr === "itag-connect") {
+                    ew.UI.btn.ntfy(1,2,0,"_bar",6,"DICONNECTED","",0,15); 
+                }
                 if (ew.apps.itag.state.ble.next) {
                     ew.apps.itag.conn(ew.apps.itag.state.ble.next);
-                    ew.notify.alert("info", { title: "CONNECTING", body: "" }, 0, 0);
+                    if ( ew.face.appCurr === "itag-connect")  ew.UI.btn.ntfy(1,1.5,0,"_bar",6,"CONNECTING","",0,15); 
                     ew.apps.itag.state.ble.next = 0;
                 }
-                else ew.apps.itag.scan();
+                else setTimeout(()=>{ if (ew.face.appCurr==="itag-connect") ew.face.go("itag-scan", 0); },1500);
             });
             return ga.getPrimaryService(0xffe0);
         }).then(function(service) {
-            if (ew.face.appCurr === "itag-scan") ew.face.go("itag-connect", 0);
-
-            console.log("getting characteristic...");
+            if (ew.face.appCurr === "itag-connect")  ew.UI.btn.ntfy(1,5,0,"_bar",6,"PRIMARY","SERVICE" ,0,15); 
+            if (ew.apps.itag.dbg) console.log("getting characteristic...");
             ew.apps.itag.state.ble.ser_sil = service;
             return service.getCharacteristic(0xffe1);
         }).then(function(characteristic) {
+            if (ew.face.appCurr === "itag-connect")  ew.UI.btn.ntfy(1,5,0,"_bar",6,"BUTTON","CHARACTERISTIC" ,0,15); 
+
             characteristic.on('characteristicvaluechanged', function(data) {
-                console.log("notification data: ", data);
+                if (ew.apps.itag.dbg) console.log("notification data: ", data);
             });
-            console.log("starting notifications...");
+            if (ew.apps.itag.dbg) console.log("starting notifications...");
             return characteristic.startNotifications();
         }).then(function() {
-            console.log("waiting for notifications");
+            if (ew.face.appCurr === "itag-connect")  ew.UI.btn.ntfy(1,5,0,"_bar",6,"START","NOTIFICATIONS" ,0,15); 
+
+            if (ew.apps.itag.dbg) console.log("waiting for notifications");
             return ew.apps.itag.state.ble.ser_sil.getCharacteristic(0xffe2);
         }).then(function(characteristic) {
-            console.log("got silence characteristic");
+            if (ew.face.appCurr === "itag-connect")  ew.UI.btn.ntfy(1,5,0,"_bar",6,"SILENCE","CHARACTERISTIC" ,0,15); 
+
+            if (ew.apps.itag.dbg) console.log("got silence characteristic");
             ew.apps.itag.state.ble.silence = characteristic;
             return ew.apps.itag.state.ble.gatt.getPrimaryService(0x1802);
         }).then(function(service) {
-            console.log("got alert service");
+            if (ew.face.appCurr === "itag-connect")  ew.UI.btn.ntfy(1,5,0,"_bar",6,"ALERT","SERVICE" ,0,15); 
+
+            if (ew.apps.itag.dbg) console.log("got alert service");
             return service.getCharacteristic(0x2A06);
         }).then(function(characteristic) {
-            console.log("got alert characteristic");
+            if (ew.face.appCurr === "itag-connect")  ew.UI.btn.ntfy(1,5,0,"_bar",6,"ALERT","CHARACTERISTIC" ,0,15); 
+
+            if (ew.apps.itag.dbg) console.log("got battery characteristic");
             ew.apps.itag.state.ble.alert = characteristic;
             return ew.apps.itag.state.ble.gatt.getPrimaryService(0x180F);
         }).then(function(service) {
-            console.log("got battery service");
+            if (ew.face.appCurr === "itag-connect")  ew.UI.btn.ntfy(1,5,0,"_bar",6,"BATTERY","SERVICE" ,0,15); 
+
+            if (ew.apps.itag.dbg) console.log("got battery service");
             return service.getCharacteristic(0x2A19);
         }).then(function(characteristic) {
-            console.log("got battery characteristic");
+            if (ew.face.appCurr === "itag-connect")  ew.UI.btn.ntfy(1,5,0,"_bar",6,"BATTERY","CHARACTERISTIC" ,0,15); 
+
+            if (ew.apps.itag.dbg) console.log("got battery characteristic");
             ew.apps.itag.state.ble.battery = characteristic;
             return characteristic.readValue(); 
          }).then(function(d) {
-             console.log("Got battery value:", JSON.stringify(d.buffer));
-            if (!ew.apps.itag.state.lost) ew.apps.itag.state.ble.silence.writeValue(0);
+            if (ew.apps.itag.dbg) console.log("Got battery value:", JSON.stringify(d.buffer));
+            ew.apps.itag.state.def.find(item => item.id === ew.apps.itag.state.ble.id).batt=JSON.stringify(d.buffer);
+            ew.apps.itag.state.ble.silence.writeValue((ew.apps.itag.state.def.find(item => item.id === ew.apps.itag.state.ble.id).silent)?0:1);
+            ew.apps.itag.state.connected=1;
+            if (ew.face.appCurr === "itag-connect") ew.face.go("itag-connect", 0);
+            
         }).catch(function(e) {
-            console.log("catch Error: " + e);
-            if (e === "ERR 0x12 (CONN_COUNT)")
-                ew.notify.alert("error", { body: "CONNECTIONS", title: "MAX 2" }, 1, 1);
+            if (ew.apps.itag.dbg) console.log("catch Error: " + e);
+            if (e === "ERR 0x12 (CONN_COUNT)"){
+                if (ew.face.appCurr === "itag-connect") ew.UI.btn.ntfy(1,1.5,0,"_bar",6,"MAX 2","CONNECTIONS",13,15); 
+            }else {
+                //if (ew.face.appCurr === "itag-connect") ew.UI.btn.ntfy(1,1.5,0,"_bar",6,"DISCONNECTING","",0,15); 
+                ew.apps.itag.state.ble.gatt.disconnect();
+            }
         });
 
     }

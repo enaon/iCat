@@ -71,7 +71,7 @@ ew.face[0].d1 = function() {
 		else if (i == 3) {
 			ew.sys.buzz.nav(ew.sys.buzz.type.ok);
 			ew.UI.btn.ntfy(1, 3, 0, "_bar", 6, "BRIGHTNESS", ". . . . . . . . .", 15, 6, 1);
-			ew.temp.bar = 1;
+			ew.is.slide = 1;
 			ew.sys.TC.val = { cur: ew.def.bri, dn: 1, up: 7, tmp: 0 };
 			ew.UI.c.tcBar = (a, b) => {
 				ew.UI.btn.ntfy(0, 3, 1);
@@ -88,6 +88,8 @@ ew.face[0].d1 = function() {
 		}
 		else if (i == 6) {
 			ew.sys.buzz.nav(ew.sys.buzz.type.ok);
+			ew.is.bar=1;
+			ew.is.slide=0;
 			ew.UI.btn.ntfy(0, 3, 1, "_bar", 6, "", "", 15, 0);
 			ew.UI.c.start(0, 1);
 			ew.UI.btn.img("bar", "_bar", 4, "restart", "RST", 15, 6);

@@ -24,7 +24,7 @@ ew.UI.c.main._2x3=(i)=>{
 		ew.sys.buzz.nav(ew.sys.buzz.type.ok);
 		let f=16<ew.face.appRoot[0].length?ew.face.appRoot[0].substr(0,16).toUpperCase()+"..":ew.face.appRoot[0].toUpperCase();
 		ew.UI.btn.ntfy(1,3,0,"_bar",6,"TIMEOUT",f ,15,6,1);
-		ew.temp.bar=1;
+		ew.is.slide=1;
 		ew.sys.TC.val={cur:3,dn:3,up:100,tmp:0};
 		ew.UI.c.tcBar=(a,b)=>{ 
 			ew.UI.btn.ntfy(0,2,1);
@@ -54,7 +54,7 @@ ew.UI.c.main._2x3=(i)=>{
 	}else if (i==4){
 		ew.sys.buzz.nav(ew.sys.buzz.type.ok);
 		ew.UI.btn.ntfy(1,3,0,"_bar",6,"TEXT SIZE","SET",15,6,1);
-		ew.temp.bar=1;
+		ew.is.slide=1;
 		ew.sys.TC.val={cur:ew.UI.size.txt*100,dn:60,up:100,tmp:0};
 		ew.UI.c.tcBar=(a,b)=>{ 
 			ew.UI.btn.ntfy(0,2,1);

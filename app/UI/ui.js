@@ -135,15 +135,13 @@ ew.UI = {
 	btn: {
 		size: { _xs: 28, _s: 22, _m: 28, _l: 35, _xl: 45, txt: 1, len: 1 },
 		c3l: function(loc, no, po, txt1, txt2, fclr, bclr) {
-			//type:main|bar,
-			//"ram";
-			//draw
+
 			const p = (ew.UI.pos[no]);
-			let ln = p[1].length;
-			let x = p[1][(po - 1) % ln];
-			let y = p[2][((po - 1) / ln) | 0];
-			let szX = p[3][(po - 1) % ln] / 2;
-			let szY = p[4][((po - 1) / ln) | 0] / 2;
+			const ln = p[1].length;
+			const x = p[1][(po - 1) % ln];
+			const y = p[2][((po - 1) / ln) | 0];
+			const szX = p[3][(po - 1) % ln] / 2;
+			const szY = p[4][((po - 1) / ln) | 0] / 2;
 			g.setCol(0, bclr);
 			g.fillRect(x - szX, y - szY, x + szX, y + szY);
 			g.setCol(1, fclr);
@@ -336,7 +334,7 @@ ew.UI = {
 			}
 			if (rst && !sel) {
 				ew.UI.c.xy.replaceWith(new Function("x", "y", "l", 'setTimeout(()=>{' + ew.UI.c.raw.main + '},0);'));
-				ew.temp.bar = 0;
+				ew.is.slide = 0;
 			}
 			if (!ignr) {
 				ew.face.off();
@@ -375,8 +373,8 @@ ew.UI = {
 					}
 				}
 			}
-			else
-				ew.is.bar = 1;
+			//else
+				//ew.is.bar = 1;
 			if (!sel) g.flip();
 			ew.UI.ntid = setTimeout(function(t) {
 				ew.UI.rtb();
@@ -430,15 +428,16 @@ ew.UI = {
 			let m = ew.UI.loc(no, po);
 			ew.UI.c.raw[loc] = ew.UI.c.raw[loc] + `${ew.UI.c.raw[loc]==" "?'':'else '}if (${m.x}-${m.szX}<x&&x<${m.x}+${m.szX}&&${m.y}-${m.szY}<y&&y<${m.y}+${m.szY}) ew.UI.c.${loc}.${no}(${po},l);`;
 		},
-		txt: function(no, po, txt, bclr, fclr) {
+		txt: function(loc, no, po, txt, bclr, fclr, size) {
 			let m = ew.UI.loc(no, po);
+			print ("m",m);
 			g.setCol(0, bclr);
 			g.fillRect(m.x - m.szX, m.y - m.szY, m.x + m.szX, m.y + m.szY);
 			g.setCol(1, fclr);
 			if (process.env.BOARD == "BANGLEJS2") g.setFont("Dylex7x13");
 			else
 				//g.setFont("Teletext10x18Ascii",1);
-				g.setFont("Vector", ew.UI.size._txt * ew.UI.size.txt);
+				g.setFont("Vector", ew.UI.size._txt * ew.UI.size.txt * (size ? size : 1));
 
 			//txt=g.wrapString(txt||"",220);
 			//g.drawString(txt.join("\n"), m.x - (g.stringWidth(txt) / 2), m.y - m.szY + (m.szY / 10));
@@ -510,7 +509,7 @@ ew.UI = {
 			ew.sys.TC.tid = 0;
 		}
 		ew.is.bar = 0;
-		ew.temp.bar = 0;
+		ew.is.slide = 0;
 		if (ew.face[0].exe) {
 			ew.face[0].exe();
 			ew.face[0].exe = 0;
@@ -519,7 +518,8 @@ ew.UI = {
 	},
 	bar: function(i) {
 		"ram"
-		ew.temp.bar = 0;
+		ew.is.bar = 1;
+		ew.is.slide = 0;
 		ew.UI.btn.ntfy(0, 1.3, 1);
 		ew.UI.ele.fill("_bar", 6, 1);
 		ew.UI.c.start(0, 1);

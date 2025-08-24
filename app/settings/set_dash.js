@@ -90,7 +90,7 @@ ew.face[0].d1 = function() {
 		else if (i == 4) {
 			ew.sys.buzz.nav(ew.sys.buzz.type.ok);
 			ew.UI.btn.ntfy(1, 3, 0, "_bar", 6, "AUTO CLEAN", "DELAY (MINUTES)", 15, 6, 1);
-			ew.temp.bar = 1;
+			ew.is.slide = 1;
 			ew.sys.TC.val = { cur: ew.apps.kitty.state.def.auto.delay, dn: 1, up: 20, tmp: 0 };
 			ew.UI.c.tcBar = (a, b) => {
 				ew.UI.btn.ntfy(0, 2, 1);
@@ -101,7 +101,7 @@ ew.face[0].d1 = function() {
 		else if (i == 5) {
 			ew.sys.buzz.nav(ew.sys.buzz.type.ok);
 			ew.UI.btn.ntfy(1, 3, 0, "_bar", 6, "SET SPEED", ew.apps.kitty.state.def.sand[ew.apps.kitty.state.def.is.sandType].name.toUpperCase(), 15, 6, 1);
-			ew.temp.bar = 1;
+			ew.is.slide = 1;
 			ew.sys.TC.val = { cur: (19 - (ew.apps.kitty.state.def.sand[ew.apps.kitty.state.def.is.sandType].speed * 10)), dn: 1, up: 9, tmp: 0 };
 			ew.UI.c.tcBar = (a, b) => {
 				ew.UI.btn.ntfy(0, 2, 1);
@@ -151,7 +151,7 @@ ew.face[0].d2 = function() {
 		else if (i == 2) {
 			ew.sys.buzz.nav(ew.sys.buzz.type.ok);
 			ew.UI.btn.ntfy(1, 3, 0, "_bar", 6, "SET TOF", "FULL (CM)", 15, 6, 1);
-			ew.temp.bar = 1;
+			ew.is.slide = 1;
 			ew.sys.TC.val = { cur: ew.apps.kitty.state.def.tof.full * 10, dn: 250, up: 450, tmp: 0 };
 			ew.UI.c.tcBar = (a, b) => {
 				ew.UI.btn.ntfy(0, 2, 1);
@@ -162,7 +162,7 @@ ew.face[0].d2 = function() {
 		else if (i == 3) {
 			ew.sys.buzz.nav(ew.sys.buzz.type.ok);
 			ew.UI.btn.ntfy(1, 3, 0, "_bar", 6, "SET TOF", "EMPTY (CM)", 15, 6, 1);
-			ew.temp.bar = 1;
+			ew.is.slide = 1;
 			ew.sys.TC.val = { cur: ew.apps.kitty.state.def.tof.empty * 10, dn: 250, up: 450, tmp: 0 };
 			ew.UI.c.tcBar = (a, b) => {
 				ew.UI.btn.ntfy(0, 2, 1);
@@ -186,7 +186,7 @@ ew.face[0].d2 = function() {
 		else if (i == 5) {
 			ew.sys.buzz.nav(ew.sys.buzz.type.ok);
 			ew.UI.btn.ntfy(1, 3, 0, "_bar", 6, "SET MAX", "SAND WEIGHT (KG)", 15, 6, 1);
-			ew.temp.bar = 1;
+			ew.is.slide = 1;
 			ew.sys.TC.val = { cur: ew.apps.kitty.state.def.sand[ew.apps.kitty.state.def.is.sandType].max / 100, dn: 15, up: 40, tmp: 0 };
 			ew.UI.c.tcBar = (a, b) => {
 				ew.UI.btn.ntfy(0, 2, 1);
@@ -197,7 +197,7 @@ ew.face[0].d2 = function() {
 		else if (i == 6) {
 			ew.sys.buzz.nav(ew.sys.buzz.type.ok);
 			ew.UI.btn.ntfy(1, 3, 0, "_bar", 6, "SET MIN", "SAND WEIGHT (KG)", 15, 6, 1);
-			ew.temp.bar = 1;
+			ew.is.slide = 1;
 			ew.sys.TC.val = { cur: ew.apps.kitty.state.def.sand[ew.apps.kitty.state.def.is.sandType].min / 100, dn: 5, up: 15, tmp: 0 };
 			ew.UI.c.tcBar = (a, b) => {
 				ew.UI.btn.ntfy(0, 2, 1);
