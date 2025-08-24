@@ -217,8 +217,6 @@ ew.apps.itag = {
             return characteristic.readValue(); 
          }).then(function(d) {
             if (ew.apps.itag.dbg) console.log("Got battery value:", JSON.stringify(d.buffer));
-            print ("d",d);
-            global.lala=JSON.stringify(d.buffer);
             ew.apps.itag.state.def.find(item => item.id === ew.apps.itag.state.ble.id).batt=d.buffer[0];
             ew.apps.itag.state.ble.silence.writeValue((ew.apps.itag.state.def.find(item => item.id === ew.apps.itag.state.ble.id).silent)?0:1);
             ew.apps.itag.state.connected=1;

@@ -137,7 +137,7 @@ ew.face[0] = {
         // get scale
         let scale =0;
         for (let i in data)
-           if (scale < 100 - Math.abs(data[i][value]) - 0) scale = 100 - Math.abs(data[i][value]);
+           if (scale <  Math.abs(data[i][value]) - 0) scale =  Math.abs(data[i][value]);
         
         scale =(height - (bottom / 10)) / ((scale) ? scale : 1);
 
