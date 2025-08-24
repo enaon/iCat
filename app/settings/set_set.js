@@ -48,7 +48,7 @@ ew.face[0].d1 = function() {
 				NRF.setTxPower(ew.def.rfTX);
 				ew.UI.btn.img("main", "_2x3", 1, ew.def.cli ? "bt" : "plane", "BT", 15, ew.def.cli ? 4 : 1);
 				g.drawImage((ew.def.rfTX == -4) ? E.toArrayBuffer(atob("EyCBAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAfAAPgAEQACIABEAAiAARAAIgAHz74=")) : (ew.def.rfTX == 0) ? E.toArrayBuffer(atob("EyCBAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD4ADEABiAAxAfYgPsQEWICLEBFiAixARYgIsQHz74=")) : E.toArrayBuffer(atob("EyCBAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA+AARAAIgAEQD6IDFEBiiAxRfYovsUUWKKLFFFiiixRRYoosUXz74=")), 55, 65);
-				ew.UI.btn.ntfy(1, 0, 0, "_bar", 6, "", ew.def.rfTX == -4 ? "TX MIN" : ew.def.rfTX == 0 ? "TX MED" : "TX MAX", 0, 15);
+				ew.UI.btn.ntfy(1, 0, 0, "_bar", 6,  ew.def.rfTX == -4 ? "TX MIN" : ew.def.rfTX == 0 ? "TX MED" : "TX MAX","", 0, 15);
 				g.flip();
 
 			}
