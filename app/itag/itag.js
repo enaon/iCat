@@ -155,7 +155,7 @@ ew.apps.itag = {
                 if (reason === 62 && ew.face.appCurr === "itag-connect") {
                    ew.UI.btn.ntfy(1,2,0,"_bar",6,"TOO FAR","",15,13); 
                 }
-                if (reason === 8 && ew.face.appCurr === "itag-connect") {
+                else if (reason === 8 && ew.face.appCurr === "itag-connect") {
                     ew.UI.btn.ntfy(1,2,0,"_bar",6,"LOST","",15,13); 
                 }
                 else if ( ew.face.appCurr === "itag-connect") {
