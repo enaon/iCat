@@ -575,10 +575,31 @@
                             return;
                         }
 
-                        // Αποστολή των δεδομένων κατευθείαν στο Espruino
-                        updateEspruinoWithImportedData(importedData.cats);
-                        statusText.textContent = 'Τα δεδομένα εισήχθησαν και εστάλησαν στην συσκευή!';
+                        // Ενημέρωση localStorage με τα εισαγόμενα δεδομένα
+                        const savedCats = {};
+                        const savedSilent = {};
 
+                        importedData.cats.forEach(cat => {
+                            if (cat.name && cat.name !== "Unknown" && cat.name !== "Αδέσποτη") {
+                                savedCats[cat.id] = cat.name;
+                            }
+                            if (cat.silent !== undefined) {
+                                savedSilent[cat.id] = Boolean(cat.silent);
+                            }
+                        });
+
+                        localStorage.setItem('catNames', JSON.stringify(savedCats));
+                        localStorage.setItem('catSilent', JSON.stringify(savedSilent));
+
+                        // Ενημέρωση Espruino αν είναι συνδεδεμένοι
+                        if (isConnected) {
+                            updateEspruinoWithImportedData(importedData.cats);
+                        }
+                        else {
+                            statusText.textContent = 'Τα δεδομένα εισήχθησαν. Συνδεθείτε για ενημέρωση της συσκευής.';
+                        }
+
+                        alert('Τα δεδομένα εισήχθησαν επιτυχώς!');
                     }
                     catch (error) {
                         console.error('Σφάλμα εισαγωγής:', error);
@@ -595,13 +616,30 @@
                 try {
                     statusText.textContent = 'Ενημέρωση συσκευής με εισαγόμενα δεδομένα...';
 
+                    // Δημιουργούμε έναν νέο πίνακα με όλες τις γάτες (υπάρχουσες + εισαγόμενες)
+                    let allCats = [...catsData]; // Υπάρχουσες γάτες
+
+                    // Προσθέτουμε/Ενημερώνουμε με τις γάτες από το import
+                    importedCats.forEach(importedCat => {
+                        const existingIndex = allCats.findIndex(c => c.id === importedCat.id);
+
+                        if (existingIndex !== -1) {
+                            // Ενημέρωση υπάρχουσας γάτας
+                            allCats[existingIndex] = { ...allCats[existingIndex], ...importedCat };
+                        }
+                        else {
+                            // Προσθήκη νέας γάτας (αν δεν υπάρχει)
+                            allCats.push(importedCat);
+                        }
+                    });
+
                     // Δημιουργούμε την εντολή για να ορίσουμε όλο τον πίνακα
                     let command = 'ew.apps.itag.state.def = [';
 
                     // Προσθέτουμε κάθε γάτα στον πίνακα
-                    for (let i = 0; i < importedCats.length; i++) {
+                    for (let i = 0; i < allCats.length; i++) {
                         if (i > 0) command += ',';
-                        command += JSON.stringify(importedCats[i]);
+                        command += JSON.stringify(allCats[i]);
                     }
                     command += '];\n';
 
@@ -620,6 +658,7 @@
 
                     // Ελέγχουμε και αποθηκεύουμε
                     await sendCommand('if (ew.apps.itag.state.def && ew.apps.itag.state.def.length > 0) { \n');
+                    //await sendCommand('  require("Storage").write("itag.state.json", ew.apps.itag.state.def);\n');
                     await sendCommand('  Bluetooth.println("Αποθηκεύτηκαν " + ew.apps.itag.state.def.length + " γάτες");\n');
                     await sendCommand('} else {\n');
                     await sendCommand('  Bluetooth.println("Σφάλμα: Ο πίνακας είναι άδειος");\n');
@@ -628,14 +667,13 @@
                     // Ανανέωση δεδομένων
                     await refreshData();
 
-                    statusText.textContent = 'Η συσκευή ενημερώθηκε με τα εισαγόμενα δεδομένα (' + importedCats.length + ' γάτες)';
+                    statusText.textContent = 'Η συσκευή ενημερώθηκε με τα εισαγόμενα δεδομένα (' + allCats.length + ' γάτες)';
                 }
                 catch (error) {
                     console.error('Σφάλμα ενημέρωσης συσκευής:', error);
                     statusText.textContent = 'Σφάλμα ενημέρωσης συσκευής: ' + error.message;
                 }
             }
-            
             // Αποστολή εντολής μέσω UART
             async function sendCommand(command) {
                 if (!uartRxCharacteristic) {
@@ -717,10 +755,21 @@
                 if (data && Array.isArray(data)) {
                     catsData = data;
 
-                    // Ενημέρωση των ονομάτων αν είναι απαραίτητο
+                    // Φόρτωση από localStorage αν υπάρχουν αποθηκευμένα ονόματα
+                    const savedCats = JSON.parse(localStorage.getItem('catNames') || '{}');
+                    const savedSilent = JSON.parse(localStorage.getItem('catSilent') || '{}');
+
+                    // Ενημέρωση των ονομάτων και silent τιμών από το localStorage
                     catsData.forEach(cat => {
-                        if (!cat.name || cat.name === "Unknown") {
+                        if (savedCats[cat.id]) {
+                            cat.name = savedCats[cat.id];
+                        }
+                        else if (!cat.name || cat.name === "Unknown") {
                             cat.name = "Αδέσποτη";
+                        }
+
+                        if (savedSilent[cat.id] !== undefined) {
+                            cat.silent = savedSilent[cat.id];
                         }
                     });
 
@@ -857,6 +906,15 @@
                     catsData[catIndex].silent = newSilent;
                 }
 
+                // Αποθήκευση στο localStorage
+                const savedCats = JSON.parse(localStorage.getItem('catNames') || '{}');
+                savedCats[editingCatId] = newName;
+                localStorage.setItem('catNames', JSON.stringify(savedCats));
+
+                const savedSilent = JSON.parse(localStorage.getItem('catSilent') || '{}');
+                savedSilent[editingCatId] = newSilent;
+                localStorage.setItem('catSilent', JSON.stringify(savedSilent));
+
                 // Αποστολή εντολών στο Espruino για ενημέρωση
                 try {
                     // Ενημέρωση ονόματος
@@ -864,6 +922,9 @@
 
                     // Ενημέρωση silent τιμής
                     await sendCommand(`ew.apps.itag.state.def.find(cat => cat.id === "${editingCatId}").silent = ${newSilent};\n`);
+
+                    // Αποθήκευση αλλαγών
+                    //await sendCommand('require("Storage").write("itag.state.json", ew.apps.itag.state.def);\n');
 
                     statusText.textContent = 'Οι αλλαγές αποθηκεύτηκαν επιτυχώς';
                 }

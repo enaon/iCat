@@ -170,12 +170,12 @@ ew.apps.itag = {
             });
             return ga.getPrimaryService(0xffe0);
         }).then(function(service) {
-            if (ew.face.appCurr === "itag-connect")  ew.UI.btn.ntfy(1,5,0,"_bar",6,"PRIMARY","SERVICE" ,0,15); 
+            if (ew.face.appCurr === "itag-connect")  ew.UI.btn.ntfy(1,10,0,"_bar",6,"PRIMARY","SERVICE" ,0,15); 
             if (ew.apps.itag.dbg) console.log("getting characteristic...");
             ew.apps.itag.state.ble.ser_sil = service;
             return service.getCharacteristic(0xffe1);
         }).then(function(characteristic) {
-            if (ew.face.appCurr === "itag-connect")  ew.UI.btn.ntfy(1,5,0,"_bar",6,"BUTTON","CHARACTERISTIC" ,0,15); 
+            if (ew.face.appCurr === "itag-connect")  ew.UI.btn.ntfy(1,10,0,"_bar",6,"BUTTON","CHARACTERISTIC" ,0,15); 
 
             characteristic.on('characteristicvaluechanged', function(data) {
                 if (ew.apps.itag.dbg) console.log("notification data: ", data);
@@ -183,34 +183,34 @@ ew.apps.itag = {
             if (ew.apps.itag.dbg) console.log("starting notifications...");
             return characteristic.startNotifications();
         }).then(function() {
-            if (ew.face.appCurr === "itag-connect")  ew.UI.btn.ntfy(1,5,0,"_bar",6,"START","NOTIFICATIONS" ,0,15); 
+            if (ew.face.appCurr === "itag-connect")  ew.UI.btn.ntfy(1,10,0,"_bar",6,"START","NOTIFICATIONS" ,0,15); 
 
             if (ew.apps.itag.dbg) console.log("waiting for notifications");
             return ew.apps.itag.state.ble.ser_sil.getCharacteristic(0xffe2);
         }).then(function(characteristic) {
-            if (ew.face.appCurr === "itag-connect")  ew.UI.btn.ntfy(1,5,0,"_bar",6,"SILENCE","CHARACTERISTIC" ,0,15); 
+            if (ew.face.appCurr === "itag-connect")  ew.UI.btn.ntfy(1,10,0,"_bar",6,"SILENCE","CHARACTERISTIC" ,0,15); 
 
             if (ew.apps.itag.dbg) console.log("got silence characteristic");
             ew.apps.itag.state.ble.silence = characteristic;
             return ew.apps.itag.state.ble.gatt.getPrimaryService(0x1802);
         }).then(function(service) {
-            if (ew.face.appCurr === "itag-connect")  ew.UI.btn.ntfy(1,5,0,"_bar",6,"ALERT","SERVICE" ,0,15); 
+            if (ew.face.appCurr === "itag-connect")  ew.UI.btn.ntfy(1,10,0,"_bar",6,"ALERT","SERVICE" ,0,15); 
 
             if (ew.apps.itag.dbg) console.log("got alert service");
             return service.getCharacteristic(0x2A06);
         }).then(function(characteristic) {
-            if (ew.face.appCurr === "itag-connect")  ew.UI.btn.ntfy(1,5,0,"_bar",6,"ALERT","CHARACTERISTIC" ,0,15); 
+            if (ew.face.appCurr === "itag-connect")  ew.UI.btn.ntfy(1,10,0,"_bar",6,"ALERT","CHARACTERISTIC" ,0,15); 
 
             if (ew.apps.itag.dbg) console.log("got battery characteristic");
             ew.apps.itag.state.ble.alert = characteristic;
             return ew.apps.itag.state.ble.gatt.getPrimaryService(0x180F);
         }).then(function(service) {
-            if (ew.face.appCurr === "itag-connect")  ew.UI.btn.ntfy(1,5,0,"_bar",6,"BATTERY","SERVICE" ,0,15); 
+            if (ew.face.appCurr === "itag-connect")  ew.UI.btn.ntfy(1,10,0,"_bar",6,"BATTERY","SERVICE" ,0,15); 
 
             if (ew.apps.itag.dbg) console.log("got battery service");
             return service.getCharacteristic(0x2A19);
         }).then(function(characteristic) {
-            if (ew.face.appCurr === "itag-connect")  ew.UI.btn.ntfy(1,5,0,"_bar",6,"BATTERY","CHARACTERISTIC" ,0,15); 
+            if (ew.face.appCurr === "itag-connect")  ew.UI.btn.ntfy(1,10,0,"_bar",6,"BATTERY","CHARACTERISTIC" ,0,15); 
 
             if (ew.apps.itag.dbg) console.log("got battery characteristic");
             ew.apps.itag.state.ble.battery = characteristic;
