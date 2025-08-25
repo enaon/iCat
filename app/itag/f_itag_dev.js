@@ -138,11 +138,8 @@ ew.face[0] = {
         let scale =0;
         for (let i in data)
            if (scale <  data[i][value] - 0) scale =  data[i][value];
-        print("scale1", scale)
         scale =(height - (bottom / 10)) / ((scale) ? scale : 1);
-
-
-        print("scale2", scale)
+        
         let limits = 1;//data[pos].live
 
         if (update) {

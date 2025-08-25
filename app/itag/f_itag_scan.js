@@ -41,8 +41,11 @@ ew.face[0] = {
                     ew.notify.alert("info", { body: "DISCONNECTING", title: ew.apps.itag.state.ble.gatt.device.id.split(" ")[0] }, 0, 0);
 
                 }
-                else
-                    ew.apps.itag.conn(ew.apps.itag.state.dev[this.data.lastPosition].id);
+                else{
+                    ew.apps.itag.state.ble.id=ew.apps.itag.state.dev[this.data.lastPosition].id,
+                    ew.face.go("itag-connect", 0, ew.apps.itag.state.dev[this.data.lastPosition].id);
+                    //ew.apps.itag.conn(ew.apps.itag.state.dev[this.data.lastPosition].id);
+                }
             }
         };
 

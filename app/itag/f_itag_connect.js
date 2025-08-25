@@ -13,7 +13,7 @@ ew.face[0] = {
     gatt: {},
     run: false,
     offms: (ew.def.off[ew.face.appCurr]) ? ew.def.off[ew.face.appCurr] : 60000,
-    init: function(o) {
+    init: function() {
         ew.def.off[ew.face.appCurr]=this.offms;
         // name
         ew.UI.btn.c2l("main", "_header", 6, this.getVal("name") , "", 15, 0, 1.5);
@@ -24,8 +24,8 @@ ew.face[0] = {
         else this.bar();
         this.info(this.getVal("batt"),ew.apps.itag.state.ble.id.split(" ")[0] )
     },
-    show: function(s) {
-
+    show: function(o) {
+        if (!ew.apps.itag.state.connected) this.tid=setTimeout(()=>{ew.apps.itag.conn(ew.apps.itag.state.ble.id)},500);
     },
     getVal:function (val){
          const device = ew.apps.itag.state.def.find(item => item.id === ew.apps.itag.state.ble.id);

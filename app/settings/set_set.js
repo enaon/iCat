@@ -86,7 +86,7 @@ ew.face[0].d1 = function() {
 			ew.sys.buzz.nav(ew.sys.buzz.type.ok);
 			ew.def.buzz = 1 - ew.def.buzz;
 			if (ew.def.info) ew.UI.btn.ntfy(1, 0, 0, "_bar", 6, "HAPTIC", ew.def.buzz ? "ENABLED" : "DISABED", 0, 15);
-			ew.UI.btn.img("main", "_2x3", 4, ew.def.buzz ? "buzzOn" : "buzzOff", "SCRN", ew.def.buzz ? 15 : 3, ew.def.scrn ? 4 : 1);
+			ew.UI.btn.img("main", "_2x3", 4, ew.def.buzz ? "buzzOn" : "buzzOff", "BUZZ", ew.def.buzz ? 15 : 3, ew.def.buzz ? 4 : 1);
 		}
 		else if (i == 5) {
 			ew.sys.buzz.nav(ew.sys.buzz.type.ok);

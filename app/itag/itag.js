@@ -139,11 +139,10 @@ ew.apps.itag = {
         ew.apps.itag.state.ble.scan = false;
     },
     conn: function(c) {
-        ew.apps.itag.state.ble.id = c;
         if (ew.face.appCurr === "itag-scan") ew.face.go("itag-connect", 0);
         if (ew.apps.itag.tid) { clearTimeout(ew.apps.itag.tid);
             ew.apps.itag.tid = 0; }
-        ew.apps.itag.stopScan();
+        //ew.apps.itag.stopScan();
         NRF.connect(c, { 
         minInterval: (-95 < ew.apps.itag.state.dev.find(item => item.id === c).rssi)?7.5:50, 
         maxInterval: (-95 < ew.apps.itag.state.dev.find(item => item.id === c).rssi)?30:400
