@@ -33,7 +33,7 @@ ew.face[0] = {
     },
     info: function(batt, id) {
         g.setCol(0, 1);
-        g.fillRect({ x: 0, y: 60, x2: 235, y2: 180, r: 10 });
+        g.fillRect({ x: 0, y: 55, x2: 235, y2: 180, r: 10 });
         g.setCol(1, 15);
         g.setFont("LECO1976Regular22", 3);
 
