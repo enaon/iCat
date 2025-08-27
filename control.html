@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>eW Launcher</title>
-    <base href="https://enaon.github.io/iCat/">
     <style>
         :root {
             --color-primary: #BB86FC;
@@ -688,7 +687,7 @@
 
                 for (const appName of appNames) {
                     try {
-                        const response = await fetch(`../app/${appName}/index.html`);
+                        const response = await fetch(`/app/${appName}/index.html`);
                         if (response.ok) {
                             availableApps.push(appName);
                         }
@@ -705,7 +704,7 @@
             // Εμφάνιση λίστας διαθέσιμων εφαρμογών
             function displayAvailableApps(apps) {
                 if (apps.length === 0) {
-                    appList.innerHTML = '<div class="empty-state"><i class="fas fa-folder-open"></i><p>Δεν βρέθηκαν αντίστοιχα web apps. Βεβαιωθείτε ότι βρίσκονται στο φάκελο ../app/[όνομα]/index.html</p></div>';
+                    appList.innerHTML = '<div class="empty-state"><i class="fas fa-folder-open"></i><p>Δεν βρέθηκαν αντίστοιχα web apps. Βεβαιωθείτε ότι βρίσκονται στο φάκελο /app/[όνομα]/index.html</p></div>';
                     statusText.textContent = 'Δεν βρέθηκαν web apps για τις εφαρμογές του Espruino';
                     statusTextHeader.textContent = '0 web apps';
                     return;
@@ -758,7 +757,7 @@
                 });
 
                 // Φόρτωση της εφαρμογής στο iframe
-                appFrame.src = `../app/${appName}/index.html`;
+                appFrame.src = `/app/${appName}/index.html`;
                 statusText.textContent = `Φόρτωση: ${appName}`;
                 statusTextHeader.textContent = `Φόρτωση: ${appName}`;
 
