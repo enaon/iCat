@@ -326,6 +326,14 @@
     </style>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<script>
+    // Auto-detect base href for GitHub Pages vs local server
+    const isGitHub = window.location.hostname === 'enaon.github.io';
+    const baseHref = isGitHub ? 'https://enaon.github.io/iCat/' : '../';
+    document.write('<base href="' + baseHref + '">');
+</script>
+
+
 </head>
 
 <body>
@@ -687,7 +695,7 @@
 
                 for (const appName of appNames) {
                     try {
-                        const response = await fetch(`/app/${appName}/index.html`);
+                        const response = await fetch(`../app/${appName}/index.html`);
                         if (response.ok) {
                             availableApps.push(appName);
                         }
@@ -704,7 +712,7 @@
             // Εμφάνιση λίστας διαθέσιμων εφαρμογών
             function displayAvailableApps(apps) {
                 if (apps.length === 0) {
-                    appList.innerHTML = '<div class="empty-state"><i class="fas fa-folder-open"></i><p>Δεν βρέθηκαν αντίστοιχα web apps. Βεβαιωθείτε ότι βρίσκονται στο φάκελο /app/[όνομα]/index.html</p></div>';
+                    appList.innerHTML = '<div class="empty-state"><i class="fas fa-folder-open"></i><p>Δεν βρέθηκαν αντίστοιχα web apps. Βεβαιωθείτε ότι βρίσκονται στο φάκελο ../app/[όνομα]/index.html</p></div>';
                     statusText.textContent = 'Δεν βρέθηκαν web apps για τις εφαρμογές του Espruino';
                     statusTextHeader.textContent = '0 web apps';
                     return;
@@ -757,7 +765,7 @@
                 });
 
                 // Φόρτωση της εφαρμογής στο iframe
-                appFrame.src = `/app/${appName}/index.html`;
+                appFrame.src = `../app/${appName}/index.html`;
                 statusText.textContent = `Φόρτωση: ${appName}`;
                 statusTextHeader.textContent = `Φόρτωση: ${appName}`;
 
