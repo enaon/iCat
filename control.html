@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="el">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -27,9 +28,15 @@
         }
 
         @keyframes skeleton-pulse {
-            0% { opacity: 1; }
-            50% { opacity: 0.5; }
-            100% { opacity: 1; }
+            0% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.5;
+            }
+            100% {
+                opacity: 1;
+            }
         }
 
         * {
@@ -200,7 +207,9 @@
         }
 
         @keyframes spin {
-            to { transform: rotate(360deg); }
+            to {
+                transform: rotate(360deg);
+            }
         }
 
         .menu-toggle {
@@ -287,8 +296,9 @@
                 width: 300px;
             }
         }
-        
+
         /* Νέο στυλ για το animation φόρτωσης */
+
         .connecting-animation {
             display: flex;
             justify-content: center;
@@ -297,12 +307,12 @@
             flex-direction: column;
             gap: 20px;
         }
-        
+
         .connecting-dots {
             display: flex;
             gap: 8px;
         }
-        
+
         .dot {
             width: 12px;
             height: 12px;
@@ -310,30 +320,29 @@
             background-color: var(--color-primary);
             animation: dot-pulse 1.5s infinite ease-in-out;
         }
-        
+
         .dot:nth-child(2) {
             animation-delay: 0.2s;
         }
-        
+
         .dot:nth-child(3) {
             animation-delay: 0.4s;
         }
-        
+
         @keyframes dot-pulse {
-            0%, 100% { transform: scale(0.8); opacity: 0.5; }
-            50% { transform: scale(1.2); opacity: 1; }
+            0%,
+            100% {
+                transform: scale(0.8);
+                opacity: 0.5;
+            }
+            50% {
+                transform: scale(1.2);
+                opacity: 1;
+            }
         }
     </style>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-<script>
-    // Auto-detect base href for GitHub Pages vs local server
-    const isGitHub = window.location.hostname === 'enaon.github.io';
-    const baseHref = isGitHub ? 'https://enaon.github.io/iCat/' : '../';
-    document.write('<base href="' + baseHref + '">');
-</script>
-
-
 </head>
 
 <body>
@@ -381,6 +390,10 @@
     </main>
 
     <script>
+        // Προσδιορισμός του base URL ανάλογα με το περιβάλλον
+        const isGitHubPages = window.location.hostname.includes('github.io');
+        const basePath = isGitHubPages ? '/iCat' : '';
+        
         document.addEventListener('DOMContentLoaded', function() {
             // Στοιχεία DOM
             const connectBtn = document.getElementById('connectBtn');
@@ -695,7 +708,8 @@
 
                 for (const appName of appNames) {
                     try {
-                        const response = await fetch(`../app/${appName}/index.html`);
+                        // Χρησιμοποιούμε το basePath για να κάνουμε το path σωστό
+                        const response = await fetch(`${basePath}/app/${appName}/index.html`);
                         if (response.ok) {
                             availableApps.push(appName);
                         }
@@ -755,7 +769,7 @@
             function loadApp(appName) {
                 // Αποθήκευση του τρέχοντος app
                 currentApp = appName;
-                
+
                 // Highlight την επιλεγμένη εφαρμογή
                 document.querySelectorAll('.app-item').forEach(item => {
                     item.classList.remove('active');
@@ -764,8 +778,8 @@
                     }
                 });
 
-                // Φόρτωση της εφαρμογής στο iframe
-                appFrame.src = `../app/${appName}/index.html`;
+                // Φόρτωση της εφαρμογής στο iframe με το σωστό basePath
+                appFrame.src = `${basePath}/app/${appName}/index.html`;
                 statusText.textContent = `Φόρτωση: ${appName}`;
                 statusTextHeader.textContent = `Φόρτωση: ${appName}`;
 
@@ -802,48 +816,46 @@
                 onDisconnected();
             }
 
- 
-
             // Χειρισμός αποσύνδεσης
-function onDisconnected() {
-    console.log("onDisconnected called");
-    
-    isConnected = false;
-    statusDot.classList.remove('connected');
-    statusDotHeader.classList.remove('connected');
-    statusText.textContent = 'Αποσυνδεθήκατε από τη συσκευή';
-    statusTextHeader.textContent = 'Αποσυνδεθήκατε';
-    connectBtn.innerHTML = '<i class="fas fa-bluetooth-b"></i> Σύνδεση';
-    
-    // ΑΠΕΝΕΡΓΟΠΟΙΗΣΗ ΤΟΥ IFRAME - ΣΩΣΤΗ ΕΚΔΟΣΗ
-    appFrame.onload = null;
-    appFrame.src = 'about:blank'; // Αδειάζουμε το iframe
-    
-    // ΕΠΑΝΑΦΟΡΑ ΤΗΣ ΑΡΧΙΚΗΣ ΚΑΤΑΣΤΑΣΗΣ
-    appList.innerHTML = `
+            function onDisconnected() {
+                console.log("onDisconnected called");
+
+                isConnected = false;
+                statusDot.classList.remove('connected');
+                statusDotHeader.classList.remove('connected');
+                statusText.textContent = 'Αποσυνδεθήκατε από τη συσκευή';
+                statusTextHeader.textContent = 'Αποσυνδεθήκατε';
+                connectBtn.innerHTML = '<i class="fas fa-bluetooth-b"></i> Σύνδεση';
+
+                // ΑΠΕΝΕΡΓΟΠΟΙΗΣΗ ΤΟΥ IFRAME - ΣΩΣΤΗ ΕΚΔΟΣΗ
+                appFrame.onload = null;
+                appFrame.src = 'about:blank'; // Αδειάζουμε το iframe
+
+                // ΕΠΑΝΑΦΟΡΑ ΤΗΣ ΑΡΧΙΚΗΣ ΚΑΤΑΣΤΑΣΗΣ
+                appList.innerHTML = `
         <div class="empty-state">
             <i class="fas fa-plug"></i>
             <p>Συνδεθείτε για να φορτώσετε apps</p>
         </div>
     `;
 
-    // ΕΠΙΣΤΡΟΦΗ ΣΤΗΝ ΑΡΧΙΚΗ ΣΕΛΙΔΑ
-    showSidebar();
+                // ΕΠΙΣΤΡΟΦΗ ΣΤΗΝ ΑΡΧΙΚΗ ΣΕΛΙΔΑ
+                showSidebar();
 
-    // Καθαρισμός των μεταβλητών σύνδεσης
-    currentDevice = null;
-    uartService = null;
-    uartRxCharacteristic = null;
-    uartTxCharacteristic = null;
-    dataBuffer = '';
+                // Καθαρισμός των μεταβλητών σύνδεσης
+                currentDevice = null;
+                uartService = null;
+                uartRxCharacteristic = null;
+                uartTxCharacteristic = null;
+                dataBuffer = '';
 
-    // Καθαρισμός ουράς εντολών
-    commandQueue = [];
-    isProcessingQueue = false;
-    
-    // Επαναφορά του currentApp
-    currentApp = null;
-}
+                // Καθαρισμός ουράς εντολών
+                commandQueue = [];
+                isProcessingQueue = false;
+
+                // Επαναφορά του currentApp
+                currentApp = null;
+            }
 
             // Συναρτήσεις για το sidebar
             function toggleSidebar() {
@@ -914,7 +926,7 @@ function onDisconnected() {
                     isFirstLoad = false;
                 }
             }
-            
+
             // Έλεγχος μεγέθους οθόνης κατά τη φόρτωση και αλλαγή μεγέθους
             window.addEventListener('load', checkScreenSize);
             window.addEventListener('resize', checkScreenSize);
@@ -922,4 +934,5 @@ function onDisconnected() {
         });
     </script>
 </body>
+
 </html>
