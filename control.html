@@ -1,11 +1,9 @@
 <!DOCTYPE html>
 <html lang="el">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cat Tracker</title>
-    <link rel="manifest" href="Loader/app.webmanifest">
+    <title>eW Launcher</title>
     <style>
         :root {
             --color-primary: #BB86FC;
@@ -19,6 +17,19 @@
             --color-on-background: #FFFFFF;
             --color-on-surface: #FFFFFF;
             --color-on-error: #000000;
+            --sidebar-width: 300px;
+        }
+
+        .skeleton {
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            animation: skeleton-pulse 1.5s ease-in-out infinite;
+        }
+
+        @keyframes skeleton-pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
         }
 
         * {
@@ -31,30 +42,31 @@
         body {
             background-color: var(--color-background);
             color: var(--color-on-background);
-            min-height: 100vh;
-            padding: 16px;
-        }
-
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
         }
 
         header {
+            background-color: var(--color-surface);
+            padding: 8px 16px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 24px;
-            padding-bottom: 16px;
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+            z-index: 100;
+            flex-shrink: 0;
+            min-height: 50px;
         }
 
         h1 {
-            font-size: 24px;
+            font-size: 18px;
             font-weight: 500;
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
         }
 
         h1 i {
@@ -66,13 +78,13 @@
             color: var(--color-on-primary);
             border: none;
             border-radius: 20px;
-            padding: 10px 20px;
-            font-size: 14px;
+            padding: 6px 12px;
+            font-size: 12px;
             font-weight: 500;
             cursor: pointer;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
             transition: all 0.3s ease;
         }
 
@@ -90,25 +102,13 @@
             color: var(--color-on-surface);
         }
 
-        .header-buttons {
-            display: flex;
-            gap: 10px;
-        }
-
         .status {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            margin-bottom: 24px;
-            padding: 12px 16px;
-            background-color: var(--color-surface);
-            border-radius: 12px;
-            font-size: 14px;
+            display: none;
         }
 
         .status-dot {
-            width: 10px;
-            height: 10px;
+            width: 8px;
+            height: 8px;
             border-radius: 50%;
             background-color: var(--color-error);
         }
@@ -117,163 +117,63 @@
             background-color: #4CAF50;
         }
 
-        .cat-list {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 16px;
-        }
-
-        .cat-card {
-            background-color: var(--color-surface);
-            border-radius: 16px;
-            padding: 16px;
+        main {
             display: flex;
-            align-items: center;
-            gap: 16px;
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .cat-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
-        }
-
-        .cat-icon {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            background-color: var(--color-primary-variant);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 24px;
-            color: var(--color-on-primary);
-        }
-
-        .cat-info {
             flex: 1;
+            overflow: hidden;
+            position: relative;
         }
 
-        .cat-name {
-            font-size: 18px;
-            font-weight: 500;
-            margin-bottom: 4px;
-        }
-
-        .cat-details {
-            font-size: 14px;
-            opacity: 0.7;
+        #sidebar {
+            width: var(--sidebar-width);
+            background-color: var(--color-surface);
+            padding: 16px;
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
             display: flex;
+            flex-direction: column;
             gap: 16px;
-            flex-wrap: wrap;
-        }
-
-        .battery {
-            display: flex;
-            align-items: center;
-            gap: 4px;
-        }
-
-        .location {
-            display: flex;
-            align-items: center;
-            gap: 4px;
-        }
-
-        .last-seen {
-            font-size: 12px;
-            opacity: 0.7;
-            margin-top: 4px;
-        }
-
-        .edit-btn {
-            background: none;
-            border: none;
-            color: var(--color-primary);
-            cursor: pointer;
-            font-size: 18px;
-        }
-
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
+            position: absolute;
             left: 0;
+            top: 0;
+            bottom: 0;
+            z-index: 10;
+            transition: transform 0.3s ease;
+            overflow-y: auto;
+        }
+
+        #sidebar.hidden {
+            transform: translateX(calc(-1 * var(--sidebar-width)));
+        }
+
+        #appFrame {
+            flex: 1;
+            border: none;
+            background-color: var(--color-background);
             width: 100%;
             height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
-            align-items: center;
-            justify-content: center;
-            z-index: 1000;
         }
 
-        .modal-content {
-            background-color: var(--color-surface);
-            border-radius: 16px;
-            padding: 24px;
-            width: 90%;
-            max-width: 500px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-        }
-
-        .modal-header {
+        .app-list {
             display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
+            flex-direction: column;
+            gap: 8px;
         }
 
-        .modal-title {
-            font-size: 20px;
-            font-weight: 500;
-        }
-
-        .close-btn {
-            background: none;
-            border: none;
-            color: var(--color-on-surface);
-            font-size: 24px;
-            cursor: pointer;
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 8px;
-            font-size: 14px;
-            opacity: 0.8;
-        }
-
-        input,
-        select {
-            width: 100%;
-            padding: 12px;
-            border-radius: 8px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+        .app-item {
+            padding: 12px 16px;
             background-color: rgba(255, 255, 255, 0.05);
-            color: var(--color-on-surface);
-            font-size: 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
         }
 
-        .toggle-group {
-            display: flex;
-            align-items: center;
-            gap: 10px;
+        .app-item:hover {
+            background-color: rgba(255, 255, 255, 0.1);
         }
 
-        .toggle-label {
-            margin-bottom: 0;
-        }
-
-        .modal-actions {
-            display: flex;
-            justify-content: flex-end;
-            gap: 10px;
+        .app-item.active {
+            background-color: var(--color-primary-variant);
+            color: var(--color-on-background);
         }
 
         .empty-state {
@@ -288,39 +188,140 @@
             color: var(--color-primary);
         }
 
-        .loading {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 10px;
-            padding: 20px;
-        }
-
         .loading-spinner {
-            width: 24px;
-            height: 24px;
-            border: 3px solid rgba(255, 255, 255, 0.3);
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
             border-radius: 50%;
             border-top-color: var(--color-primary);
             animation: spin 1s ease-in-out infinite;
+            display: inline-block;
+            margin-left: 8px;
         }
 
         @keyframes spin {
-            to {
-                transform: rotate(360deg);
-            }
+            to { transform: rotate(360deg); }
         }
 
-        @media (max-width: 600px) {
-            .cat-details {
-                flex-direction: column;
-                gap: 4px;
-            }
+        .menu-toggle {
+            display: block;
+            background: none;
+            border: none;
+            color: var(--color-on-surface);
+            font-size: 20px;
+            cursor: pointer;
+            margin-right: 12px;
+        }
 
-            .header-buttons {
-                flex-direction: column;
-                gap: 5px;
+        .overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 5;
+            display: none;
+        }
+
+        .overlay.visible {
+            display: block;
+        }
+
+        .frame-selector {
+            position: absolute;
+            top: 8px;
+            left: 8px;
+            z-index: 90;
+            background-color: var(--color-primary);
+            color: var(--color-on-primary);
+            border: none;
+            border-radius: 16px;
+            padding: 6px 12px;
+            font-size: 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .current-app-indicator {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-right: 12px;
+            font-size: 12px;
+        }
+
+        #sidebar {
+            width: 80%;
+            max-width: 300px;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.5);
+        }
+
+        #sidebar:not(.hidden)+.overlay {
+            display: block;
+        }
+
+        .header-buttons {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .btn {
+            padding: 6px 12px;
+            font-size: 12px;
+        }
+
+        .header-title {
+            margin-left: 12px;
+            margin-right: auto;
+            font-size: 18px;
+            font-weight: 500;
+        }
+
+        @media (min-width: 769px) {
+            #sidebar {
+                width: 300px;
             }
+        }
+        
+        /* Νέο στυλ για το animation φόρτωσης */
+        .connecting-animation {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        .connecting-dots {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background-color: var(--color-primary);
+            animation: dot-pulse 1.5s infinite ease-in-out;
+        }
+        
+        .dot:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+        
+        .dot:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+        
+        @keyframes dot-pulse {
+            0%, 100% { transform: scale(0.8); opacity: 0.5; }
+            50% { transform: scale(1.2); opacity: 1; }
         }
     </style>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
@@ -328,95 +329,114 @@
 </head>
 
 <body>
-    <div class="container">
-        <header>
-            <h1><i class="fas fa-cat"></i> Cat Tracker</h1>
-            <div class="header-buttons">
-                <button id="connectBtn" class="btn">
-                    <i class="fas fa-bluetooth-b"></i> Σύνδεση
-                </button>
-                <button id="refreshBtn" class="btn" style="display:none;">
-                    <i class="fas fa-sync"></i> Ανανέωση
-                </button>
-                <button id="exportBtn" class="btn btn-secondary" style="display:none;">
-                    <i class="fas fa-download"></i> Export
-                </button>
-                <button id="importBtn" class="btn btn-secondary" style="display:none;">
-                    <i class="fas fa-upload"></i> Import
-                </button>
-            </div>
-        </header>
+    <header>
+        <button class="menu-toggle" id="menuToggle">
+            <i class="fas fa-bars"></i>
+        </button>
 
-        <div class="status">
-            <div class="status-dot" id="statusDot"></div>
-            <span id="statusText">Δεν έχετε συνδεθεί με Espruino</span>
-        </div>
+        <h1 class="header-title">eW</h1>
 
-        <div id="catList" class="cat-list">
-            <div class="empty-state">
-                <i class="fas fa-cat"></i>
-                <p>Δεν υπάρχουν καταχωρημένες γάτες. Συνδεθείτε για να εμφανιστούν τα δεδομένα.</p>
+        <div class="header-buttons">
+            <div class="current-app-indicator" id="currentAppIndicator">
+                <div class="status-dot" id="statusDotHeader"></div>
+                <span id="statusTextHeader">-</span>
             </div>
+
+            <button id="connectBtn" class="btn">
+                <i class="fas fa-bluetooth-b"></i> Σύνδεση
+            </button>
         </div>
+    </header>
+
+    <div class="status">
+        <div class="status-dot" id="statusDot"></div>
+        <span id="statusText">Δεν έχετε συνδεθεί με Espruino</span>
     </div>
 
-    <div id="editModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2 class="modal-title">Επεξεργασία γάτας</h2>
-                <button class="close-btn">&times;</button>
-            </div>
-            <div class="form-group">
-                <label for="catName">Όνομα γάτας</label>
-                <input type="text" id="catName" placeholder="Πληκτρολογήστε το όνομα">
-            </div>
-            <div class="form-group">
-                <label for="catId">ID iTag (μη επεξεργάσιμο)</label>
-                <input type="text" id="catId" disabled>
-            </div>
-            <div class="form-group">
-                <label for="catSilent">Λειτουργία σιγή</label>
-                <select id="catSilent">
-                    <option value="0">Ενεργό (false)</option>
-                    <option value="1">Σιγή (true)</option>
-                </select>
-            </div>
-            <div class="modal-actions">
-                <button id="saveCatBtn" class="btn">Αποθήκευση</button>
-                <button id="cancelEditBtn" class="btn btn-secondary">Ακύρωση</button>
-            </div>
-        </div>
-    </div>
+    <button class="frame-selector" id="frameSelector">
+        <i class="fas fa-th-large"></i> Επιλογή App
+    </button>
 
-    <input type="file" id="importFile" accept=".json" style="display: none;">
+    <main>
+        <aside id="sidebar" class="hidden">
+            <div id="appList" class="app-list">
+                <div class="empty-state">
+                    <i class="fas fa-plug"></i>
+                    <p>Συνδεθείτε για να φορτώσετε apps</p>
+                </div>
+            </div>
+        </aside>
+
+        <div class="overlay" id="overlay"></div>
+
+        <iframe id="appFrame" src="about:blank"></iframe>
+    </main>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             // Στοιχεία DOM
             const connectBtn = document.getElementById('connectBtn');
-            const refreshBtn = document.getElementById('refreshBtn');
-            const exportBtn = document.getElementById('exportBtn');
-            const importBtn = document.getElementById('importBtn');
-            const importFile = document.getElementById('importFile');
             const statusDot = document.getElementById('statusDot');
             const statusText = document.getElementById('statusText');
-            const catList = document.getElementById('catList');
-            const editModal = document.getElementById('editModal');
-            const catNameInput = document.getElementById('catName');
-            const catIdInput = document.getElementById('catId');
-            const catSilentInput = document.getElementById('catSilent');
-            const saveCatBtn = document.getElementById('saveCatBtn');
-            const cancelEditBtn = document.getElementById('cancelEditBtn');
-            const closeBtn = document.querySelector('.close-btn');
+            const appList = document.getElementById('appList');
+            const appFrame = document.getElementById('appFrame');
+            const menuToggle = document.getElementById('menuToggle');
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('overlay');
+            const frameSelector = document.getElementById('frameSelector');
+
+            // Νέα στοιχεία DOM για την ένδειξη στο header
+            const statusDotHeader = document.getElementById('statusDotHeader');
+            const statusTextHeader = document.getElementById('statusTextHeader');
 
             let isConnected = false;
             let currentDevice = null;
             let uartService = null;
             let uartRxCharacteristic = null;
             let uartTxCharacteristic = null;
-            let catsData = [];
-            let editingCatId = null;
             let dataBuffer = '';
+
+            // Μεταβλητές για swipe
+            let touchStartX = 0;
+            let touchStartY = 0;
+            let sidebarVisible = false;
+
+            // Νέες μεταβλητές για ουρά εντολών
+            let commandQueue = [];
+            let isProcessingQueue = false;
+
+            let isFirstLoad = true;
+            let currentApp = null; // Αποθήκευση του τρέχοντος app
+
+            // Εκκίνηση Web Bluetooth
+            if (!navigator.bluetooth) {
+                statusText.textContent = 'Το Web Bluetooth δεν υποστηρίζεται από αυτό το browser';
+                statusTextHeader.textContent = 'No WebBT';
+                connectBtn.disabled = true;
+            }
+
+            // Χειρισμός menu toggle
+            menuToggle.addEventListener('click', toggleSidebar);
+            overlay.addEventListener('click', hideSidebar);
+            frameSelector.addEventListener('click', toggleSidebar);
+
+            // Προσθήκη event listeners για swipe
+            document.addEventListener('touchstart', handleTouchStart, false);
+            document.addEventListener('touchmove', handleTouchMove, false);
+            document.addEventListener('touchend', handleTouchEnd, false);
+
+            // Ανακατάταξη του ύψους όταν αλλάζει το μέγεθος του παραθύρου
+            window.addEventListener('resize', updateAppFrameHeight);
+
+            // Αρχικοποίηση του ύψους του iframe
+            updateAppFrameHeight();
+
+            window.addEventListener('message', function(event) {
+                if (event.data.type === 'BLUETOOTH_COMMAND') {
+                    console.log("Launcher received command from app:", event.data.command);
+                    addToCommandQueue(event.data.command);
+                }
+            });
 
             // UUIDs για την UART υπηρεσία του Espruino
             const UART_SERVICE_UUID = '6e400001-b5a3-f393-e0a9-e50e24dcca9e';
@@ -426,6 +446,7 @@
             // Έλεγχος αν το Web Bluetooth είναι διαθέσιμο
             if (!navigator.bluetooth) {
                 statusText.textContent = 'Το Web Bluetooth δεν υποστηρίζεται από αυτό το browser';
+                statusTextHeader.textContent = 'No WebBT';
                 connectBtn.disabled = true;
             }
 
@@ -439,28 +460,13 @@
                 }
             });
 
-            refreshBtn.addEventListener('click', function() {
-                if (isConnected) {
-                    refreshData();
-                }
-            });
-
-            exportBtn.addEventListener('click', function() {
-                exportData();
-            });
-
-            importBtn.addEventListener('click', function() {
-                importFile.click();
-            });
-
-            importFile.addEventListener('change', function(e) {
-                handleImport(e.target.files[0]);
-            });
-
             // Σύνδεση με συσκευή
             async function connectToDevice() {
                 try {
+                    // Επαναφορά του iframe πριν από σύνδεση
+
                     statusText.textContent = 'Αναζήτηση συσκευών Bluetooth...';
+                    statusTextHeader.textContent = 'Αναζήτηση...';
 
                     currentDevice = await navigator.bluetooth.requestDevice({
                         filters: [{ namePrefix: 'eW' }],
@@ -469,10 +475,12 @@
 
                     if (!currentDevice) {
                         statusText.textContent = 'Δεν επιλέχθηκε συσκευή';
+                        statusTextHeader.textContent = 'Δεν επιλέχθηκε';
                         return;
                     }
 
                     statusText.textContent = 'Σύνδεση με ' + currentDevice.name + '...';
+                    statusTextHeader.textContent = 'Σύνδεση...';
                     const server = await currentDevice.gatt.connect();
 
                     uartService = await server.getPrimaryService(UART_SERVICE_UUID);
@@ -484,163 +492,93 @@
 
                     isConnected = true;
                     statusDot.classList.add('connected');
+                    statusDotHeader.classList.add('connected');
                     statusText.textContent = 'Συνδεδεμένοι με ' + currentDevice.name;
+                    statusTextHeader.textContent = 'Συνδεδεμένοι';
                     connectBtn.innerHTML = '<i class="fas fa-bluetooth-b"></i> Αποσύνδεση';
-                    refreshBtn.style.display = 'inline-block';
-                    exportBtn.style.display = 'inline-block';
-                    importBtn.style.display = 'inline-block';
 
                     currentDevice.addEventListener('gattserverdisconnected', onDisconnected);
 
                     // Μικρή καθυστέρηση πριν την πρώτη εντολή
-                    statusText.textContent = 'Προετοιμασία...';
-                    await new Promise(resolve => setTimeout(resolve, 1500));
+                    await new Promise(resolve => setTimeout(resolve, 1000));
 
-                    // Αποστολή εντολής για ανάγνωση δεδομένων
-                    statusText.textContent = 'Ανάγνωση δεδομένων...';
-                    await sendCommand('Bluetooth.println(JSON.stringify(ew.apps.itag.state.def))\n');
+                    // ΑΥΤΟΜΑΤΗ ΣΑΡΩΣΗ ΜΟΛΙΣ ΣΥΝΔΕΘΟΥΜΕ
+                    await scanForApps();
 
                 }
                 catch (error) {
                     console.error('Σφάλμα σύνδεσης:', error);
                     statusText.textContent = 'Σφάλμα σύνδεσης: ' + error.message;
+                    statusTextHeader.textContent = 'Σφάλμα σύνδεσης';
                 }
             }
 
-            // Ανανέωση δεδομένων
-            async function refreshData() {
+            // Σάρωση για εφαρμογές στο Espruino
+            async function scanForApps() {
                 if (!isConnected) return;
 
                 try {
-                    statusText.textContent = 'Ανάγνωση δεδομένων...';
-                    await sendCommand('Bluetooth.println(JSON.stringify(ew.apps.itag.state.def))\n');
+                    statusText.innerHTML = 'Σάρωση για εφαρμογές... <span class="loading-spinner"></span>';
+                    statusTextHeader.textContent = 'Σάρωση...';
+                    appList.innerHTML = `
+                    <div class="app-item" style="opacity: 0.5;"><div class="skeleton" style="width: 80%; height: 1.2em;"></div></div>
+                    <div class="app-item" style="opacity: 0.5;"><div class="skeleton" style="width: 60%; height: 1.2em;"></div></div>
+                    <div class="app-item" style="opacity: 0.5;"><div class="skeleton" style="width: 70%; height: 1.2em;"></div></div>
+                    `;
+
+                    // 1. Πάρε τη λίστα με τα ΟΝΟΜΑΤΑ των εγκατεστημένων εφαρμογών (Object.keys(ew.apps))
+                    dataBuffer = ''; // Clear buffer πριν την νέα αίτηση
+                    const commandToSend = 'Bluetooth.println(JSON.stringify(Object.keys(ew.apps)));\n';
+                    console.log("Στέλνω εντολή:", commandToSend);
+                    await sendCommand(commandToSend);
+
                 }
                 catch (error) {
-                    console.error('Σφάλμα ανανέωσης:', error);
-                    statusText.textContent = 'Σφάλμα ανανέωσης: ' + error.message;
+                    console.error('Σφάλμα σάρωσης:', error);
+                    statusText.textContent = 'Σφάλμα σάρωσης: ' + error.message;
+                    statusTextHeader.textContent = 'Σφάλμα σάρωσης';
                 }
             }
 
-            // Εξαγωγή δεδομένων
-            function exportData() {
-                if (catsData.length === 0) {
-                    alert('Δεν υπάρχουν δεδομένα για εξαγωγή');
+            // ΣΥΣΤΗΜΑ ΟΥΡΑΣ ΕΝΤΟΛΩΝ
+            function addToCommandQueue(command) {
+                commandQueue.push(command);
+                if (!isProcessingQueue) {
+                    processCommandQueue();
+                }
+            }
+
+            async function processCommandQueue() {
+                if (commandQueue.length === 0) {
+                    isProcessingQueue = false;
                     return;
                 }
 
-                // Δημιουργία αντικειμένου με τα δεδομένα για εξαγωγή
-                const exportData = {
-                    cats: catsData,
-                    timestamp: new Date().toISOString(),
-                    version: '1.0'
-                };
-
-                // Δημιουργία JSON string
-                const jsonString = JSON.stringify(exportData, null, 2);
-
-                // Δημιουργία blob και λήψη URL
-                const blob = new Blob([jsonString], { type: 'application/json' });
-                const url = URL.createObjectURL(blob);
-
-                // Δημιουργία link για λήψη
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = `cat_tracker_export_${new Date().toISOString().slice(0, 10)}.json`;
-                document.body.appendChild(a);
-                a.click();
-
-                // Καθαρισμός
-                setTimeout(() => {
-                    document.body.removeChild(a);
-                    URL.revokeObjectURL(url);
-                }, 100);
-
-                statusText.textContent = 'Τα δεδομένα εξήχθησαν επιτυχώς';
-            }
-
-            // Εισαγωγή δεδομένων
-            function handleImport(file) {
-                if (!file) return;
-
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    try {
-                        const importedData = JSON.parse(e.target.result);
-
-                        if (!importedData.cats || !Array.isArray(importedData.cats)) {
-                            throw new Error('Μη έγκυρη μορφή αρχείου');
-                        }
-
-                        if (!confirm(`Θέλετε να εισαγάγετε ${importedData.cats.length} γάτες; Αυτή η ενέργεια θα αντικαταστήσει τις τρέχουσες ρυθμίσεις.`)) {
-                            return;
-                        }
-
-                        // Αποστολή των δεδομένων κατευθείαν στο Espruino
-                        updateEspruinoWithImportedData(importedData.cats);
-                        statusText.textContent = 'Τα δεδομένα εισήχθησαν και εστάλησαν στην συσκευή!';
-
-                    }
-                    catch (error) {
-                        console.error('Σφάλμα εισαγωγής:', error);
-                        alert('Σφάλμα κατά την εισαγωγή: ' + error.message);
-                    }
-                };
-                reader.readAsText(file);
-            }
-
-            // Ενημέρωση Espruino με εισαγόμενα δεδομένα
-            async function updateEspruinoWithImportedData(importedCats) {
-                if (!isConnected) return;
+                isProcessingQueue = true;
+                const command = commandQueue[0];
 
                 try {
-                    statusText.textContent = 'Ενημέρωση συσκευής με εισαγόμενα δεδομένα...';
-
-                    // Δημιουργούμε την εντολή για να ορίσουμε όλο τον πίνακα
-                    let command = 'ew.apps.itag.state.def = [';
-
-                    // Προσθέτουμε κάθε γάτα στον πίνακα
-                    for (let i = 0; i < importedCats.length; i++) {
-                        if (i > 0) command += ',';
-                        command += JSON.stringify(importedCats[i]);
-                    }
-                    command += '];\n';
-
-                    console.log("Εντολή μήκος:", command.length);
-
-                    // Στέλνουμε την εντολή σε μέρη αν είναι πολύ μεγάλη
-                    const chunkSize = 100;
-                    for (let i = 0; i < command.length; i += chunkSize) {
-                        const chunk = command.substring(i, i + chunkSize);
-                        await sendCommand(chunk);
-                        await new Promise(resolve => setTimeout(resolve, 50));
-                    }
-
-                    // Περιμένουμε να ολοκληρωθεί η εντολή
-                    await new Promise(resolve => setTimeout(resolve, 500));
-
-                    // Ελέγχουμε και αποθηκεύουμε
-                    await sendCommand('if (ew.apps.itag.state.def && ew.apps.itag.state.def.length > 0) { \n');
-                    await sendCommand('  Bluetooth.println("Αποθηκεύτηκαν " + ew.apps.itag.state.def.length + " γάτες");\n');
-                    await sendCommand('} else {\n');
-                    await sendCommand('  Bluetooth.println("Σφάλμα: Ο πίνακας είναι άδειος");\n');
-                    await sendCommand('}\n');
-
-                    // Ανανέωση δεδομένων
-                    await refreshData();
-
-                    statusText.textContent = 'Η συσκευή ενημερώθηκε με τα εισαγόμενα δεδομένα (' + importedCats.length + ' γάτες)';
+                    await sendCommandDirect(command);
+                    commandQueue.shift();
                 }
                 catch (error) {
-                    console.error('Σφάλμα ενημέρωσης συσκευής:', error);
-                    statusText.textContent = 'Σφάλμα ενημέρωσης συσκευής: ' + error.message;
+                    console.error("Σφάλμα αποστολής εντολής, προσπαθώ ξανά:", error);
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                }
+
+                if (commandQueue.length > 0) {
+                    setTimeout(processCommandQueue, 50);
+                }
+                else {
+                    isProcessingQueue = false;
                 }
             }
-            
-            // Αποστολή εντολής μέσω UART
-            async function sendCommand(command) {
+
+            // Αποστολή εντολής απευθείας στη συσκευή (χωρίς ουρά)
+            async function sendCommandDirect(command) {
                 if (!uartRxCharacteristic) {
                     console.error("Δεν υπάρχει σύνδεση UART");
-                    return;
+                    throw new Error("No UART connection");
                 }
 
                 try {
@@ -648,24 +586,39 @@
                     const encoder = new TextEncoder();
                     const data = encoder.encode(command);
                     await uartRxCharacteristic.writeValue(data);
-                    console.log("Εντολή αποσταλεί επιτυχώς");
                 }
                 catch (error) {
                     console.error("Σφάλμα αποστολής εντολής:", error);
+                    throw error;
                 }
+            }
+
+            // ΠΑΛΙΑ ΣΥΝΑΡΤΗΣΗ sendCommand (για πίσω συμβατότητα)
+            async function sendCommand(command) {
+                return sendCommandDirect(command);
             }
 
             // Χειρισμός εισερχόμενων δεδομένων από UART
             function handleUartData(event) {
                 const value = event.target.value;
                 const decoder = new TextDecoder();
-                const data = decoder.decode(value);
+                const rawData = decoder.decode(value);
 
-                dataBuffer += data;
+                console.log("Launcher received RAW:", rawData);
 
-                // Έλεγχος αν έχουμε λάβει πλήρη JSON απάντηση
+                // 1. ΠΡΟΩΘΗΣΗ: Στείλε ΟΛΑ τα RAW δεδομένα στο τρέχον iframe (app)
+                if (appFrame && appFrame.contentWindow) {
+                    appFrame.contentWindow.postMessage({
+                        type: 'BLUETOOTH_RAW_DATA',
+                        data: rawData
+                    }, '*');
+                }
+
+                // 2. ΕΠΕΞΕΡΓΑΣΙΑ ΓΙΑ ΤΟΝ LAUNCHER:
+                dataBuffer += rawData;
+
+                // Έλεγχος αν το buffer περιέχει την απάντηση για τα apps
                 try {
-                    // Προσπαθούμε να βρούμε JSON στο buffer
                     const jsonStart = dataBuffer.indexOf('[');
                     const jsonEnd = dataBuffer.lastIndexOf(']');
 
@@ -673,17 +626,164 @@
                         const jsonString = dataBuffer.substring(jsonStart, jsonEnd + 1);
                         const jsonData = JSON.parse(jsonString);
 
-                        // Επεξεργασία των δεδομένων
-                        processRetrievedData(jsonData);
-
-                        // Καθαρισμός buffer
-                        dataBuffer = '';
+                        // ΕΛΕΓΧΟΣ: Είναι array και όλα τα items είναι strings?
+                        if (Array.isArray(jsonData) && jsonData.every(item => typeof item === 'string')) {
+                            console.log("Επιτυχής ανάλυση λίστας apps:", jsonData);
+                            dataBuffer = '';
+                            processAppsObject(jsonData);
+                        }
                     }
                 }
                 catch (e) {
-                    // Αγνοούμε σφάλματα ανάλυσης JSON (ίσως τα δεδομένα δεν είναι ακόμα πλήρη)
-                    console.log('Λήψη δεδομένων:', data);
+                    console.log("Λήψη μερικών δεδομένων... (Δεν ήταν λίστα apps)");
                 }
+
+                // Αποκοπή buffer αν γίνει πολύ μεγάλο
+                if (dataBuffer.length > 1024) {
+                    console.warn("Buffer μεγάλο, αποκοπή");
+                    dataBuffer = '';
+                }
+            }
+
+            // Επεξεργασία λίστας εφαρμογών
+            function processAppList(appArray) {
+                const appObject = {};
+                appArray.forEach(appName => {
+                    appObject[appName] = true;
+                });
+                processAppsObject(appObject);
+            }
+
+            // Επεξεργασία αντικειμένου εφαρμογών
+            function processAppsObject(appsObject) {
+                let appNames = [];
+                if (Array.isArray(appsObject) && appsObject.every(item => typeof item === 'string')) {
+                    appNames = appsObject;
+                }
+                else if (typeof appsObject === 'object' && appsObject !== null) {
+                    appNames = Object.keys(appsObject);
+                }
+                else {
+                    console.error("Μη αναμενόμενο format apps:", appsObject);
+                    return;
+                }
+
+                statusText.textContent = `Βρέθηκαν ${appNames.length} εφαρμογές`;
+                statusTextHeader.textContent = `Βρέθηκαν ${appNames.length} apps`;
+
+                if (appNames.length === 0) {
+                    appList.innerHTML = '<div class="empty-state"><i class="fas fa-exclamation-triangle"></i><p>Δεν βρέθηκαν εφαρμογές στο Espruino</p></div>';
+                    statusTextHeader.textContent = '0 apps';
+                    return;
+                }
+
+                // Έλεγχος για κάθε εφαρμογή αν υπάρχει το αντίστοιχο web app
+                checkAppsExistence(appNames);
+            }
+
+            // Έλεγχος ύπαρξης HTML για κάθε app
+            async function checkAppsExistence(appNames) {
+                const availableApps = [];
+
+                for (const appName of appNames) {
+                    try {
+                        const response = await fetch(`../app/${appName}/index.html`);
+                        if (response.ok) {
+                            availableApps.push(appName);
+                        }
+                    }
+                    catch (e) {
+                        // Το app δεν υπάρχει, αγνοούμε
+                    }
+                }
+
+                // Εμφάνιση των διαθέσιμων εφαρμογών
+                displayAvailableApps(availableApps);
+            }
+
+            // Εμφάνιση λίστας διαθέσιμων εφαρμογών
+            function displayAvailableApps(apps) {
+                if (apps.length === 0) {
+                    appList.innerHTML = '<div class="empty-state"><i class="fas fa-folder-open"></i><p>Δεν βρέθηκαν αντίστοιχα web apps. Βεβαιωθείτε ότι βρίσκονται στο φάκελο ../app/[όνομα]/index.html</p></div>';
+                    statusText.textContent = 'Δεν βρέθηκαν web apps για τις εφαρμογές του Espruino';
+                    statusTextHeader.textContent = '0 web apps';
+                    return;
+                }
+
+                statusText.textContent = `Βρέθηκαν ${apps.length} web apps`;
+                statusTextHeader.textContent = `${apps.length} web apps`;
+                appList.innerHTML = '';
+
+                apps.forEach(app => {
+                    const appItem = document.createElement('div');
+                    appItem.className = 'app-item';
+                    appItem.textContent = app;
+                    appItem.addEventListener('click', () => {
+                        loadApp(app);
+                        hideSidebar();
+                    });
+                    appList.appendChild(appItem);
+                });
+
+                // ΕΠΙΛΟΓΗ DEFAULT ΕΦΑΡΜΟΓΗΣ & ΑΥΤΟΜΑΤΗ ΦΟΡΤΩΣΗ
+                let defaultAppName = null;
+                if (apps.includes('itag')) {
+                    defaultAppName = 'itag';
+                }
+                else if (apps.includes('timer')) {
+                    defaultAppName = 'timer';
+                }
+                else {
+                    defaultAppName = apps[0];
+                }
+
+                // Φόρτωση της default εφαρμογής
+                if (defaultAppName) {
+                    loadApp(defaultAppName);
+                }
+            }
+
+            // Φόρτωση εφαρμογής στο iframe
+            function loadApp(appName) {
+                // Αποθήκευση του τρέχοντος app
+                currentApp = appName;
+                
+                // Highlight την επιλεγμένη εφαρμογή
+                document.querySelectorAll('.app-item').forEach(item => {
+                    item.classList.remove('active');
+                    if (item.textContent === appName) {
+                        item.classList.add('active');
+                    }
+                });
+
+                // Φόρτωση της εφαρμογής στο iframe
+                appFrame.src = `../app/${appName}/index.html`;
+                statusText.textContent = `Φόρτωση: ${appName}`;
+                statusTextHeader.textContent = `Φόρτωση: ${appName}`;
+
+                // Άδειασμα του buffer μηνύσεων πριν φορτωθεί νέο app
+                dataBuffer = '';
+
+                // Όταν το iframe φορτωθεί, στείλ'του ένα μήνυμα "handshake"
+                appFrame.onload = function() {
+                    statusText.textContent = `Τρέχει: ${appName}`;
+                    statusTextHeader.textContent = `Τρέχει: ${appName}`;
+                    let firstCommand = `Bluetooth.println(JSON.stringify(ew.apps.${appName}.state.def));\n`;
+                    console.log(`Launcher sending first command to ${appName}:`, firstCommand);
+                    addToCommandQueue(firstCommand);
+
+                    try {
+                        appFrame.contentWindow.postMessage({
+                            type: 'LAUNCHER_INFO',
+                            message: 'App loaded successfully. First command sent.'
+                        }, '*');
+                    }
+                    catch (e) {
+                        console.log("Could not post message to iframe:", e);
+                    }
+
+                    setTimeout(updateAppFrameHeight, 100);
+                };
             }
 
             // Αποσύνδεση από συσκευή
@@ -694,209 +794,124 @@
                 onDisconnected();
             }
 
+ 
+
             // Χειρισμός αποσύνδεσης
-            function onDisconnected() {
-                isConnected = false;
-                statusDot.classList.remove('connected');
-                statusText.textContent = 'Αποσυνδεθήκατε από τη συσκευή';
-                connectBtn.innerHTML = '<i class="fas fa-bluetooth-b"></i> Σύνδεση';
-                refreshBtn.style.display = 'none';
-                exportBtn.style.display = 'none';
-                importBtn.style.display = 'none';
+function onDisconnected() {
+    console.log("onDisconnected called");
+    
+    isConnected = false;
+    statusDot.classList.remove('connected');
+    statusDotHeader.classList.remove('connected');
+    statusText.textContent = 'Αποσυνδεθήκατε από τη συσκευή';
+    statusTextHeader.textContent = 'Αποσυνδεθήκατε';
+    connectBtn.innerHTML = '<i class="fas fa-bluetooth-b"></i> Σύνδεση';
+    
+    // ΑΠΕΝΕΡΓΟΠΟΙΗΣΗ ΤΟΥ IFRAME - ΣΩΣΤΗ ΕΚΔΟΣΗ
+    appFrame.onload = null;
+    appFrame.src = 'about:blank'; // Αδειάζουμε το iframe
+    
+    // ΕΠΑΝΑΦΟΡΑ ΤΗΣ ΑΡΧΙΚΗΣ ΚΑΤΑΣΤΑΣΗΣ
+    appList.innerHTML = `
+        <div class="empty-state">
+            <i class="fas fa-plug"></i>
+            <p>Συνδεθείτε για να φορτώσετε apps</p>
+        </div>
+    `;
 
-                // Καθαρισμός των μεταβλητών σύνδεσης
-                currentDevice = null;
-                uartService = null;
-                uartRxCharacteristic = null;
-                uartTxCharacteristic = null;
-                dataBuffer = '';
-            }
+    // ΕΠΙΣΤΡΟΦΗ ΣΤΗΝ ΑΡΧΙΚΗ ΣΕΛΙΔΑ
+    showSidebar();
 
-            // Επεξεργασία των δεδομένων που ελήφθησαν από το Espruino
-            function processRetrievedData(data) {
-                if (data && Array.isArray(data)) {
-                    catsData = data;
+    // Καθαρισμός των μεταβλητών σύνδεσης
+    currentDevice = null;
+    uartService = null;
+    uartRxCharacteristic = null;
+    uartTxCharacteristic = null;
+    dataBuffer = '';
 
-                    // Ενημέρωση των ονομάτων αν είναι απαραίτητο
-                    catsData.forEach(cat => {
-                        if (!cat.name || cat.name === "Unknown") {
-                            cat.name = "Αδέσποτη";
-                        }
-                    });
+    // Καθαρισμός ουράς εντολών
+    commandQueue = [];
+    isProcessingQueue = false;
+    
+    // Επαναφορά του currentApp
+    currentApp = null;
+}
 
-                    renderCatList();
-                    statusText.textContent = 'Βρέθηκαν ' + catsData.length + ' γάτες';
+            // Συναρτήσεις για το sidebar
+            function toggleSidebar() {
+                if (sidebar.classList.contains('hidden')) {
+                    showSidebar();
                 }
                 else {
-                    statusText.textContent = 'Μη έγκυρα δεδομένα από το Espruino';
-                    console.error('Μη έγκυρα δεδομένα:', data);
+                    hideSidebar();
                 }
             }
 
-            // Απόδοση λίστας γατών
-            function renderCatList() {
-                if (catsData.length === 0) {
-                    catList.innerHTML = `
-                        <div class="empty-state">
-                            <i class="fas fa-cat"></i>
-                            <p>Δεν βρέθηκαν δεδομένα iTag. Βεβαιωθείτε ότι το Espruino εκτελεί το σωστό script.</p>
-                        </div>
-                    `;
-                    return;
-                }
-
-                catList.innerHTML = '';
-
-                catsData.forEach(cat => {
-                    const lastSeen = new Date(cat.lastseen);
-                    const now = new Date();
-                    const diffMs = now - lastSeen;
-                    const diffMins = Math.floor(diffMs / 60000);
-
-                    let locationStatus = 'Σε βόλτα';
-                    let locationIcon = 'fa-walking';
-                    if (diffMins < 5) {
-                        locationStatus = 'Στο σπίτι';
-                        locationIcon = 'fa-house';
-                    }
-
-                    const batteryIcon = cat.batt > 70 ? 'fa-battery-full' :
-                        cat.batt > 40 ? 'fa-battery-half' : 'fa-battery-quarter';
-
-                    const silentStatus = cat.silent ? 'Σιγή (true)' : 'Ενεργό (false)';
-                    const silentIcon = cat.silent ? 'fa-volume-mute' : 'fa-volume-up';
-
-                    const catCard = document.createElement('div');
-                    catCard.className = 'cat-card';
-                    catCard.innerHTML = `
-                        <div class="cat-icon">
-                            <i class="fas fa-cat"></i>
-                        </div>
-                        <div class="cat-info">
-                            <div class="cat-name">${cat.name}</div>
-                            <div class="cat-details">
-                                <div class="battery">
-                                    <i class="fas ${batteryIcon}"></i>
-                                    <span>${cat.batt}%</span>
-                                </div>
-                                <div class="location">
-                                    <i class="fas ${locationIcon}"></i>
-                                    <span>${locationStatus}</span>
-                                </div>
-                                <div class="silent">
-                                    <i class="fas ${silentIcon}"></i>
-                                    <span>${silentStatus}</span>
-                                </div>
-                            </div>
-                            <div class="last-seen">
-                                Τελευταία είδην: ${formatTimeDiff(diffMins)}
-                            </div>
-                        </div>
-                        <button class="edit-btn" data-id="${cat.id}">
-                            <i class="fas fa-edit"></i>
-                        </button>
-                    `;
-
-                    catList.appendChild(catCard);
-                });
-
-                // Προσθήκη event listeners για τα κουμπιά επεξεργασίας
-                document.querySelectorAll('.edit-btn').forEach(btn => {
-                    btn.addEventListener('click', function() {
-                        const catId = this.getAttribute('data-id');
-                        openEditModal(catId);
-                    });
-                });
+            function showSidebar() {
+                sidebar.classList.remove('hidden');
+                overlay.classList.add('visible');
+                sidebarVisible = true;
             }
 
-            // Μορφοποίηση χρονικού διαστήματος
-            function formatTimeDiff(mins) {
-                if (mins < 1) return 'τώρα';
-                if (mins < 60) return `${mins} λεπτά πριν`;
-                const hours = Math.floor(mins / 60);
-                if (hours < 24) return `${hours} ώρες πριν`;
-                const days = Math.floor(hours / 24);
-                return `${days} μέρες πριν`;
+            function hideSidebar() {
+                sidebar.classList.add('hidden');
+                overlay.classList.remove('visible');
+                sidebarVisible = false;
             }
 
-            // Άνοιγμα modal επεξεργασίας
-            function openEditModal(catId) {
-                const cat = catsData.find(c => c.id === catId);
-                if (!cat) return;
-
-                editingCatId = catId;
-                catIdInput.value = catId;
-                catNameInput.value = cat.name;
-                catSilentInput.value = cat.silent ? "1" : "0";
-
-                editModal.style.display = 'flex';
+            // Συναρτήσεις για swipe
+            function handleTouchStart(evt) {
+                const firstTouch = evt.touches[0];
+                touchStartX = firstTouch.clientX;
+                touchStartY = firstTouch.clientY;
             }
 
-            // Κλείσιμο modal
-            function closeEditModal() {
-                editModal.style.display = 'none';
-                editingCatId = null;
-                catNameInput.value = '';
-                catIdInput.value = '';
-                catSilentInput.value = '0';
+            function handleTouchMove(evt) {
+                if (!touchStartX || !touchStartY) return;
+
+                const touchX = evt.touches[0].clientX;
+                const touchY = evt.touches[0].clientY;
+
+                const diffX = touchX - touchStartX;
+                const diffY = touchY - touchStartY;
+
+                if (Math.abs(diffX) > Math.abs(diffY) && diffX > 50 && touchStartX < 50) {
+                    showSidebar();
+                }
             }
 
-            // Αποθήκευση αλλαγών
-            async function saveCatName() {
-                if (!editingCatId) return;
-
-                const newName = catNameInput.value.trim();
-                const newSilent = catSilentInput.value === "1";
-
-                if (!newName) return;
-
-                // Ενημέρωση στο catsData
-                const catIndex = catsData.findIndex(c => c.id === editingCatId);
-                if (catIndex !== -1) {
-                    catsData[catIndex].name = newName;
-                    catsData[catIndex].silent = newSilent;
-                }
-
-                // Αποστολή εντολών στο Espruino για ενημέρωση
-                try {
-                    // Ενημέρωση ονόματος
-                    await sendCommand(`ew.apps.itag.state.def.find(cat => cat.id === "${editingCatId}").name = "${newName}";\n`);
-
-                    // Ενημέρωση silent τιμής
-                    await sendCommand(`ew.apps.itag.state.def.find(cat => cat.id === "${editingCatId}").silent = ${newSilent};\n`);
-
-                    statusText.textContent = 'Οι αλλαγές αποθηκεύτηκαν επιτυχώς';
-                }
-                catch (error) {
-                    console.error('Σφάλμα αποστολής εντολών:', error);
-                    statusText.textContent = 'Σφάλμα αποστολής εντολών: ' + error.message;
-                }
-
-                // Επανάληψη απόδοσης λίστας
-                renderCatList();
-                closeEditModal();
+            function handleTouchEnd() {
+                touchStartX = 0;
+                touchStartY = 0;
             }
 
-            // Event listeners για modal
-            closeBtn.addEventListener('click', closeEditModal);
-            cancelEditBtn.addEventListener('click', closeEditModal);
-            saveCatBtn.addEventListener('click', saveCatName);
+            // Συνάρτηση για να ενημερώνει το ύψος του iframe
+            function updateAppFrameHeight() {
+                const headerHeight = document.querySelector('header').offsetHeight;
+                const mainElement = document.querySelector('main');
 
-            // Κλείσιμο modal με κλικ έξω από το περιεχόμενο
-            editModal.addEventListener('click', function(e) {
-                if (e.target === editModal) {
-                    closeEditModal();
-                }
-            });
+                const availableHeight = window.innerHeight - headerHeight;
 
-            // Κλείσιμο modal με πλήκρο Escape
-            document.addEventListener('keydown', function(e) {
-                if (e.key === 'Escape' && editModal.style.display === 'flex') {
-                    closeEditModal();
+                mainElement.style.height = availableHeight + 'px';
+                appFrame.style.height = '100%';
+
+                console.log('Updated iframe height:', availableHeight);
+            }
+
+            // Το sidebar είναι ανοιχτό στην πρώτη φόρτωση
+            function checkScreenSize() {
+                if (isFirstLoad) {
+                    sidebar.classList.remove('hidden');
+                    overlay.classList.remove('visible');
+                    isFirstLoad = false;
                 }
-            });
+            }
+            
+            // Έλεγχος μεγέθους οθόνης κατά τη φόρτωση και αλλαγή μεγέθους
+            window.addEventListener('load', checkScreenSize);
+            window.addEventListener('resize', checkScreenSize);
+            checkScreenSize();
         });
     </script>
 </body>
-
 </html>

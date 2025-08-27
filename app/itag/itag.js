@@ -29,7 +29,7 @@ ew.apps.itag = {
             var deviceExistsInStore = false;
             //print(device);
 
-            if (device.manufacturer === 261 || device.name=== "eC-08") {
+            if (device.manufacturer === 261 || (device.name && device.name.startsWith("eC-"))) {
 
                 // Ενημέρωση lastseen στο store (ανεξάρτητα από το αν υπάρχει στο deviceMap)
                 for (var i = 0; i < store.length; i++) {
@@ -56,7 +56,7 @@ ew.apps.itag = {
                         rssi: device.rssi,
                         live: true,
                         lastSeen: now,
-                        offlineCount: 0
+                        offlineCount: 0,
                     };
                     if (device.name) deviceObj.name = device.name;
 
@@ -68,7 +68,7 @@ ew.apps.itag = {
                     if (!deviceExistsInStore) {
                         var storeDevice = {
                             id: device.id,
-                            name: "Unknown",
+                            name: "New Tag",
                             batt: 100,  
                             lastseen: now,
                             silent: 1,  
@@ -87,7 +87,7 @@ ew.apps.itag = {
         // Εάν δεν υπάρχει ήδη offline checker, τον δημιουργούμε
         if (!ew.apps.itag.state.offlineChecker) {
             ew.apps.itag.state.offlineChecker = setInterval(function() {
-                var maxOfflineTime = 6000; // 6 δευτερόλεπτα offline
+                var maxOfflineTime = 4000; // 6 δευτερόλεπτα offline
                 var now = Date.now();
 
                 // Ενημέρωση κατάστασης συσκευών
@@ -137,15 +137,17 @@ ew.apps.itag = {
             ew.apps.itag.state.offlineChecker = undefined;
         }
         ew.apps.itag.state.ble.scan = false;
+        NRF.setTxPower(ew.def.rfTX);
     },
     conn: function(c) {
+        
         if (ew.face.appCurr === "itag-scan") ew.face.go("itag-connect", 0);
         if (ew.apps.itag.tid) { clearTimeout(ew.apps.itag.tid);
             ew.apps.itag.tid = 0; }
         //ew.apps.itag.stopScan();
         NRF.connect(c, { 
-        minInterval: (-95 < ew.apps.itag.state.dev.find(item => item.id === c).rssi)?7.5:50, 
-        maxInterval: (-95 < ew.apps.itag.state.dev.find(item => item.id === c).rssi)?20:400
+        minInterval: (-95 < ew.apps.itag.state.dev.find(item => item.id === c).rssi)?50:50, 
+        maxInterval: (-95 < ew.apps.itag.state.dev.find(item => item.id === c).rssi)?50:400
         }).then(function(ga) {
         //NRF.connect(c).then(function(ga) {
             ew.apps.itag.state.ble.gatt = ga;
@@ -230,7 +232,7 @@ ew.apps.itag = {
             }else {
                 if (ew.apps.itag.dbg) console.log("itag: disconnected");
                 //if (ew.face.appCurr === "itag-connect") ew.UI.btn.ntfy(1,1.5,0,"_bar",6,"DISCONNECTING","",0,15); 
-                ew.apps.itag.state.ble.gatt.disconnect();
+                //ew.apps.itag.state.ble.gatt.disconnect();
             }
         });
 

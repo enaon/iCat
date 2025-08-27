@@ -22,6 +22,7 @@ ew.face[0] = {
 		this.ref();
 		ew.UI.c.end();
 		ew.UI.c.bar._bar=(i)=>{
+			print("in set bar:",i)
 			if (i==1){
 				if (this.page=="set1") {ew.sys.buzz.nav(ew.sys.buzz.type.na);return;}
 				ew.sys.buzz.nav(ew.sys.buzz.type.ok);

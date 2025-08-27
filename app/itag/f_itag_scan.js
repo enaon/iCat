@@ -6,7 +6,7 @@ ew.UI.nav.next.replaceWith(() => {
 });
 ew.UI.nav.back.replaceWith(() => {
     ew.sys.buzz.nav(ew.sys.buzz.type.ok);
-    ew.face.go("main", 0);
+    ew.face.go("itag-dev", 0);
 });
 
 ew.face[0] = {
@@ -14,7 +14,7 @@ ew.face[0] = {
     gatt: {},
     run: false,
     offms: (ew.def.off[ew.face.appCurr]) ? ew.def.off[ew.face.appCurr] : 60000,
-    init: function(o) {
+    init: function() {
         ew.def.off[ew.face.appCurr] = this.offms;
         if (ew.apps.itag.state.ble.gatt.connected) {
             ew.face.go("itag-connect", 0);
@@ -55,7 +55,7 @@ ew.face[0] = {
         //this.run=1
 
     },
-    show: function(s) {
+    show: function() {
         if (!this.run) return;
 
         this.bar();
@@ -68,28 +68,32 @@ ew.face[0] = {
     info: function(rssi, id, name, offlineCount) {
         //"ram";
         g.setCol(0, 15);
-        g.fillRect({ x: 0, y: 60, x2: 235, y2: 180, r: 10 });
+        g.fillRect({ x: 0, y: 55, x2: 235, y2: 180, r: 10 });
 
         // values
         g.setCol(1, 4);
         g.setFont("LECO1976Regular22", 3);
         let l = g.stringWidth(rssi) / 2;
-        g.drawString(rssi, 100 - l, 95);
+        g.drawString(rssi, 100 - l, 85);
 
         // units
         g.setFont("Teletext10x18Ascii");
-        g.drawString("dBm", 125 + l - g.stringWidth("dBm") / 2, 127);
-
+        g.drawString("dBm", 125 + l - g.stringWidth("dBm") / 2, 117);
+        
+        //OfflineCount
         g.setCol(1, 0);
-        if (offlineCount)
-            g.drawString("OFFLINE: " + offlineCount, 120 - g.stringWidth("OFFLINE: " + offlineCount) / 2, 156);
-
+        if (offlineCount){
+            g.drawString("OFFLINE: " , 55, 156);
+            g.setFont("LECO1976Regular22");
+            g.drawString(offlineCount, 155, 155);
+        }
+        
         //name
         if (name)
             ew.UI.btn.c2l("main", "_headerS", 6, name, "", 15, 0, 1.5);
         else {
             // id
-            //g.setFont("LECO1976Regular22");
+            g.setFont("Teletext10x18Ascii");
             if (!offlineCount) g.drawString(id, 120 - g.stringWidth(id) / 2, 156);
             // name
             ew.UI.btn.c2l("main", "_headerS", 6, "New itag", "", 15, 0, 1.5);

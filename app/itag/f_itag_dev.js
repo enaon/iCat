@@ -1,7 +1,9 @@
 //itag scan viewer
 
 ew.UI.nav.next.replaceWith(() => {
-    ew.sys.buzz.nav(ew.sys.buzz.type.na);
+    ew.sys.buzz.nav(ew.sys.buzz.type.ok);
+    ew.face.go("itag-scan", 0);
+
 });
 ew.UI.nav.back.replaceWith(() => {
     ew.sys.buzz.nav(ew.sys.buzz.type.ok);
@@ -37,26 +39,26 @@ ew.face[0] = {
 
     info: function(batt, id, name, last) {
         //"ram";
-        g.setCol(0, 15);
-        g.fillRect({ x: 0, y: 60, x2: 235, y2: 175, r: 10 });
+        g.setCol(0, 1);
+        g.fillRect({ x: 0, y: 55, x2: 235, y2: 180, r: 10 });
 
         // values
-        g.setCol(1, 4);
+        g.setCol(1, 15);
         g.setFont("LECO1976Regular22", 3);
         let l = g.stringWidth(batt) / 2;
-        g.drawString(batt, 120 - l, 95);
+        g.drawString(batt, 120 - l, 85);
 
         // units
         g.setFont("Teletext10x18Ascii");
-        g.drawString("%", 140 + l - g.stringWidth("%") / 2, 127);
+        g.drawString("%", 140 + l - g.stringWidth("%") / 2, 117);
 
         // id
-        g.setCol(1, 0);
+        g.setCol(1, 14);
         //g.setFont("LECO1976Regular22");
         g.drawString(id, 120 - g.stringWidth(id) / 2, 156); //
+        
         // name
         ew.UI.btn.c2l("main", "_headerS", 6, name, "", 15, 0, 1.5);
-
 
     },
     catName: function(targetId) {

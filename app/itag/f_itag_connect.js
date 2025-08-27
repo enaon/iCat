@@ -25,7 +25,7 @@ ew.face[0] = {
         this.info(this.getVal("batt"),ew.apps.itag.state.ble.id.split(" ")[0] )
     },
     show: function(o) {
-        if (!ew.apps.itag.state.connected) this.tid=setTimeout(()=>{ew.apps.itag.conn(ew.apps.itag.state.ble.id)},500);
+        if (!ew.apps.itag.state.connected) this.tid=setTimeout(()=>{ew.apps.itag.conn(ew.apps.itag.state.ble.id)},800);
     },
     getVal:function (val){
          const device = ew.apps.itag.state.def.find(item => item.id === ew.apps.itag.state.ble.id);

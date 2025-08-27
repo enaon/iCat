@@ -71,10 +71,10 @@ ew.sys.BLEdis = () => {
     ew.sys.emit('BLE_dis');
 
 }
-NRF.setTxPower(ew.def.rfTX);
 NRF.on('disconnect',ew.sys.BLEdis);  
 NRF.on('connect',ew.sys.BLEcon);
 ew.do.update.bluetooth();
+NRF.setTxPower(ew.def.rfTX);
 
 //ble_uart module
 Modules.addCached("bleuart",function(){exports.connect=function(r){var k,l,m,n,f,h={write:function(a){return new Promise(function b(g,e){a.length?(n.writeValue(a.substr(0,20)).then(function(){b(g,e)}).catch(e),a=a.substr(20)):g()})},disconnect:function(){return k.disconnect()},eval:function(a){return new Promise(function(c,g){function e(){var d=b.indexOf("\n");if(0<=d){clearTimeout(p);f=p=void 0;var q=b.substr(0,d);try{c(JSON.parse(q))}catch(t){g(q)}b.length>d+1&&h.emit("data",b.substr(d+1))}}var b="";var p=setTimeout(e,

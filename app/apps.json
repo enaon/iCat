@@ -27,7 +27,7 @@
 	{ "id": "ew_handler",
 		"name": "Handler",
 		"icon": "../icon.png",
-		"version":"2.80",
+		"version":"2.81",
 		"description": "handlers ",
 		"tags": "magic3",
 	    "needsFeatures":["magic3"],
@@ -37,6 +37,7 @@
 			{"name":"ew_handler_notify","url":"../handler/handler_notify.js"},
 			{"name":"ew_handler_set","url":"../handler/handler_set.js"},
 			{"name":"ew_handler_btn","url":"../handler/handler_btn.js"},
+			{"name":"ew_handler_charge","url":"../handler/handler_charge.js"},
 			{"name":"ew_handler_conn","url":"../handler/handler_conn.js"},
 			{"name":"ew_handler_touch","url":"../handler/handler_touch.js"},
 			{"name":"ew_handler_touch_716","url":"../handler/handler_touch_716.js"},
@@ -47,7 +48,7 @@
 	{ "id": "ew_UI",
 		"name": "UI support",
 		"icon": "../icon.png",
-		"version":"2.80",
+		"version":"2.81",
 		"description": "UI",
 		"tags": "magic3",
 		"type":"core",
@@ -61,7 +62,7 @@
 	{ "id": "ew_settings",
 		"name": "Settings",
 		"icon": "../icon.png",
-		"version":"2.82",
+		"version":"2.84",
 		"description": "Settings face",
 		"tags": "magic3",
 		"type":"clock",
@@ -105,7 +106,7 @@
 	{ "id": "ew_itag",
 		"name": "itag",
 		"icon": "../icon.png",
-		"version":"2.84",
+		"version":"2.86",
 		"description": "itag",
 		"tags": "magic3",
 	    "needsFeatures":["magic3"],
@@ -115,6 +116,18 @@
 			{"name":"ew_f_itag-dev","url":"../itag/f_itag_dev.js"},
 			{"name":"ew_f_itag-connect","url":"../itag/f_itag_connect.js"}	
 
+		]
+	},
+		{ "id": "ew_timer",
+		"name": "timer",
+		"icon": "../icon.png",
+		"version":"2.53",
+		"description": "timer",
+		"tags": "magic3",
+	    "needsFeatures":["magic3"],
+		"storage": [
+			{"name":"ew_a_timer","url":"../timer/timer.js"},
+			{"name":"ew_f_timer","url":"../timer/f_timer.js"}
 		]
 	}
 
