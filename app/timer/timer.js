@@ -1,13 +1,13 @@
 ew.apps.timer = {
   state: {
     def: {
-      1: { min: 5, active: 0,  buzz: 1, buzzRep: 5, buzzDelay: 2000, rep: 0, remaining: 0, paused: 0, name: "Timer 1" },
-      2: { min: 10, active: 0,  buzz: 1, buzzRep: 5, buzzDelay: 2000, rep: 0, remaining: 0,  paused: 0, name: "Timer 2" },
-      3: { min: 15, active: 0,  buzz: 1, buzzRep: 5, buzzDelay: 2000, rep: 0, remaining: 0,  paused: 0, name: "Timer 3" },
-      4: { min: 20, active: 0,  buzz: 1, buzzRep: 5, buzzDelay: 2000, rep: 0, remaining: 0,  paused: 0, name: "Timer 4" },
-      5: { min: 25, active: 0,  buzz: 1, buzzRep: 5, buzzDelay: 2000, rep: 0, remaining: 0,  paused: 0, name: "Timer 5" }
+      1: { min: 5, active: 0, buzz: 1, buzzRep: 5, buzzDelay: 2000, rep: 0, repLeft: 0, remaining: 0, paused: 0, name: "Timer 1" },
+      2: { min: 10, active: 0, buzz: 1, buzzRep: 5, buzzDelay: 2000, rep: 0, repLeft: 0, remaining: 0, paused: 0, name: "Timer 2" },
+      3: { min: 15, active: 0, buzz: 1, buzzRep: 5, buzzDelay: 2000, rep: 0, repLeft: 0, remaining: 0, paused: 0, name: "Timer 3" },
+      4: { min: 20, active: 0, buzz: 1, buzzRep: 5, buzzDelay: 2000, rep: 0, repLeft: 0, remaining: 0, paused: 0, name: "Timer 4" },
+      5: { min: 25, active: 0, buzz: 1, buzzRep: 5, buzzDelay: 2000, rep: 0, repLeft: 0, remaining: 0, paused: 0, name: "Timer 5" }
     },
-    tid: {  
+    tid: {
       1: { timer: 0, interval: 0, buzz: 0 },
       2: { timer: 0, interval: 0, buzz: 0 },
       3: { timer: 0, interval: 0, buzz: 0 },
@@ -16,11 +16,17 @@ ew.apps.timer = {
     }
   },
 
+
   // Αρχικοποίηση
   init: function() {
     for (var i = 1; i <= 5; i++) {
       var timer = this.state.def[i];
-      
+
+      // Αν δεν υπάρχει repLeft, το δημιουργούμε από το rep
+      if (timer.repLeft === undefined) {
+        timer.repLeft = timer.rep > 0 ? timer.rep   : 0;
+      }
+
       if (timer.active === 1 && timer.paused === 0) {
         this._startTimer(i, timer.remaining);
       }
@@ -41,11 +47,12 @@ ew.apps.timer = {
     timer.buzz = buzz ? 1 : 0;
     timer.buzzRep = buzzRep || 1;
     timer.buzzDelay = buzzDelay || 2000;
-    timer.rep = repetitions || 0;
+    timer.rep = repetitions || 0; // Αυτό παραμένει η ρύθμιση
+    timer.repLeft = repetitions > 0 ? repetitions - 1 : 0; // Επαναλήψεις που απομένουν
     timer.remaining = minutes * 60000;
     timer.active = 0; // Δεν είναι active ακόμα
     timer.paused = 0;
-    
+
 
     return true;
   },
@@ -64,10 +71,10 @@ ew.apps.timer = {
     // Clear existing resources
     this._stopTimerResources(timerId);
 
-    // ΑΝ remaining ΕΙΝΑΙ 0, ΞΑΝΑϋΠΟΛΟΓΙΣΕ ΤΟ!
-    if (timer.remaining === 0) {
-      timer.remaining = timer.min * 60000;
-    }
+    timer.remaining = timer.min * 60000;
+
+    // Αρχικοποίηση repLeft - repLeft = rep - 1 (επαναλήψεις που απομένουν)
+    timer.repLeft = timer.rep > 0 ? timer.rep : 0;
 
     // Ξεκινάει τον timer
     timer.active = 1;
@@ -76,7 +83,6 @@ ew.apps.timer = {
 
     return true;
   },
-
   // Εσωτερική συνάρτηση εκκίνησης timer
   _startTimer: function(timerId, ms) {
     var self = this;
@@ -107,7 +113,6 @@ ew.apps.timer = {
       }
     }, 1000);
   },
-
   // Pause timer
   pauseTimer: function(timerId) {
     if (timerId < 1 || timerId > 5) return false;
@@ -157,12 +162,13 @@ ew.apps.timer = {
     }
 
     // Handle repetitions
-    if (timer.rep > 0) {
-      timer.rep--;
-      if (timer.rep > 0) {
-        // Για repetitions, χρησιμοποιούμε setTimer + startTimer
-        this.setTimer(timerId, timer.min, timer.buzz, timer.buzzRep, timer.buzzDelay, timer.rep, timer.name);
-        this.startTimer(timerId);
+    if (timer.repLeft > 0) {
+      timer.repLeft--; // Μείωση των επαναλήψεων που απομένουν
+      if (timer.repLeft >= 0) {
+        // Επαναφορά και εκκίνηση timer
+        timer.remaining = timer.min * 60000;
+        timer.active = 1;
+        this._startTimer(timerId, timer.remaining);
       }
     }
   },
@@ -184,12 +190,14 @@ ew.apps.timer = {
       if (count < repetitions && tid.buzz) {
         ew.sys.buzz.alrm([100, 200, 200]);
         count++;
-        tid.buzz = setTimeout(()=>{ buzz(timer) }, delay,timer);
-        ew.notify.alert("error", { body: timer.name, title: "TIMER" }, 0, 0);
+        tid.buzz = setTimeout(() => { buzz(timer) }, delay, timer);
+        //ew.notify.alert("error", { body: timer.name, title: "TIMER" }, 0, 0);
+        ew.UI.btn.ntfy(1, 1.5, 0, "_bar", 6, timer.name.toUpperCase(), "", 15, 13);
+
 
       }
     }
-    if (ew.face.appCurr === "timer") ew.face[0].init();
+    //if (ew.face.appCurr === "timer") ew.face[0].init();
     // Start the buzz
     tid.buzz = 1; // Mark as active
     buzz(timer);
@@ -252,6 +260,8 @@ ew.apps.timer = {
     timer.active = 0;
     timer.paused = 0;
     timer.remaining = timer.min * 60000; // Επαναφορά στο αρχικό χρόνο
+    timer.repLeft = timer.rep > 0 ? timer.rep : 0; // Επαναφορά και των επαναλήψεων
+    if (ew.face.appCurr === "timer") ew.face[0].init();
 
     return true;
   },
@@ -268,7 +278,7 @@ ew.apps.timer = {
     if (timerId < 1 || timerId > 5) return null;
 
     var timer = this.state.def[timerId];
-    var tid = this.state.tid[timerId]
+    var tid = this.state.tid[timerId];
 
     var totalSeconds = Math.ceil(timer.remaining / 1000);
     var minutes = Math.floor(totalSeconds / 60);
@@ -284,11 +294,12 @@ ew.apps.timer = {
       buzzActive: tid.buzz !== 0,
       buzzRep: timer.buzzRep,
       buzzDelay: timer.buzzDelay,
-      repetitions: timer.rep,
-      repetitionsLeft: timer.rep,
+      repetitions: timer.rep, // Η ρύθμιση των επαναλήψεων
+      repetitionsLeft: timer.repLeft, // Οι υπόλοιπες επαναλήψεις
       name: timer.name
     };
   },
+
 
   // Λήψη όλων των timers
   getAllStatus: function() {
@@ -356,69 +367,3 @@ if (require('Storage').readJSON('ew.json', 1).timer)
 
 // Αρχικοποίηση κατά την φόρτωση
 ew.apps.timer.init();
-
-/*
-// Ορισμός πολλαπλών timers
-ew.apps.timer.set(1, 5, true, 5);  // Timer 1: 5 λεπτά
-ew.apps.timer.set(2, 10, false, 1); // Timer 2: 10 λεπτά
-ew.apps.timer.set(3, 2, true, 0);   // Timer 3: 2 λεπτά
-
-// Stop μόνο του timer 2
-ew.apps.timer.stopTimer(2);
-
-// Stop μόνο του timer 3 (εναλλακτικά με clear)
-ew.apps.timer.clear(3);
-
-// Έλεγχος κατάστασης ενός timer
-var status = ew.apps.timer.getStatus(1);
-console.log("Timer 1: " + status.remainingSeconds + " δευτερόλεπτα");
-
-// Επανεκκίνηση του timer 2
-ew.apps.timer.restart(2);
-
-
-
-
-
-// Timer για 1 λεπτό, με μπάζερ 3 φορές με 2 δευτερόλεπτα delay
-ew.apps.timer.set(1, 1, true, 3, 2000, 0);
-
-// Τώρα το status θα δείχνει:
-// { active: true, minutes: 1, remainingMinutes: 0, remainingSeconds: 59,
-//   buzz: true, buzzRep: 3, buzzDelay: 2000, repetitions: 0, repetitionsLeft: 0 }
-
-// Timer για 119 δευτερόλεπτα (1 λεπτό 59 δευτερόλεπτα)
-ew.apps.timer.set(2, 2, false, 1, 2000, 0); // 2 λεπτά = 120 δευτερόλεπτα
-
-// Μετά από 1 δευτερόλεπτο θα δείχνει:
-// { active: true, minutes: 2, remainingMinutes: 1, remainingSeconds: 59, ... }
-
-// Ορισμός timer με buzz 10 επαναλήψεις
-ew.apps.timer.set(1, 1, true, 10, 2000, 0);
-
-// Σταμάτημα μόνο του buzz (ο timer συνεχίζει)
-ew.apps.timer.stopBuzz(1);
-
-// Σταμάτημα όλων των buzz
-ew.apps.timer.stopAllBuzz();
-
-// Έλεγχος αν το buzz είναι active
-var status = ew.apps.timer.getStatus(1);
-console.log("Buzz active: " + status.buzzActive);
-
-
-// Ορισμός timer
-ew.apps.timer.setTimer(1, 5, true, 3, 2000, 0);
-
-// Pause
-ew.apps.timer.pauseTimer(1);
-
-// Resume
-ew.apps.timer.resumeTimer(1);
-
-// Snooze
-ew.apps.timer.snoozeTimer(1);
-
-// Stop
-ew.apps.timer.stopTimer(1);
-*/

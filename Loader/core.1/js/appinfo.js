@@ -129,10 +129,10 @@ const AppInfo = {
     });
   },
   getAppInfoFilename : (app) => {
-    if (Const.SINGLE_APP_ONLY) // only one app on device, info file is in app.ew
-      return "app.ew";
+    if (Const.SINGLE_APP_ONLY) // only one app on device, info file is in app.info
+      return "app.info";
     else
-      return app.id+".ew";
+      return app.id+".info";
   },
   createAppJSON : (app, fileContents) => {
     return new Promise((resolve,reject) => {

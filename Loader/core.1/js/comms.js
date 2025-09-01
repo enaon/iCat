@@ -158,11 +158,11 @@ const Comms = {
         }
 
         let cmd, finalJS = `E.toJS([process.env.BOARD,process.env.VERSION]).substr(1)`;
-        if (Const.SINGLE_APP_ONLY) // only one app on device, info file is in app.ew
-          cmd = `\x10Bluetooth.println("["+(require("Storage").read("app.ew")||"null")+","+${finalJS})\n`;
+        if (Const.SINGLE_APP_ONLY) // only one app on device, info file is in app.info
+          cmd = `\x10Bluetooth.println("["+(require("Storage").read("app.info")||"null")+","+${finalJS})\n`;
         else
-          cmd = `\x10Bluetooth.print("[");require("Storage").list(/\\.ew/).forEach(f=>{var j=require("Storage").readJSON(f,1)||{};Bluetooth.print(JSON.stringify(j)+",")});Bluetooth.println(${finalJS})\n`; //ew
-          ///cmd = `\x10Bluetooth.print("[");require("Storage").list(/\\.ew/).forEach(f=>{var j=require("Storage").readJSON(f,1)||{};Bluetooth.print(JSON.stringify({id:f.slice(0,-5),version:j.version})+",")});Bluetooth.println(${finalJS})\n`;
+          cmd = `\x10Bluetooth.print("[");require("Storage").list(/\\.info$/).forEach(f=>{var j=require("Storage").readJSON(f,1)||{};Bluetooth.print(JSON.stringify(j)+",")});Bluetooth.println(${finalJS})\n`; //ew
+          ///cmd = `\x10Bluetooth.print("[");require("Storage").list(/\\.info$/).forEach(f=>{var j=require("Storage").readJSON(f,1)||{};Bluetooth.print(JSON.stringify({id:f.slice(0,-5),version:j.version})+",")});Bluetooth.println(${finalJS})\n`;
 
         Puck.write(cmd, (appListStr,err) => {
           Progress.hide({sticky:true});

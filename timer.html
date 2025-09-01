@@ -430,8 +430,12 @@
                 <input type="text" id="timerId" disabled>
             </div>
             <div class="form-group">
+                <label for="timerHours">Ώρες</label>
+                <input type="number" id="timerHours" min="0" max="24" value="0">
+            </div>
+            <div class="form-group">
                 <label for="timerMinutes">Λεπτά</label>
-                <input type="number" id="timerMinutes" min="0" max="600">
+                <input type="number" id="timerMinutes" min="0" max="59" value="0">
             </div>
             <div class="form-group">
                 <label for="timerBuzz">Buzz</label>
@@ -471,6 +475,7 @@
             const editModal = document.getElementById('editModal');
             const timerNameInput = document.getElementById('timerName');
             const timerIdInput = document.getElementById('timerId');
+            const timerHoursInput = document.getElementById('timerHours');
             const timerMinutesInput = document.getElementById('timerMinutes');
             const timerBuzzInput = document.getElementById('timerBuzz');
             const timerBuzzRepInput = document.getElementById('timerBuzzRep');
@@ -883,6 +888,27 @@
                 Notification.requestPermission();
             }
 
+            // Συνάρτηση μετατροπής λεπτών σε ώρες:λεπτά
+            function minutesToHoursMinutes(minutes) {
+                const hours = Math.floor(minutes / 60);
+                const mins = minutes % 60;
+                return `${hours}:${mins.toString().padStart(2, '0')}`;
+            }
+
+            // Συνάρτηση μετατροπής χιλιοστοδευτερολέπτων σε ώρες:λεπτά:δευτερόλεπτα
+            function msToHMS(ms) {
+                const totalSeconds = Math.ceil(ms / 1000);
+                const hours = Math.floor(totalSeconds / 3600);
+                const minutes = Math.floor((totalSeconds % 3600) / 60);
+                const seconds = totalSeconds % 60;
+                
+                if (hours > 0) {
+                    return `${hours}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                } else {
+                    return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+                }
+            }
+
             // Απόδοση λίστας χρονομετρητών
             function renderTimerList() {
                 const timerKeys = Object.keys(timersData);
@@ -902,11 +928,11 @@
                 timerKeys.forEach(key => {
                     const timer = timersData[key];
                     
-                    // Υπολογισμός χρόνου που απομένει σε λεπτά και δευτερόλεπτα
-                    const totalSeconds = Math.ceil(timer.remaining / 1000);
-                    const minutes = Math.floor(totalSeconds / 60);
-                    const seconds = totalSeconds % 60;
-                    const formattedTime = minutes + ":" + (seconds < 10 ? "0" + seconds : seconds);
+                    // Μετατροπή συνολικών λεπτών σε ώρες:λεπτά
+                    const totalTimeFormatted = minutesToHoursMinutes(timer.min);
+                    
+                    // Μετατροπή απομένοντος χρόνου σε ώρες:λεπτά:δευτερόλεπτα
+                    const remainingTimeFormatted = msToHMS(timer.remaining);
                     
                     // Κατάσταση χρονομετρητή
                     let statusClass = 'status-inactive';
@@ -934,16 +960,20 @@
                         </div>
                         <div class="timer-info">
                             <div class="timer-detail">
-                                <span class="detail-label">Συνολικά Λεπτά</span>
-                                <span class="detail-value">${timer.min}</span>
+                                <span class="detail-label">Συνολικός Χρόνος</span>
+                                <span class="detail-value">${totalTimeFormatted}</span>
                             </div>
                             <div class="timer-detail">
                                 <span class="detail-label">Απομένων Χρόνος</span>
-                                <span class="detail-value">${formattedTime}</span>
+                                <span class="detail-value">${remainingTimeFormatted}</span>
                             </div>
                             <div class="timer-detail">
-                                <span class="detail-label">Repetitions</span>
+                                <span class="detail-label">Repeat Total</span>
                                 <span class="detail-value">${timer.rep}</span>
+                            </div>
+                             <div class="timer-detail">
+                                <span class="detail-label">Repeat Left</span>
+                                <span class="detail-value">${timer.repLeft !== undefined ? timer.repLeft : 0}</span>
                             </div>
                             <div class="timer-detail">
                                 <span class="detail-label">Buzz</span>
@@ -972,9 +1002,11 @@
                                     <i class="fas fa-stop"></i> Διακοπή
                                 </button>` : ''
                             }
-                            <button class="btn btn-secondary edit-timer" data-id="${key}">
-                                <i class="fas fa-edit"></i> Επεξεργασία
-                            </button>
+                            ${timer.active === 1 ? '' : 
+                                `<button class="btn btn-secondary edit-timer" data-id="${key}">
+                                    <i class="fas fa-edit"></i> Επεξεργασία
+                                </button>`
+                            }
                         </div>
                     `;
 
@@ -1069,7 +1101,7 @@
                 }
             }
 
-            // Διακοπή χρονομετρητή
+            // Διακοпή χρονομετρητή
             async function stopTimer(timerId) {
                 if (!isConnected) return;
                 
@@ -1094,7 +1126,13 @@
                 editingTimerId = timerId;
                 timerIdInput.value = timerId;
                 timerNameInput.value = timer.name || '';
-                timerMinutesInput.value = timer.min;
+                
+                // Μετατροπή λεπτών σε ώρες και λεπτά
+                const hours = Math.floor(timer.min / 60);
+                const minutes = timer.min % 60;
+                timerHoursInput.value = hours;
+                timerMinutesInput.value = minutes;
+                
                 timerBuzzInput.value = timer.buzz;
                 timerBuzzRepInput.value = timer.buzzRep;
                 timerRepInput.value = timer.rep;
@@ -1108,7 +1146,8 @@
                 editingTimerId = null;
                 timerNameInput.value = '';
                 timerIdInput.value = '';
-                timerMinutesInput.value = '';
+                timerHoursInput.value = '0';
+                timerMinutesInput.value = '0';
                 timerBuzzInput.value = '1';
                 timerBuzzRepInput.value = '5';
                 timerRepInput.value = '0';
@@ -1119,12 +1158,16 @@
                 if (!editingTimerId) return;
 
                 const newName = timerNameInput.value.trim();
-                const newMinutes = parseInt(timerMinutesInput.value);
+                const newHours = parseInt(timerHoursInput.value) || 0;
+                const newMinutes = parseInt(timerMinutesInput.value) || 0;
                 const newBuzz = parseInt(timerBuzzInput.value);
                 const newBuzzRep = parseInt(timerBuzzRepInput.value);
                 const newRep = parseInt(timerRepInput.value);
 
-                if (!newName || isNaN(newMinutes) || isNaN(newBuzz) || isNaN(newBuzzRep) || isNaN(newRep)) {
+                // Υπολογισμός συνολικών λεπτών από ώρες και λεπτά
+                const totalMinutes = (newHours * 60) + newMinutes;
+
+                if (!newName || isNaN(totalMinutes) || totalMinutes <= 0 || isNaN(newBuzz) || isNaN(newBuzzRep) || isNaN(newRep)) {
                     alert('Παρακαλώ συμπληρώστε όλα τα πεδία σωστά');
                     return;
                 }
@@ -1134,8 +1177,8 @@
                     // Ενημέρωση ονόματος
                     await sendCommand(`ew.apps.timer.state.def[${editingTimerId}].name = "${newName}";\n`);
 
-                    // Ενημέρωση λεπτών
-                    await sendCommand(`ew.apps.timer.state.def[${editingTimerId}].min = ${newMinutes};\n`);
+                    // Ενημέρωση συνολικών λεπτών
+                    await sendCommand(`ew.apps.timer.state.def[${editingTimerId}].min = ${totalMinutes};\n`);
 
                     // Ενημέρωση buzz
                     await sendCommand(`ew.apps.timer.state.def[${editingTimerId}].buzz = ${newBuzz};\n`);

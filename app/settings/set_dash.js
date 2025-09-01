@@ -1,6 +1,5 @@
 E.setFlags({ pretokenise: 1 });
 //dash  Options
-//ew.UI.nav.next.replaceWith(new Function("x", "y",'setTimeout(()=>{'+ew.UI.c.raw.main+ew.UI.c.raw.bar+'},0);'));
 ew.UI.nav.next.replaceWith((x, y) => {
 	//if (ew.face[0].page == "dash2") {
 	ew.sys.buzz.nav(ew.sys.buzz.type.na);

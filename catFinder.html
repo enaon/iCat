@@ -223,7 +223,6 @@
             justify-content: space-between;
             align-items: center;
             margin-bottom: 20px;
-            position: relative;
         }
 
         .modal-title {
@@ -237,9 +236,6 @@
             color: var(--color-on-surface);
             font-size: 24px;
             cursor: pointer;
-            position: absolute;
-            top: -10px;
-            right: -10px;
         }
 
         .form-group {
@@ -336,7 +332,7 @@
         <header>
             <h1><i class="fas fa-cat"></i> Cat Tracker</h1>
             <div class="header-buttons">
-                <button id="connectBtn" class="btn" style="display:none;">
+                <button id="connectBtn" class="btn">
                     <i class="fas fa-bluetooth-b"></i> Σύνδεση
                 </button>
                 <button id="refreshBtn" class="btn" style="display:none;">
@@ -353,13 +349,13 @@
 
         <div class="status">
             <div class="status-dot" id="statusDot"></div>
-            <span id="statusText">Συνδεδεμένοι μέσω eW Launcher</span>
+            <span id="statusText">Δεν έχετε συνδεθεί με Espruino</span>
         </div>
 
         <div id="catList" class="cat-list">
             <div class="empty-state">
                 <i class="fas fa-cat"></i>
-                <p>Δεν υπάρχουν καταχωρημένες γάτες. Πατήστε Ανανέωση για να εμφανιστούν τα δεδομένα.</p>
+                <p>Δεν υπάρχουν καταχωρημένες γάτες. Συνδεθείτε για να εμφανιστούν τα δεδομένα.</p>
             </div>
         </div>
     </div>
@@ -413,25 +409,40 @@
             const cancelEditBtn = document.getElementById('cancelEditBtn');
             const closeBtn = document.querySelector('.close-btn');
 
-            let isConnected = true; // Είμαστε πάντα συνδεδεμένοι μέσω Launcher
+            let isConnected = false;
+            let currentDevice = null;
+            let uartService = null;
+            let uartRxCharacteristic = null;
+            let uartTxCharacteristic = null;
             let catsData = [];
             let editingCatId = null;
             let dataBuffer = '';
 
-            // Άμεσα ενημέρωσε το UI ότι η σύνδεση είναι active
-            if (statusDot && statusText) {
-                statusDot.classList.add('connected');
-                statusText.textContent = 'Συνδεδεμένοι μέσω eW Launcher';
+            // UUIDs για την UART υπηρεσία του Espruino
+            const UART_SERVICE_UUID = '6e400001-b5a3-f393-e0a9-e50e24dcca9e';
+            const UART_RX_CHARACTERISTIC_UUID = '6e400002-b5a3-f393-e0a9-e50e24dcca9e';
+            const UART_TX_CHARACTERISTIC_UUID = '6e400003-b5a3-f393-e0a9-e50e24dcca9e';
+
+            // Έλεγχος αν το Web Bluetooth είναι διαθέσιμο
+            if (!navigator.bluetooth) {
+                statusText.textContent = 'Το Web Bluetooth δεν υποστηρίζεται από αυτό το browser';
+                connectBtn.disabled = true;
             }
 
-            // Εμφάνιση κουμπιών
-            if (refreshBtn) refreshBtn.style.display = 'inline-block';
-            if (exportBtn) exportBtn.style.display = 'inline-block';
-            if (importBtn) importBtn.style.display = 'inline-block';
+            // Εκκίνηση Web Bluetooth
+            connectBtn.addEventListener('click', function() {
+                if (isConnected) {
+                    disconnectDevice();
+                }
+                else {
+                    connectToDevice();
+                }
+            });
 
-            // Event listeners
             refreshBtn.addEventListener('click', function() {
-                refreshData();
+                if (isConnected) {
+                    refreshData();
+                }
             });
 
             exportBtn.addEventListener('click', function() {
@@ -446,8 +457,60 @@
                 handleImport(e.target.files[0]);
             });
 
+            // Σύνδεση με συσκευή
+            async function connectToDevice() {
+                try {
+                    statusText.textContent = 'Αναζήτηση συσκευών Bluetooth...';
+
+                    currentDevice = await navigator.bluetooth.requestDevice({
+                        filters: [{ namePrefix: 'eW' }],
+                        optionalServices: [UART_SERVICE_UUID]
+                    });
+
+                    if (!currentDevice) {
+                        statusText.textContent = 'Δεν επιλέχθηκε συσκευή';
+                        return;
+                    }
+
+                    statusText.textContent = 'Σύνδεση με ' + currentDevice.name + '...';
+                    const server = await currentDevice.gatt.connect();
+
+                    uartService = await server.getPrimaryService(UART_SERVICE_UUID);
+                    uartRxCharacteristic = await uartService.getCharacteristic(UART_RX_CHARACTERISTIC_UUID);
+                    uartTxCharacteristic = await uartService.getCharacteristic(UART_TX_CHARACTERISTIC_UUID);
+
+                    await uartTxCharacteristic.startNotifications();
+                    uartTxCharacteristic.addEventListener('characteristicvaluechanged', handleUartData);
+
+                    isConnected = true;
+                    statusDot.classList.add('connected');
+                    statusText.textContent = 'Συνδεδεμένοι με ' + currentDevice.name;
+                    connectBtn.innerHTML = '<i class="fas fa-bluetooth-b"></i> Αποσύνδεση';
+                    refreshBtn.style.display = 'inline-block';
+                    exportBtn.style.display = 'inline-block';
+                    importBtn.style.display = 'inline-block';
+
+                    currentDevice.addEventListener('gattserverdisconnected', onDisconnected);
+
+                    // Μικρή καθυστέρηση πριν την πρώτη εντολή
+                    statusText.textContent = 'Προετοιμασία...';
+                    await new Promise(resolve => setTimeout(resolve, 1500));
+
+                    // Αποστολή εντολής για ανάγνωση δεδομένων
+                    statusText.textContent = 'Ανάγνωση δεδομένων...';
+                    await sendCommand('Bluetooth.println(JSON.stringify(ew.apps.itag.state.def.store))\n');
+
+                }
+                catch (error) {
+                    console.error('Σφάλμα σύνδεσης:', error);
+                    statusText.textContent = 'Σφάλμα σύνδεσης: ' + error.message;
+                }
+            }
+
             // Ανανέωση δεδομένων
             async function refreshData() {
+                if (!isConnected) return;
+
                 try {
                     statusText.textContent = 'Ανάγνωση δεδομένων...';
                     await sendCommand('Bluetooth.println(JSON.stringify(ew.apps.itag.state.def.store))\n');
@@ -527,6 +590,8 @@
 
             // Ενημέρωση Espruino με εισαγόμενα δεδομένα
             async function updateEspruinoWithImportedData(importedCats) {
+                if (!isConnected) return;
+
                 try {
                     statusText.textContent = 'Ενημέρωση συσκευής με εισαγόμενα δεδομένα...';
 
@@ -570,45 +635,25 @@
                     statusText.textContent = 'Σφάλμα ενημέρωσης συσκευής: ' + error.message;
                 }
             }
-
+            
             // Αποστολή εντολής μέσω UART
             async function sendCommand(command) {
-                window.parent.postMessage({
-                    type: 'BLUETOOTH_COMMAND',
-                    command: command
-                }, '*');
-            }
-
-            // Κάνε listen για μηνύματα από τον Launcher
-            window.addEventListener('message', function(event) {
-                // Ελέγχουμε ότι το μήνυμα είναι το σωστό type
-                if (event.data.type === 'BLUETOOTH_RAW_DATA') {
-                    console.log("App received raw data:", event.data.data);
-
-                    // ΠΡΟΣΟΜΟΙΩΣΗ Bluetooth event!
-                    // Ο κώδικας σου περιμένει ένα Event object. Ας το φτιάξουμε.
-                    const encoder = new TextEncoder();
-                    const rawData = encoder.encode(event.data.data); // Μετατρέπει το string σε bytes
-
-                    // Δημιουργούμε ένα ψεύτικο Event object που μοιάζει με αυτό του Web Bluetooth API
-                    const fakeEvent = {
-                        target: {
-                            value: rawData // Τοποθετούμε τα encoded bytes
-                        }
-                    };
-
-                    // Καλούμε την ΥΠΑΡΧΟΥΣΑ function handleUartData του app με το ψεύτικο event
-                    if (typeof handleUartData === 'function') {
-                        handleUartData(fakeEvent);
-                    }
-                    else {
-                        console.warn("Η function handleUartData δεν βρέθηκε. Δεν μπορούν να επεξεργαστούν δεδομένα.");
-                    }
+                if (!uartRxCharacteristic) {
+                    console.error("Δεν υπάρχει σύνδεση UART");
+                    return;
                 }
 
-                // Μπορείς να προσθέσεις και άλλα message types εδώ αργότερα
-                // if (event.data.type === 'OTHER_ACTION') { ... }
-            });
+                try {
+                    console.log("Αποστολή εντολής:", command);
+                    const encoder = new TextEncoder();
+                    const data = encoder.encode(command);
+                    await uartRxCharacteristic.writeValue(data);
+                    console.log("Εντολή αποσταλεί επιτυχώς");
+                }
+                catch (error) {
+                    console.error("Σφάλμα αποστολής εντολής:", error);
+                }
+            }
 
             // Χειρισμός εισερχόμενων δεδομένων από UART
             function handleUartData(event) {
@@ -641,6 +686,32 @@
                 }
             }
 
+            // Αποσύνδεση από συσκευή
+            function disconnectDevice() {
+                if (currentDevice && currentDevice.gatt.connected) {
+                    currentDevice.gatt.disconnect();
+                }
+                onDisconnected();
+            }
+
+            // Χειρισμός αποσύνδεσης
+            function onDisconnected() {
+                isConnected = false;
+                statusDot.classList.remove('connected');
+                statusText.textContent = 'Αποσυνδεθήκατε από τη συσκευή';
+                connectBtn.innerHTML = '<i class="fas fa-bluetooth-b"></i> Σύνδεση';
+                refreshBtn.style.display = 'none';
+                exportBtn.style.display = 'none';
+                importBtn.style.display = 'none';
+
+                // Καθαρισμός των μεταβλητών σύνδεσης
+                currentDevice = null;
+                uartService = null;
+                uartRxCharacteristic = null;
+                uartTxCharacteristic = null;
+                dataBuffer = '';
+            }
+
             // Επεξεργασία των δεδομένων που ελήφθησαν από το Espruino
             function processRetrievedData(data) {
                 if (data && Array.isArray(data)) {
@@ -668,7 +739,7 @@
                     catList.innerHTML = `
                         <div class="empty-state">
                             <i class="fas fa-cat"></i>
-                            <p>Δεν βρέθηκαν δεδομένα iTag. Πατήστε Ανανέωση για να φορτώσετε τα δεδομένα.</p>
+                            <p>Δεν βρέθηκαν δεδομένα iTag. Βεβαιωθείτε ότι το Espruino εκτελεί το σωστό script.</p>
                         </div>
                     `;
                     return;

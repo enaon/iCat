@@ -1,5 +1,5 @@
 	if (ew.def.touchtype != "816" && ew.def.touchtype != "716") {
-		digitalPulse(ew.def.rstP, 1, [5, 500]);
+		digitalPulse(ew.pin.touch.RST, 1, [5, 500]);
 		i2c.writeTo(0x15, 0x80);
 		ew.def.touchtype = (i2c.readFrom(0x15, 1)[0] == 96) ? "816" : "716";
 	}

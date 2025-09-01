@@ -187,6 +187,10 @@
             text-align: center;
             padding: 40px 20px;
             opacity: 0.7;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
         }
 
         .empty-state i {
@@ -392,8 +396,9 @@
     <script>
         // Προσδιορισμός του base URL ανάλογα με το περιβάλλον
         const isGitHubPages = window.location.hostname.includes('github.io');
+        const isFileProtocol = window.location.protocol === 'file:';
         const basePath = isGitHubPages ? '/iCat' : '';
-        
+
         document.addEventListener('DOMContentLoaded', function() {
             // Στοιχεία DOM
             const connectBtn = document.getElementById('connectBtn');
@@ -702,20 +707,50 @@
                 checkAppsExistence(appNames);
             }
 
+            // Βοηθητική συνάρτηση για έλεγχο ύπαρξης αρχείου σε file:// protocol
+            function checkAppExistenceFileProtocol(appName) {
+                return new Promise((resolve) => {
+                    const xhr = new XMLHttpRequest();
+                    xhr.open('GET', `app/${appName}/index.html`, true);
+                    xhr.onreadystatechange = function() {
+                        if (xhr.readyState === 4) {
+                            resolve(xhr.status === 0 || xhr.status === 200);
+                        }
+                    };
+                    xhr.onerror = function() {
+                        resolve(false);
+                    };
+                    try {
+                        xhr.send();
+                    } catch (e) {
+                        resolve(false);
+                    }
+                });
+            }
+
             // Έλεγχος ύπαρξης HTML για κάθε app
             async function checkAppsExistence(appNames) {
                 const availableApps = [];
 
                 for (const appName of appNames) {
                     try {
-                        // Χρησιμοποιούμε το basePath για να κάνουμε το path σωστό
-                        const response = await fetch(`${basePath}/app/${appName}/index.html`);
-                        if (response.ok) {
+                        let exists = false;
+                        
+                        if (isFileProtocol) {
+                            // Χρήση XMLHttpRequest για file:// protocol
+                            exists = await checkAppExistenceFileProtocol(appName);
+                        } else {
+                            // Κανονικό fetch για http/https
+                            const response = await fetch(`${basePath}/app/${appName}/index.html`);
+                            exists = response.ok;
+                        }
+                        
+                        if (exists) {
                             availableApps.push(appName);
                         }
-                    }
-                    catch (e) {
+                    } catch (e) {
                         // Το app δεν υπάρχει, αγνοούμε
+                        console.log(`App ${appName} not found:`, e);
                     }
                 }
 
@@ -726,7 +761,7 @@
             // Εμφάνιση λίστας διαθέσιμων εφαρμογών
             function displayAvailableApps(apps) {
                 if (apps.length === 0) {
-                    appList.innerHTML = '<div class="empty-state"><i class="fas fa-folder-open"></i><p>Δεν βρέθηκαν αντίστοιχα web apps. Βεβαιωθείτε ότι βρίσκονται στο φάκελο ../app/[όνομα]/index.html</p></div>';
+                    appList.innerHTML = '<div class="empty-state"><i class="fas fa-folder-open"></i><p>Δεν βρέθηκαν αντίστοιχα web apps. Βεβαιωθείτε ότι βρίσκονται στο φάκελο app/[όνομα]/index.html</p></div>';
                     statusText.textContent = 'Δεν βρέθηκαν web apps για τις εφαρμογές του Espruino';
                     statusTextHeader.textContent = '0 web apps';
                     return;
@@ -749,10 +784,7 @@
 
                 // ΕΠΙΛΟΓΗ DEFAULT ΕΦΑΡΜΟΓΗΣ & ΑΥΤΟΜΑΤΗ ΦΟΡΤΩΣΗ
                 let defaultAppName = null;
-                if (apps.includes('itag')) {
-                    defaultAppName = 'itag';
-                }
-                else if (apps.includes('timer')) {
+                if (apps.includes('timer')) {
                     defaultAppName = 'timer';
                 }
                 else {
@@ -778,8 +810,15 @@
                     }
                 });
 
-                // Φόρτωση της εφαρμογής στο iframe με το σωστό basePath
-                appFrame.src = `${basePath}/app/${appName}/index.html`;
+                // Φόρτωση της εφαρμογής στο iframe με το σωστό path
+                let appPath;
+                if (isFileProtocol) {
+                    appPath = `app/${appName}/index.html`;
+                } else {
+                    appPath = `${basePath}/app/${appName}/index.html`;
+                }
+                
+                appFrame.src = appPath;
                 statusText.textContent = `Φόρτωση: ${appName}`;
                 statusTextHeader.textContent = `Φόρτωση: ${appName}`;
 
@@ -799,8 +838,7 @@
                             type: 'LAUNCHER_INFO',
                             message: 'App loaded successfully. First command sent.'
                         }, '*');
-                    }
-                    catch (e) {
+                    } catch (e) {
                         console.log("Could not post message to iframe:", e);
                     }
 

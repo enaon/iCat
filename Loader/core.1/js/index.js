@@ -477,7 +477,7 @@ function updateApp(app) {
     if (remove.files===undefined) remove.files="";
     // no need to remove files which will be overwritten anyway
     remove.files = remove.files.split(',')
-      .filter(f => f !== app.id + '.ew')
+      .filter(f => f !== app.id + '.info')
       .filter(f => !app.storage.some(s => s.name === f))
       .join(',');
     let data = AppInfo.parseDataString(remove.data)
@@ -518,7 +518,7 @@ function appNameToApp(appName) {
     name: "Unknown app "+appName,
     icon: "../unknown.png",
     description: "Unknown app",
-    storage: [ {name:appName+".ew"}],
+    storage: [ {name:appName+".info"}],
     unknown: true,
   };
 }

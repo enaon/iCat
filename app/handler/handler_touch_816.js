@@ -1,7 +1,7 @@
 E.setFlags({ pretokenise: 1 });
 ew.def.touchtype = "816";
 ew.is.tpT = 0;
-ew.def.rstR = 0xA5; //the rock has auto sleep if 254 is 0.
+// 0xA5 the rock has auto sleep if 254 is 0.
 ew.sys.TC = {
 	x: 0,
 	y: 0,
@@ -10,7 +10,7 @@ ew.sys.TC = {
 	val: { cur: 0, up: 0, dn: 0 },
 	start: function() {
 		"ram";
-		digitalPulse(ew.def.rstP, 1, [5, 50]);
+		digitalPulse(ew.pin.touch.RST, 1, [5, 50]);
 		if (ew.tid.TC) { clearWatch(ew.tid.TC);	ew.tid.TC = 0; }
 		setTimeout(() => {
 			i2c.writeTo(0x15, 236, 0); //MotionMask 7/4/1

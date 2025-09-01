@@ -1,5 +1,4 @@
 ew.def.touchtype = "716";
-//ew.def.rstR=0xA5; 
 ew.sys.TC = {
 	dbg: 0,
 	tid: 0,
@@ -42,14 +41,12 @@ ew.sys.TC = {
 						if (this.val.reverce) this.val.tmp = this.x > tp[4] ? this.val.tmp - (tp[4] - this.x) : this.val.tmp + (this.x - tp[4]);
 						else this.val.tmp = this.x < tp[4] ? this.val.tmp + (tp[4] - this.x) : this.val.tmp - (this.x - tp[4]);
 						let len = 15;
-						//let step = Math.round(this.val.tmp / len);
 						let step = this.val.tmp / len | 0;
 						if (step == 1) step = 0;
 						else if (step == -1) step = 0;
 						else if (step == 2 || step == 3) step = 1;
 						else if (step == -2 || step == -3) step = -1;
 						else if (step) step = step * 1.8 | 0;
-						//else if (step) step = Math.round(step * 1.8);
 						if (step) {
 							if (len < this.val.tmp || this.val.tmp < -len) {
 								this.val.cur = this.val.cur + step;
@@ -59,19 +56,19 @@ ew.sys.TC = {
 							else if (this.val.cur < this.val.dn) this.val.cur = (this.val.loop) ? this.val.up : this.val.dn;
 							if (!this.val.tmp) {
 								ew.sys.buzz.nav(10);
-								ew.UI.nav.bar( this.x < tp[4] ? 1 : -1, this.val.cur );
-								//this.emit("bar", this.x < tp[4] ? 1 : -1, this.val.cur);
+								ew.UI.c.tcBar( this.x < tp[4] ? 1 : -1, this.val.cur );
 							}
 						}
 						this.x = tp[4];
 					}
 					else {
 						this.bt = 1;
-						if (!this.tim) this.tim = setTimeout(() => {
+						if (!this.tim && !this.rp) this.tim = setTimeout(() => {
 							this.rp = 1;
 							this.tim = 0;
 						}, 300)
 						if (this.rp) {
+							this.rp++;
 							ew.sys.buzz.nav(10);
 							this.bt = 0;
 							let side = (g.getWidth() / 2 < tp[4]) ? 1 : 0;
@@ -79,8 +76,7 @@ ew.sys.TC = {
 							side ? this.val.cur++ : this.val.cur--;
 							if (this.val.up < this.val.cur) this.val.cur = (this.val.loop) ? this.val.dn : this.val.up;
 							else if (this.val.cur < this.val.dn) this.val.cur = (this.val.loop) ? this.val.up : this.val.dn;
-							ew.UI.nav.bar( side ? 1 : -1, this.val.cur );
-							//this.emit("bar", side ? 1 : -1, this.val.cur);
+							ew.UI.c.tcBar( side ? 1 : -1, this.val.cur, this.rp );
 						}
 					}
 				}
@@ -99,8 +95,7 @@ ew.sys.TC = {
 						side ? this.val.cur++ : this.val.cur--;
 						if (this.val.up < this.val.cur) this.val.cur = (this.val.loop) ? this.val.dn : this.val.up;
 						else if (this.val.cur < this.val.dn) this.val.cur = (this.val.loop) ? this.val.up : this.val.dn;
-						//this.emit("bar", side ? 1 : -1, this.val.cur);
-						ew.UI.nav.bar( side ? 1 : -1, this.val.cur );
+						ew.UI.c.tcBar( side ? 1 : -1, this.val.cur );
 					}
 					ew.face.off();
 				}
@@ -166,7 +161,7 @@ ew.sys.TC = {
 	start: function() {
 		//	"ram";
 		if (this.tid) clearInterval(this.tid);
-		digitalPulse(ew.def.rstP, 1, [10, 100]); //touch wake
+		digitalPulse(ew.pin.touch.RST, 1, [10, 100]); //touch wake
 		i2c.writeTo(0x15, 0);
 		this.st = 1;
 		this.tid = setInterval(function() {
@@ -177,8 +172,8 @@ ew.sys.TC = {
 		//"ram";
 		if (this.tid) clearInterval(this.tid);
 		this.tid = 0;
-		digitalPulse(ew.def.rstP, 1, [5, 50]);
-		setTimeout(() => { i2c.writeTo(0x15, ew.def.rstR, 3); }, 100);
+		digitalPulse(ew.pin.touch.RST, 1, [5, 50]);
+		setTimeout(() => { i2c.writeTo(0x15, ew.pin.touch.SLP, 3); }, 100);
 		this.aLast = 0;
 		this.st = 1;
 		this.time = 0;

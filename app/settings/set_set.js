@@ -85,6 +85,8 @@ ew.face[0].d1 = function() {
 		else if (i == 4) {
 			ew.sys.buzz.nav(ew.sys.buzz.type.ok);
 			ew.def.buzz = 1 - ew.def.buzz;
+			if (ew.def.buzz) ew.sys.buzz.nav = digitalPulse.bind(null,ew.pin.BUZZ,ew.pin.BUZ0);
+			else ew.sys.buzz.nav=function(){return true;};
 			if (ew.def.info) ew.UI.btn.ntfy(1, 0, 0, "_bar", 6, "HAPTIC", ew.def.buzz ? "ENABLED" : "DISABED", 0, 15);
 			ew.UI.btn.img("main", "_2x3", 4, ew.def.buzz ? "buzzOn" : "buzzOff", "BUZZ", ew.def.buzz ? 15 : 3, ew.def.buzz ? 4 : 1);
 		}
@@ -108,10 +110,13 @@ ew.face[0].d1 = function() {
 			ew.UI.btn.img("bar", "_bar", 5, "power", "OFF", 15, 13);
 			ew.UI.c.end();
 			ew.UI.c.bar._bar = (i) => {
+				ew.sys.buzz.nav(ew.sys.buzz.type.ok);
 				if (i == 4) 
 					ew.do.sysReboot();
-				else if (i == 5) 
-					ew.apps.kitty.call.sleep("deep");
+				else if (i == 5) {
+					ew.UI.btn.ntfy(1, 5, 0, "_bar", 6, "SLEEP MODE","", 15, 13);
+					ew.do.sysSleep();
+				}
 			};
 		}
 		/*else if (i == 5) {

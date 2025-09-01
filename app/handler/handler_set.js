@@ -117,6 +117,7 @@ ew.sys.batt = function(i, c) {
 };
 
 ew.sys.on('hour', function(){ew.sys.batt("info")});
+
 // ----  sleep ----
 
 ew.do.sysSleep = function() {
@@ -124,12 +125,8 @@ ew.do.sysSleep = function() {
 	//NRF.disconnect();
 	require("Storage").write("devmode", "shutdown");
 	ew.sys.acc.off();
-	ew.sys.TC.stop();
-	g.setCol(0, 0);
-	g.clear();
-	g.flip();
-	g.off();
-	E.reboot();
+	ew.face.go("main", -1);
+	setTimeout(()=>{E.reboot();},500);
 };
 
 // ---- reboot ----
@@ -138,7 +135,8 @@ ew.do.sysReboot = function() {
 	g.clear();
 	g.flip();
 	ew.do.update.settings();
-	reset();
+	ew.face.go("main", -1);
+	setTimeout(()=>{reset();},500);
 };
 
 ew.do.update.acc = function() {
@@ -172,9 +170,6 @@ ew.do.fileWrite = function(file, name, value, value2, value3) {
 	return true;
 };
 
-
-if (!ew.def.rstP) ew.def.rstP = E.toJS(ew.pin.touch.RST);
-if (!ew.def.rstR) ew.def.rstR = 0xA5;
 if (!ew.def.addr) ew.def.addr = NRF.getAddress();
 //
 //E.setTimeZone(ew.def.timezone);

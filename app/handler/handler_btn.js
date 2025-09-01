@@ -29,15 +29,16 @@ ew.sys.btn1=(x)=>{
 };
 ew.tid.btn1 = setWatch(ew.sys.btn1, BTN1, { repeat: true, debounce: 50, edge: 0 });
 
+
 ew.sys.on("button", (x) => { 
+	ew.sys.buzz.nav(ew.sys.buzz.type.ok);
+
 	if (x=== "short"){
-		if (ew.face.pageCurr == -1) {
+		if (ew.face.pageCurr == -1) 
 			ew.face.go("main", 0);
-			ew.sys.buzz.nav(ew.sys.buzz.type.on);
-		}
 		else {
-			if (ew.face.appCurr == "main") { ew.face.go("main", -1);
-				ew.sys.buzz.nav(ew.sys.buzz.type.off); }
+			if (ew.face.appCurr == "main") 
+				ew.face.go("main", -1);
 			else ew.face.go("main", 0);
 		}
 	

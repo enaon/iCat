@@ -10,7 +10,7 @@ ew.UI.nav.back.replaceWith(() => {
 });
 
 ew.face[0] = {
-    data: { source: 0, name: 0, key: 0, key_1: 0, key_2: 0, key_3: 0, lowLimit: 0, hiLimit: 0, fields: 0, totLowField: 0, ref: 0, style: 0, lastPosition: 0 },
+    data: { source: 0, name: 0, key: 0, key_1: 0, key_2: 0, key_3: 0, lowLimit: 0, hiLimit: 0, fields: 0, totLowField: 0, ref: 0, style: 0, posL: 0 },
     gatt: {},
     run: false,
     offms: (ew.def.off[ew.face.appCurr]) ? ew.def.off[ew.face.appCurr] : 60000,
@@ -20,6 +20,7 @@ ew.face[0] = {
             ew.face.go("itag-connect", 0);
             return;
         }
+        ew.is.bar=0;
         if (ew.face.appPrev === "itag-dev") this.started = 1
         ew.UI.ele.ind(1, 2, 0, 2);
 
@@ -35,23 +36,28 @@ ew.face[0] = {
             if (l) {
                 ew.sys.buzz.nav(ew.sys.buzz.type.ok);
                 if (ew.apps.itag.state.ble.gatt.connected) {
-                    if (ew.apps.itag.state.dev[this.data.lastPosition].id != ew.apps.itag.state.ble.gatt.device.id)
-                        ew.apps.itag.state.ble.next = ew.apps.itag.state.dev[this.data.lastPosition].id
+                    if (ew.apps.itag.state.dev[this.data.posL].id != ew.apps.itag.state.ble.gatt.device.id)
+                        ew.apps.itag.state.ble.next = ew.apps.itag.state.dev[this.data.posL].id
                     ew.apps.itag.state.ble.gatt.disconnect()
                     ew.notify.alert("info", { body: "DISCONNECTING", title: ew.apps.itag.state.ble.gatt.device.id.split(" ")[0] }, 0, 0);
 
                 }
                 else{
-                    ew.apps.itag.state.ble.id=ew.apps.itag.state.dev[this.data.lastPosition].id,
-                    ew.face.go("itag-connect", 0, ew.apps.itag.state.dev[this.data.lastPosition].id);
-                    //ew.apps.itag.conn(ew.apps.itag.state.dev[this.data.lastPosition].id);
+                    ew.apps.itag.state.ble.id=ew.apps.itag.state.dev[this.data.posL].id,
+                    ew.face.go("itag-connect", 0, ew.apps.itag.state.dev[this.data.posL].id);
+                    //ew.apps.itag.conn(ew.apps.itag.state.dev[this.data.posL].id);
                 }
             }
         };
+        
+        if (ew.apps.itag.state.ble.focus) 
+            this.data.posL= ew.apps.itag.state.dev.findIndex(item => item.id === ew.apps.itag.state.ble.focus);
+        
+        if (this.data.posL===-1) this.data.posL=0;
 
         this.bar();
 
-        ew.apps.itag.scan();
+        if (!ew.apps.itag.state.ble.scan) ew.apps.itag.scan();
         //this.run=1
 
     },
@@ -87,21 +93,20 @@ ew.face[0] = {
             g.setFont("LECO1976Regular22");
             g.drawString(offlineCount, 155, 155);
         }
-        
         //name
-        if (name)
+        if (name && name != "New Tag" )
             ew.UI.btn.c2l("main", "_headerS", 6, name, "", 15, 0, 1.5);
         else {
             // id
             g.setFont("Teletext10x18Ascii");
             if (!offlineCount) g.drawString(id, 120 - g.stringWidth(id) / 2, 156);
             // name
-            ew.UI.btn.c2l("main", "_headerS", 6, "New itag", "", 15, 0, 1.5);
+            ew.UI.btn.c2l("main", "_headerS", 6, "New tag", "", 15, 0, 1.5);
         }
 
     },
     catName: function(targetId) {
-        const cat = ew.apps.itag.state.def.find(item => item.id === targetId);
+        const cat = ew.apps.itag.state.def.store.find(item => item.id === targetId);
 
         if (cat && cat.name !== "Unknown") {
             return cat.name;
@@ -115,7 +120,7 @@ ew.face[0] = {
         if (ew.is.bar) return;
 
         // set the bar control
-        ew.sys.TC.val = { cur: this.data.lastPosition, dn: 0, up: ew.apps.itag.state.dev.length - 1, tmp: 0, reverce: 0, loop: this.data.loop };
+        ew.sys.TC.val = { cur: this.data.posL, dn: 0, up: ew.apps.itag.state.dev.length - 1, tmp: 0, reverce: 0, loop: 1 };
         ew.UI.c.tcBar = (a, b) => {
             //"ram";
             let v = this.graph(ew.apps.itag.state.dev, b, 1, this.data.key);
@@ -157,10 +162,10 @@ ew.face[0] = {
 
         g.setCol(0, 0);
         g.fillRect({ x: 0, y: 185, x2: 250, y2: 280, });
-        ew.sys.TC.val = { cur: this.data.lastPosition, dn: 0, up: ew.apps.itag.state.dev.length - 1, tmp: 0, reverce: 0, loop: this.data.loop };
+        ew.sys.TC.val = { cur: this.data.posL, dn: 0, up: ew.apps.itag.state.dev.length - 1, tmp: 0, reverce: 0, loop: 1 };
         // graph the bar
         if (ew.apps.itag.state.dev.length) {
-            let v = this.graph(ew.apps.itag.state.dev, this.data.lastPosition, 0, this.data.key);
+            let v = this.graph(ew.apps.itag.state.dev, this.data.posL, 0, this.data.key);
             //print("v",v);
             this.info(v[0], v[1].split(" ")[0], this.catName(v[1]), v[3]);
         }
@@ -189,18 +194,18 @@ ew.face[0] = {
 
             // top dot - erase last
             g.setCol(1, 0);
-            g.fillRect(margin + 2 + (this.data.lastPosition * bw) + bw - 2, bottom - height + 0, margin + 2 + (this.data.lastPosition * bw), bottom - height + 5);
+            g.fillRect(margin + 2 + (this.data.posL * bw) + bw - 2, bottom - height + 0, margin + 2 + (this.data.posL * bw), bottom - height + 5);
             // top dot - create current
             g.setCol(1, 14);
 
             if (fields) g.fillRect(margin + 2 + (pos * bw) + bw - 2, bottom - height + 0, margin + 2 + (pos * bw), bottom - height + 5);
-            limits = data[this.data.lastPosition].live;
+            limits = data[this.data.posL].live;
 
             // style 1
             if (this.data.style) {
                 // bar - clear previus 
                 g.setCol(1, limits ? 4 : 13);
-                g.fillRect(margin + 2 + (this.data.lastPosition * bw) + bw - 2, bottom - ((100 - Math.abs(data[this.data.lastPosition][value])) * scale), margin + 2 + (this.data.lastPosition * bw), bottom);
+                g.fillRect(margin + 2 + (this.data.posL * bw) + bw - 2, bottom - ((100 - Math.abs(data[this.data.posL][value])) * scale), margin + 2 + (this.data.posL * bw), bottom);
                 // bar - highlight current
                 g.setCol(1, 14);
                 g.fillRect(margin + 2 + (pos * bw) + bw - 2, bottom - ((100 - Math.abs(data[pos][value])) * scale), margin + 2 + (pos * bw), bottom);
@@ -210,12 +215,12 @@ ew.face[0] = {
                 //limits color coding
                 g.setCol(1, limits ? 4 : 13);
                 // bar - clear previus
-                g.drawRect(margin + 2 + (this.data.lastPosition * bw) + bw - 2, bottom - ((100 - Math.abs(data[this.data.lastPosition][value])) * scale), margin + 2 + (this.data.lastPosition * bw), bottom);
+                g.drawRect(margin + 2 + (this.data.posL * bw) + bw - 2, bottom - ((100 - Math.abs(data[this.data.posL][value])) * scale), margin + 2 + (this.data.posL * bw), bottom);
                 // bar - highlight current 
                 g.setCol(1, 14);
                 g.drawRect(margin + 2 + (pos * bw) + bw - 2, bottom - ((100 - Math.abs(data[pos][value])) * scale), margin + 2 + (pos * bw), bottom);
             }
-            this.data.lastPosition = pos;
+            this.data.posL = pos;
         }
 
         // first draw
@@ -248,7 +253,7 @@ ew.face[0] = {
         ew.is.slide = 0; /*TC.removeAllListeners();*/
         if (this.tid) clearTimeout(this.tid);
         this.tid = 0;
-        ew.apps.itag.stopScan();
+        if (!ew.apps.itag.state.ble.focus || ew.face.appCurr==="itag-conn" ) ew.apps.itag.stopScan();
         return true;
     },
     off: function(o) {

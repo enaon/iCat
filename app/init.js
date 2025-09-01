@@ -9,7 +9,7 @@ global.save = function() { throw new Error("You don't need to use save() on eucW
 global.ew = { "sys":{}, "apps":{}, "dbg": 0, "face":{}, "logger": {},"notify":{}, "log": [], "def": {}, "is": {}, "do": { "reset": {}, "update": {} }, "tid": {}, "temp": {}, "pin": {} };
 
 if (process.env.BOARD == "MAGIC3" || process.env.BOARD == "Magic3" || process.env.BOARD == "ROCK") {
-  ew.pin = { BAT: D30, CHRG: D8, BUZZ: D6, BUZ0: 0, BL: D12, i2c: { SCL: D14, SDA: D15 }, touch: { RST: D39, INT: D32 }, disp: { CS: D3, DC: D47, RST: D2, BL: D12 }, acc: { INT: D16 } };
+  ew.pin = { BAT: D30, CHRG: D8, BUZZ: D6, BUZ0: 0, BL: D12, i2c: { SCL: D14, SDA: D15 }, touch: { RST: D39, INT: D32, SLP: 0xA5 }, disp: { CS: D3, DC: D47, RST: D2, BL: D12 }, acc: { INT: D16 } };
   E.showMessage = print; //apploader suport
   D7.write(1); // turns off sp02 red led
   ew.do.maxTx = 8;
@@ -52,7 +52,7 @@ if ((BTN1.read() || require("Storage").read("devmode"))) {
   else {
     require("Storage").write("devmode", "done");
     NRF.setAdvertising({}, { name: "Espruino-devmode", connectable: true });
-    digitalPulse(ew.pin.BUZZ, ew.pin.BUZ0, [80,50,80,50,80]);
+    //digitalPulse(ew.pin.BUZZ, ew.pin.BUZ0, [80,50,80,50,80]);
     print("Welcome!\n*** DevMode ***\nShort press the side button\nto restart in WorkingMode");
   }
   
@@ -69,6 +69,21 @@ if ((BTN1.read() || require("Storage").read("devmode"))) {
     }, 500);
   }, BTN1, { repeat: false, edge: "rising" });
 
+
+ // ---- put touch/acc to sleep ----
+  setTimeout(()=>{
+    var i2c = new I2C();
+    i2c.setup({ scl: ew.pin.i2c.SCL, sda: ew.pin.i2c.SDA, bitrate: 100000 });
+
+    // ---- acc sleep ----
+		i2c.writeTo(0x18,0x20,0x07); //Clear LPen-Enable all axes-Power down
+		i2c.writeTo(0x18,0x26);
+		i2c.readFrom(0x18,1);// Read REFERENCE-Reset filter block 
+    // ---- touch sleep ----
+  	digitalPulse(ew.pin.touch.RST, 1, [5, 50]);
+		setTimeout(() => { i2c.writeTo(0x15,ew.pin.touch.SLP, 3); }, 100);
+  },1000);
+
 }
 
 // === working mode ===
@@ -81,10 +96,10 @@ else {
   // ---- handler ----
   if (require('Storage').read('ew_handler')) eval(require('Storage').read('ew_handler'));
   
-  //clock
+  // ---- clock ----
   if (require('Storage').read('ew_clock')) eval(require('Storage').read('ew_clock'));
   
-  //apps
+  // ---- apps ----
   require("Storage").list(/^ew_a/).forEach(appKey => {
     eval(require('Storage').read(appKey));
 	});
