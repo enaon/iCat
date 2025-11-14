@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="el">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>System Settings</title>
+    <link rel="stylesheet" href="/common.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            overflow-y: auto !important;
+            overflow-x: hidden !important;
+            min-height: 100vh;
+            width: 100%;
+            max-width: 100vw;
+        }
+
+        .settings-container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 16px;
+            min-height: 100vh;
+        }
+
+        .settings-tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 24px;
+            flex-wrap: nowrap;
+            /* <-- ΑΠΑΓΟΡΕΥΕΙ ΤΟ WRAP */
+            justify-content: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 16px;
+            overflow-x: auto;
+            /* <-- ΓΙΑ MOBILE SCROLL */
+        }
+
+        .tab-btn {
+            padding: 12px 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border: none;
+            border-radius: 8px;
+            color: var(--color-on-surface);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .tab-btn.active {
+            background: var(--color-primary);
+            color: var(--color-on-primary);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .settings-group {
+            background: var(--color-surface);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .settings-title {
+            font-size: 18px;
+            font-weight: 500;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            /* ΜΟΝΟ 1 ΣΤΗΛΗ */
+            gap: 16px;
+            max-width: 400px;
+            /* Προαιρετικό - για να μην απλώνεται πολύ */
+            margin: 0 auto;
+            /* Κεντράρισμα */
+        }
+
+
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 12px;
+            align-items: flex-end;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 6px;
+            font-size: 14px;
+            opacity: 0.8;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 10px 12px;
+            border-radius: 6px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--color-on-surface);
+            font-size: 14px;
+        }
+
+        .form-group input:disabled,
+        .form-group select:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            width: auto;
+        }
+
+        .readonly-field {
+            background: rgba(255, 255, 255, 0.02) !important;
+            border-color: rgba(255, 255, 255, 0.05) !important;
+        }
+
+        .role-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        .role-tag {
+            padding: 4px 12px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .role-tag .remove-role {
+            background: none;
+            border: none;
+            color: inherit;
+            cursor: pointer;
+            padding: 0;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .role-tag .remove-role:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .actions-bar {
+            position: sticky;
+            bottom: 0;
+            background: var(--color-background);
+            padding: 16px 0;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            /* ΑΥΤΟ ΚΕΝΤΡΑΡΕΙ ΤΑ ΚΟΥΜΠΙΑ */
+            flex-wrap: wrap;
+            /* Για mobile */
+        }
+
+        .range-value {
+            margin-left: 8px;
+            font-weight: 500;
+            color: var(--color-primary);
+        }
+
+        @media (max-width: 768px) {
+            .settings-tabs {
+                flex-direction: column;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .form-row {
+                flex-direction: column;
+            }
+        }
+
+        .btn-danger {
+            background: #dc3545 !important;
+            border-color: #dc3545 !important;
+        }
+
+        .btn-danger:hover {
+            background: #c82333 !important;
+            border-color: #bd2130 !important;
+        }
+ 
+      
+    </style>
+</head>
+
+<body>
+    <div class="settings-container">
+        <div class="settings-header">
+            <!--   <h1><i class="fas fa-cog"></i> <span id="titleText">System Settings</span></h1>
+           <p id="subtitleText">Device configuration and preferences</p> -->
+        </div>
+
+        <div class="settings-tabs">
+            <button class="tab-btn active" data-tab="general">
+                <i class="fas fa-sliders-h"></i>
+                <span id="tabGeneralText">General</span>
+            </button>
+            <button class="tab-btn" data-tab="display">
+                <i class="fas fa-display"></i>
+                <span id="tabDisplayText">Display</span>
+            </button>
+            <button class="tab-btn" data-tab="bluetooth">
+                <i class="fas fa-bluetooth-b"></i>
+                <span id="tabBluetoothText">Bluetooth</span>
+            </button>
+            <button class="tab-btn" data-tab="device">
+                <i class="fas fa-microchip"></i>
+                <span id="tabDeviceText">Device</span>
+            </button>
+            <button class="tab-btn" data-tab="time">
+                <i class="fas fa-clock"></i>
+                <span id="tabTimeText">Time</span>
+            </button>
+        </div>
+
+        <!-- General Tab -->
+        <div class="tab-content active" id="generalTab">
+            <div class="settings-group">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="deviceName" id="deviceNameLabel">Device Name</label>
+                        <input type="text" id="deviceName" placeholder="Enter device name">
+                    </div>
+                    <div class="form-group">
+                        <label id="deviceRolesLabel">Device Roles</label>
+                        <div class="form-row">
+                            <select id="newRole">
+                                <option value="watch">watch</option>
+                                <option value="litterBox">litterBox</option>
+                                <option value="tag">tag</option>
+                                <option value="pb">pb</option>
+                                <option value="light">light</option>
+                                <option value="blind">blind</option>
+                                <option value="pir">pir</option>
+                            </select>
+                            <button class="btn" id="addRoleBtn"><i class="fas fa-plus"></i></button>
+                        </div>
+                        <div class="role-tags" id="roleTags"></div>
+                    </div>
+
+                    <!-- 🔥 ΠΡΟΣΘΗΚΗ RESET BUTTON -->
+                    <div class="form-group">
+                        <button id="resetDeviceBtn" class="btn btn-danger" style="width: 100%; margin-top: 20px;">
+                            <i class="fas fa-power-off"></i> <span id="resetDeviceText">Reset Device</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="settings-group">
+                <div class="form-grid">
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="noWd">
+                        <label for="noWd" id="noWdLabel">Watchdog Disabled</label>
+                    </div>
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="frce">
+                        <label for="frce" id="frceLabel">Force Name Change</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Display Tab -->
+        <div class="tab-content" id="displayTab">
+            <div class="settings-group">
+                <!-- <h3 class="settings-title"><i class="fas fa-toggle-on"></i> <span id="displayFeaturesText">Display Features</span></h3> -->
+                <div class="form-grid">
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="faceInfo">
+                        <label for="faceInfo" id="faceInfoLabel">Show info on actions</label>
+                    </div>
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="faceBuzz">
+                        <label for="faceBuzz" id="faceBuzzLabel">Haptic on navigation</label>
+                    </div>
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="faceScrn">
+                        <label for="faceScrn" id="faceScrnLabel">Display auto turn on</label>
+                    </div>
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="faceTxt">
+                        <label for="faceTxt" id="faceTxtLabel">Text on icons</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="settings-group">
+                <!-- <h3 class="settings-title"><i class="fas fa-adjust"></i> <span id="displayAppearanceText">Display Appearance</span></h3> -->
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="faceSize" id="faceSizeLabel">Text Size <span id="faceSizeValue" class="range-value">0.8</span></label>
+                        <input type="range" id="faceSize" min="0.7" max="1" step="0.1" value="0.8">
+                    </div>
+                    <div class="form-group">
+                        <label for="faceBri" id="faceBriLabel">Brightness <span id="faceBriValue" class="range-value">7</span></label>
+                        <input type="range" id="faceBri" min="1" max="10" step="1" value="7">
+                    </div>
+                </div>
+            </div>
+
+            <div class="settings-group">
+                <!--  <h3 class="settings-title"><i class="fas fa-info-circle"></i> <span id="displayInfoText">Display Information</span></h3> -->
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="faceBpp" id="faceBppLabel">Color Bit Mode</label>
+                        <input type="text" id="faceBpp" class="readonly-field" disabled>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bluetooth Tab -->
+        <div class="tab-content" id="bluetoothTab">
+
+            <div class="settings-group">
+                <!--   <h3 class="settings-title"><i class="fas fa-broadcast-tower"></i> <span id="bluetoothSettingsText">Bluetooth Settings</span></h3> -->
+                <div class="form-grid">
+
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="btPair">
+                        <label for="btPair" id="btPairLabel">Enable pair mode</label>
+                    </div>
+
+
+                    <div class="form-group">
+                        <label for="btCode" id="btCodeLabel">BT code</label>
+                        <input type="text" id="btCode" placeholder="Enter BT code" pattern="[0-9]{6}" maxlength="6" required>
+
+                        <small class="form-text text-muted" id="btCodeInfoLabel">Must be exactly 6 digits</small>
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="settings-group">
+                <!--<h3 class="settings-title"><i class="fas fa-tachometer-alt"></i> <span id="bluetoothAdvancedText">Bluetooth Advanced</span></h3> -->
+                <div class="form-grid">
+
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="btUart">
+                        <label for="btUart" id="btUartLabel">Nordic UART Service</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="settings-group">
+                <!--   <h3 class="settings-title"><i class="fas fa-broadcast-tower"></i> <span id="bluetoothSettingsText">Bluetooth Settings</span></h3> -->
+                <div class="form-grid">
+
+
+                    <div class="form-group">
+                        <label for="btPhyC" id="btPhyCLabel">PHY Connection Mode</label>
+                        <select id="btPhyC">
+                            <option value="1mbps">1mbps</option>
+                            <option value="coded">coded</option>
+                            <option value="both">both</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="btPhyA" id="btPhyALabel">PHY Advertising Mode</label>
+                        <select id="btPhyA">
+                            <option value="1mbps">1mbps</option>
+                            <option value="coded">coded</option>
+                        <!--<option value="coded,1mbps">coded,1mbps</option>
+                            <option value="1mbps,coded">1mbps,coded</option>
+                        -->
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="btRfTX" id="btRfTXLabel">Radio TX Power</label>
+                        <select id="btRfTX">
+                            <option value="-8">-8 dBm</option>
+                            <option value="-4">-4 dBm</option>
+                            <option value="0">0 dBm</option>
+                            <option value="4">+4 dBm</option>
+                            <option value="8">+8 dBm</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="settings-group">
+                <!--<h3 class="settings-title"><i class="fas fa-tachometer-alt"></i> <span id="bluetoothAdvancedText">Bluetooth Advanced</span></h3> -->
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="btIntA" id="btIntALabel">Advertising Interval (ms)</label>
+                        <input type="number" id="btIntA" min="300" max="60000" step="100" value="1626">
+                    </div>
+                    <div class="form-group">
+                        <label for="btIntC" id="btIntCLabel">Διάστημα Σύνδεσης</label>
+                        <select id="btIntC">
+                        <option value="auto">auto</option>
+                        <option value="7.5">7.5 ms</option>
+                        <option value="10">10 ms</option>
+                        <option value="15">15 ms</option>
+                        <option value="20">20 ms</option>
+                        <option value="25">25 ms</option>
+                        <option value="30">30 ms</option>
+                        <option value="50">50 ms</option>
+                        <option value="75">75 ms</option>
+                        <option value="100">100 ms</option>
+                        <option value="200">200 ms</option>
+                        <option value="300">300 ms</option>
+                        <option value="400">400 ms</option>
+                        <option value="500">500 ms</option>
+                        <option value="750">750 ms</option>
+                        <option value="1000">1000 ms</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="btMtu" id="btMtuLabel">MTU Size</label>
+                        <input type="number" id="btMtu" min="23" max="131" value="90">
+                    </div>
+                </div>
+            </div>
+
+            <div class="settings-group">
+                <!--  <h3 class="settings-title"><i class="fas fa-info-circle"></i> <span id="bluetoothInfoText">Bluetooth Information</span></h3> -->
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="btConn" id="btConnLabel">BT Connectable</label>
+                        <input type="text" id="btConn" class="readonly-field" disabled>
+                    </div>
+                    <div class="form-group">
+                        <label for="btAdv" id="btAdvLabel">BT Advertising</label>
+                        <input type="text" id="btAdv" class="readonly-field" disabled>
+                    </div>
+                    <div class="form-group">
+                        <label for="btAddr" id="btAddrLabel">BT Address</label>
+                        <input type="text" id="btAddr" class="readonly-field" disabled>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Device Tab -->
+        <div class="tab-content" id="deviceTab">
+            <div class="settings-group">
+                <!--<h3 class="settings-title"><i class="fas fa-sensor"></i> <span id="sensorSettingsText">Sensor Settings</span></h3> -->
+                <div class="form-grid">
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="devAcc">
+                        <label for="devAcc" id="devAccLabel">Accelerometer Enabled</label>
+                    </div>
+                    <div class="form-group">
+                        <label for="devAccM" id="devAccMLabel">Accelerometer Mode</label>
+                        <select id="devAccM">
+                            <option value="0">Mode 0</option>
+                            <option value="1">Mode 1</option>
+                            <option value="2">Mode 2</option>
+                            <option value="3">Mode 3</option>
+                            <option value="4">Mode 4</option>
+                            <option value="5">Mode 5</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="settings-group">
+                <!--<h3 class="settings-title"><i class="fas fa-info-circle"></i> <span id="deviceInfoText">Device Information</span></h3>-->
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="devTouchType" id="devTouchTypeLabel">Touch Controller</label>
+                        <input type="text" id="devTouchType" class="readonly-field" disabled>
+                    </div>
+                    <div class="form-group">
+                        <label for="devAccType" id="devAccTypeLabel">Accelerometer Type</label>
+                        <input type="text" id="devAccType" class="readonly-field" disabled>
+                    </div>
+                    <div class="form-group">
+                        <label for="devBoard" id="devBoardLabel">Board Type</label>
+                        <input type="text" id="devBoard" class="readonly-field" disabled>
+                    </div>
+                    <div class="form-group">
+                        <label for="devFirm" id="devFirmLabel">Firmware Version</label>
+                        <input type="text" id="devFirm" class="readonly-field" disabled>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Time Tab -->
+        <div class="tab-content" id="timeTab">
+            <div class="settings-group">
+                <div class="form-grid">
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="timeHr24">
+                        <label for="timeHr24" id="timeHr24Label">24 Hour Mode</label>
+                    </div>
+                    <div class="form-group">
+                        <label for="timeTimezone" id="timeTimezoneLabel">Timezone</label>
+                        <input type="number" id="timeTimezone" min="-12" max="14" value="3">
+                    </div>
+
+                    <!--  ΠΡΟΣΘΗΚΗ SYNC TIME BUTTON -->
+                    <div class="form-group">
+                        <button id="syncTimeBtn" class="btn btn-primary" style="width: 100%; margin-top: 20px;">
+                            <i class="fas fa-clock"></i> <span id="syncTimeText">Sync Browser Time</span>
+                        </button>
+                        <!--<small class="form-text text-muted" id="syncTimeInfoLabel">Sync current browser time to device</small>
+                        -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="actions-bar">
+            <button id="exportSettingsBtn" class="btn btn-secondary">
+                <i class="fas fa-download"></i> <span id="exportSettingsText">Export</span>
+            </button>
+            <button id="importSettingsBtn" class="btn btn-secondary">
+                <i class="fas fa-upload"></i> <span id="importSettingsText">Import</span>
+            </button>
+            <button id="saveSettingsBtn" class="btn">
+                <i class="fas fa-save"></i> <span id="saveSettingsText">Save Settings</span>
+            </button>
+        </div>
+    </div>
+
+    <input type="file" id="importSettingsFile" accept=".json" style="display: none;">
+
+    <script src="/common.js"></script>
+    <script src="app.js"></script>
+</body>
+
+</html>

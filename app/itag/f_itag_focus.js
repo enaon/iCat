@@ -9,9 +9,9 @@ ew.UI.nav.back.replaceWith(() => {
 
 ew.face[0] = {
     run: false,
-    offms: (ew.def.off[ew.face.appCurr]) ? ew.def.off[ew.face.appCurr] : 60000,
+    offms: (ew.def.face.off[ew.face.appCurr]) ? ew.def.face.off[ew.face.appCurr] : 60000,
     init: function() {
-        ew.def.off[ew.face.appCurr]=this.offms;
+        if (!ew.def.face.off[ew.face.appCurr])  ew.def.face.off[ew.face.appCurr] = this.offms;
         // name
         ew.UI.btn.c2l("main", "_header", 6, this.getVal("name") , "", 15, 0, 1.5);
         
@@ -87,11 +87,11 @@ ew.face[0] = {
             if (i==4){
                 ew.apps.itag.state.alert=1-ew.apps.itag.state.alert;
                 ew.UI.btn.img("bar", "_bar", 4, "alarm", "ALERT", 15, ew.apps.itag.state.alert?4:1);
-                if (ew.def.info) ew.UI.btn.ntfy(1,1,0,"_bar",6,"ALERT",ew.apps.itag.state.alert?"ON":"OFF" ,0,15); 
+                if (ew.def.face.info) ew.UI.btn.ntfy(1,1,0,"_bar",6,"ALERT",ew.apps.itag.state.alert?"ON":"OFF" ,0,15); 
                 ew.apps.itag.state.ble.alert.writeValue(ew.apps.itag.state.alert?1:0);
             }
             if (i==5 || i==6){
-                if (ew.def.info) ew.UI.btn.ntfy(1,1,0,"_bar",6,"DISCONNECTING","" ,0,15); 
+                if (ew.def.face.info) ew.UI.btn.ntfy(1,1,0,"_bar",6,"DISCONNECTING","" ,0,15); 
                 ew.apps.itag.state.ble.gatt.disconnect();
                 
             }
@@ -103,9 +103,9 @@ ew.face[0] = {
         ew.is.slide = 0; /*TC.removeAllListeners();*/
         if (this.tid) clearTimeout(this.tid);
         this.tid = 0;
-        if (ew.apps.itag.tid) {
-            clearTimeout(ew.apps.itag.tid);
-            ew.apps.itag.tid = 0;
+        if (ew.apps.itag.tid.con) {
+            clearTimeout(ew.apps.itag.tid.con);
+            ew.apps.itag.tid.con = 0;
         }
         return true;
     },

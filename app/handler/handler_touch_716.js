@@ -1,4 +1,4 @@
-ew.def.touchtype = "716";
+ew.def.dev.touchtype = "716";
 ew.sys.TC = {
 	dbg: 0,
 	tid: 0,
@@ -40,13 +40,12 @@ ew.sys.TC = {
 						};
 						if (this.val.reverce) this.val.tmp = this.x > tp[4] ? this.val.tmp - (tp[4] - this.x) : this.val.tmp + (this.x - tp[4]);
 						else this.val.tmp = this.x < tp[4] ? this.val.tmp + (tp[4] - this.x) : this.val.tmp - (this.x - tp[4]);
-						let len = 15;
+						let len = this.val.len || 100/(this.val.up-this.val.dn);
 						let step = this.val.tmp / len | 0;
 						if (step == 1) step = 0;
 						else if (step == -1) step = 0;
 						else if (step == 2 || step == 3) step = 1;
 						else if (step == -2 || step == -3) step = -1;
-						else if (step) step = step * 1.8 | 0;
 						if (step) {
 							if (len < this.val.tmp || this.val.tmp < -len) {
 								this.val.cur = this.val.cur + step;
@@ -56,7 +55,7 @@ ew.sys.TC = {
 							else if (this.val.cur < this.val.dn) this.val.cur = (this.val.loop) ? this.val.up : this.val.dn;
 							if (!this.val.tmp) {
 								ew.sys.buzz.nav(10);
-								ew.UI.c.tcBar( this.x < tp[4] ? 1 : -1, this.val.cur );
+								ew.UI.c.tcBar( this.x < tp[4] ? 1 : -1, this.val.cur ); 
 							}
 						}
 						this.x = tp[4];
@@ -95,7 +94,7 @@ ew.sys.TC = {
 						side ? this.val.cur++ : this.val.cur--;
 						if (this.val.up < this.val.cur) this.val.cur = (this.val.loop) ? this.val.dn : this.val.up;
 						else if (this.val.cur < this.val.dn) this.val.cur = (this.val.loop) ? this.val.up : this.val.dn;
-						ew.UI.c.tcBar( side ? 1 : -1, this.val.cur );
+						ew.UI.c.tcBar( side ? 1 : -1, this.val.cur ); 
 					}
 					ew.face.off();
 				}
@@ -121,7 +120,7 @@ ew.sys.TC = {
 			if (this.do && getTime() - this.time > 1 && tp[2] == 1) {
 				//print("hold",this.do,this.st, tp)
 				this.do = 0;
-				ew.UI.c.xy(this.x + (this.x / 10), this.y, 1);
+				ew.UI.c.xy(this.x + (this.x / 10), this.y, 1); 
 				ew.face.off();
 			}
 			else if (this.do && tp[2] == 1) {
@@ -151,7 +150,7 @@ ew.sys.TC = {
 				this.do = 0;
 				ew.face.off();
 				if (ew.UI.ntid && !ew.is.bar && (180 < (((tp[5] & 0x0F) << 8) | tp[6]))) { ew.sys.buzz.nav(ew.sys.buzz.type.ok);ew.UI.rtb(); return; }
-				ew.UI.c.xy(this.x + (this.x / 10), this.y);
+				ew.UI.c.xy(this.x + (this.x / 10), this.y); 
 			}
 			this.aLast = 0;
 			this.st = 1;

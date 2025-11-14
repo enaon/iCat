@@ -1,0 +1,1099 @@
+<!DOCTYPE html>
+<html lang="el">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Timer Manager</title>
+    <link rel="manifest" href="Loader/app.webmanifest">
+    <style>
+        :root {
+            --color-primary: #BB86FC;
+            --color-primary-variant: #3700B3;
+            --color-secondary: #03DAC6;
+            --color-background: #121212;
+            --color-surface: #1E1E1E;
+            --color-error: #CF6679;
+            --color-on-primary: #000000;
+            --color-on-secondary: #000000;
+            --color-on-background: #FFFFFF;
+            --color-on-surface: #FFFFFF;
+            --color-on-error: #000000;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Roboto', sans-serif;
+        }
+
+        body {
+            background-color: var(--color-background);
+            color: var(--color-on-background);
+            min-height: 100vh;
+            padding: 16px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        h1 {
+            font-size: 24px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        h1 i {
+            color: var(--color-primary);
+        }
+
+        .btn {
+            background-color: var(--color-primary);
+            color: var(--color-on-primary);
+            border: none;
+            border-radius: 20px;
+            padding: 10px 20px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .btn:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn-secondary {
+            background-color: var(--color-surface);
+            color: var(--color-on-surface);
+        }
+
+        .btn-success {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        .btn-warning {
+            background-color: #FF9800;
+            color: white;
+        }
+
+        .btn-danger {
+            background-color: var(--color-error);
+            color: white;
+        }
+
+        .header-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 24px;
+            padding: 12px 16px;
+            background-color: var(--color-surface);
+            border-radius: 12px;
+            font-size: 14px;
+        }
+
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background-color: var(--color-error);
+        }
+
+        .status-dot.connected {
+            background-color: #4CAF50;
+        }
+
+        .timer-list {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 16px;
+        }
+
+        .timer-card {
+            background-color: var(--color-surface);
+            border-radius: 16px;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .timer-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .timer-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .timer-name {
+            font-size: 18px;
+            font-weight: 500;
+        }
+
+        .timer-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .timer-detail {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .detail-label {
+            font-size: 12px;
+            opacity: 0.7;
+        }
+
+        .detail-value {
+            font-size: 16px;
+            font-weight: 500;
+        }
+
+        .timer-actions {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .timer-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .status-active {
+            background-color: rgba(76, 175, 80, 0.2);
+            color: #4CAF50;
+        }
+
+        .status-paused {
+            background-color: rgba(255, 152, 0, 0.2);
+            color: #FF9800;
+        }
+
+        .status-inactive {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .edit-btn {
+            background: none;
+            border: none;
+            color: var(--color-primary);
+            cursor: pointer;
+            font-size: 18px;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background-color: var(--color-surface);
+            border-radius: 16px;
+            padding: 24px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-title {
+            font-size: 20px;
+            font-weight: 500;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            color: var(--color-on-surface);
+            font-size: 24px;
+            cursor: pointer;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 14px;
+            opacity: 0.8;
+        }
+
+        input,
+        select {
+            width: 100%;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background-color: rgba(255, 255, 255, 0.05);
+            color: var(--color-on-surface);
+            font-size: 16px;
+        }
+
+        .toggle-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .toggle-label {
+            margin-bottom: 0;
+        }
+
+        .modal-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            opacity: 0.7;
+        }
+
+        .empty-state i {
+            font-size: 48px;
+            margin-bottom: 16px;
+            color: var(--color-primary);
+        }
+
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            padding: 20px;
+        }
+
+        .loading-spinner {
+            width: 24px;
+            height: 24px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: var(--color-primary);
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background-color: var(--color-error);
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        @media (max-width: 600px) {
+            .timer-info {
+                grid-template-columns: 1fr;
+            }
+
+            .header-buttons {
+                flex-direction: column;
+                gap: 5px;
+            }
+
+            .timer-actions {
+                flex-direction: column;
+            }
+
+            .timer-actions .btn {
+                width: 100%;
+            }
+        }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-clock"></i> Timer Manager</h1>
+            <div class="header-buttons">
+                <button id="connectBtn" class="btn" style="display:none;">
+                    <i class="fas fa-bluetooth-b"></i> Σύνδεση
+                </button>
+                <button id="refreshBtn" class="btn" style="display:none;">
+                    <i class="fas fa-sync"></i> Ανανέωση
+                </button>
+                <button id="exportBtn" class="btn btn-secondary" style="display:none;">
+                    <i class="fas fa-download"></i> Export
+                </button>
+                <button id="importBtn" class="btn btn-secondary" style="display:none;">
+                    <i class="fas fa-upload"></i> Import
+                </button>
+            </div>
+        </header>
+
+        <div class="status">
+            <div class="status-dot" id="statusDot"></div>
+            <span id="statusText">Συνδεδεμένοι μέσω eW Launcher</span>
+        </div>
+
+        <div id="timerList" class="timer-list">
+            <div class="empty-state">
+                <i class="fas fa-clock"></i>
+                <p>Δεν υπάρχουν διαθέσιμοι χρονομετρητές. Πατήστε Ανανέωση για να εμφανιστούν τα δεδομένα.</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Επεξεργασία χρονομετρητή</h2>
+                <button class="close-btn">&times;</button>
+            </div>
+            <div class="form-group">
+                <label for="timerName">Όνομα χρονομετρητή</label>
+                <input type="text" id="timerName" placeholder="Πληκτρολογήστε το όνομα">
+            </div>
+            <div class="form-group">
+                <label for="timerId">ID (μη επεξεργάσιμο)</label>
+                <input type="text" id="timerId" disabled>
+            </div>
+            <div class="form-group">
+                <label for="timerMinutes">Λεπτά</label>
+                <input type="number" id="timerMinutes" min="0" max="600">
+            </div>
+            <div class="form-group">
+                <label for="timerBuzz">Buzz</label>
+                <select id="timerBuzz">
+                    <option value="1">Ενεργό</option>
+                    <option value="0">Απενεργοποιημένο</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="timerBuzzRep">Buzz Repetitions</label>
+                <input type="number" id="timerBuzzRep" min="1" max="200">
+            </div>
+            <div class="form-group">
+                <label for="timerRep">Repetitions</label>
+                <input type="number" id="timerRep" min="0" max="100">
+            </div>
+            <div class="modal-actions">
+                <button id="saveTimerBtn" class="btn">Αποθήκευση</button>
+                <button id="cancelEditBtn" class="btn btn-secondary">Ακύρωση</button>
+            </div>
+        </div>
+    </div>
+
+    <input type="file" id="importFile" accept=".json" style="display: none;">
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Στοιχεία DOM
+            const connectBtn = document.getElementById('connectBtn');
+            const refreshBtn = document.getElementById('refreshBtn');
+            const exportBtn = document.getElementById('exportBtn');
+            const importBtn = document.getElementById('importBtn');
+            const importFile = document.getElementById('importFile');
+            const statusDot = document.getElementById('statusDot');
+            const statusText = document.getElementById('statusText');
+            const timerList = document.getElementById('timerList');
+            const editModal = document.getElementById('editModal');
+            const timerNameInput = document.getElementById('timerName');
+            const timerIdInput = document.getElementById('timerId');
+            const timerMinutesInput = document.getElementById('timerMinutes');
+            const timerBuzzInput = document.getElementById('timerBuzz');
+            const timerBuzzRepInput = document.getElementById('timerBuzzRep');
+            const timerRepInput = document.getElementById('timerRep');
+            const saveTimerBtn = document.getElementById('saveTimerBtn');
+            const cancelEditBtn = document.getElementById('cancelEditBtn');
+            const closeBtn = document.querySelector('.close-btn');
+
+            let isConnected = true; // Είμαστε πάντα συνδεδεμένοι μέσω Launcher
+            let timersData = {};
+            let editingTimerId = null;
+            let dataBuffer = '';
+            let autoRefreshInterval = null;
+            let lastActiveTimers = {};
+
+            // Άμεσα ενημέρωσε το UI ότι η σύνδεση είναι active
+            if (statusDot && statusText) {
+                statusDot.classList.add('connected');
+                statusText.textContent = 'Συνδεδεμένοι μέσω eW Launcher';
+            }
+
+            // Εμφάνιση κουμπιών
+            if (refreshBtn) refreshBtn.style.display = 'inline-block';
+            if (exportBtn) exportBtn.style.display = 'inline-block';
+            if (importBtn) importBtn.style.display = 'inline-block';
+
+            // Event listeners
+            refreshBtn.addEventListener('click', function() {
+                refreshData();
+            });
+
+            exportBtn.addEventListener('click', function() {
+                exportData();
+            });
+
+            importBtn.addEventListener('click', function() {
+                importFile.click();
+            });
+
+            importFile.addEventListener('change', function(e) {
+                handleImport(e.target.files[0]);
+            });
+
+            // Ανανέωση δεδομένων
+            async function refreshData() {
+                try {
+                    statusText.textContent = 'Ανάγνωση δεδομένων...';
+                    await sendCommand('Bluetooth.println(JSON.stringify(ew.apps.timer.state.def))\n');
+                }
+                catch (error) {
+                    console.error('Σφάλμα ανανέωσης:', error);
+                    statusText.textContent = 'Σφάλμα ανανέωσης: ' + error.message;
+                }
+            }
+
+            // Εξαγωγή δεδομένων
+            function exportData() {
+                if (Object.keys(timersData).length === 0) {
+                    alert('Δεν υπάρχουν δεδομένα για εξαγωγή');
+                    return;
+                }
+
+                // Δημιουργία αντικειμένου με τα δεδομένα για εξαγωγή
+                const exportData = {
+                    timers: timersData,
+                    timestamp: new Date().toISOString(),
+                    version: '1.0'
+                };
+
+                // Δημιουργία JSON string
+                const jsonString = JSON.stringify(exportData, null, 2);
+
+                // Δημιουργία blob και λήψη URL
+                const blob = new Blob([jsonString], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+
+                // Δημιουργία link για λήψη
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `timer_export_${new Date().toISOString().slice(0, 10)}.json`;
+                document.body.appendChild(a);
+                a.click();
+
+                // Καθαρισμός
+                setTimeout(() => {
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                }, 100);
+
+                statusText.textContent = 'Τα δεδομένα εξήχθησαν επιτυχώς';
+            }
+
+            // Εισαγωγή δεδομένων
+            function handleImport(file) {
+                if (!file) return;
+
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    try {
+                        const importedData = JSON.parse(e.target.result);
+
+                        if (!importedData.timers || typeof importedData.timers !== 'object') {
+                            throw new Error('Μη έγκυρη μορφή αρχείου');
+                        }
+
+                        if (!confirm(`Θέλετε να εισαγάγετε ${Object.keys(importedData.timers).length} χρονομετρητές; Αυτή η ενέργεια θα αντικαταστήσει τις τρέχουσες ρυθμίσεις.`)) {
+                            return;
+                        }
+
+                        // Αποστολή των δεδομένων κατευθείαν στο Espruino
+                        updateEspruinoWithImportedData(importedData.timers);
+                        statusText.textContent = 'Τα δεδομένα εισήχθησαν και εστάλησαν στην συσκευή!';
+
+                    }
+                    catch (error) {
+                        console.error('Σφάλμα εισαγωγής:', error);
+                        alert('Σφάλμα κατά την εισαγωγή: ' + error.message);
+                    }
+                };
+                reader.readAsText(file);
+            }
+
+            // Ενημέρωση Espruino με εισαγόμενα δεδομένα
+            async function updateEspruinoWithImportedData(importedTimers) {
+                try {
+                    statusText.textContent = 'Ενημέρωση συσκευής με εισαγόμενα δεδομένα...';
+
+                    // Δημιουργούμε την εντολή για να ορίσουμε όλο το αντικείμενο
+                    let command = 'ew.apps.timer.state.def = ' + JSON.stringify(importedTimers) + ';\n';
+
+                    console.log("Εντολή μήκος:", command.length);
+
+                    // Στέλνουμε την εντολή σε μέρη αν είναι πολύ μεγάλη
+                    const chunkSize = 100;
+                    for (let i = 0; i < command.length; i += chunkSize) {
+                        const chunk = command.substring(i, i + chunkSize);
+                        await sendCommand(chunk);
+                        await new Promise(resolve => setTimeout(resolve, 50));
+                    }
+
+                    // Περιμένουμε να ολοκληρωθεί η εντολή
+                    await new Promise(resolve => setTimeout(resolve, 500));
+
+                    // Ελέγχουμε και αποθηκεύουμε
+                    await sendCommand('if (ew.apps.timer.state.def && Object.keys(ew.apps.timer.state.def).length > 0) { \n');
+                    await sendCommand('  Bluetooth.println("Αποθηκεύτηκαν " + Object.keys(ew.apps.timer.state.def).length + " χρονομετρητές");\n');
+                    await sendCommand('} else {\n');
+                    await sendCommand('  Bluetooth.println("Σφάλμα: Το αντικείμενο είναι άδειο");\n');
+                    await sendCommand('}\n');
+
+                    // Ανανέωση δεδομένων
+                    await refreshData();
+
+                    statusText.textContent = 'Η συσκευή ενημερώθηκε με τα εισαγόμενα δεδομένα (' + Object.keys(importedTimers).length + ' χρονομετρητές)';
+                }
+                catch (error) {
+                    console.error('Σφάλμα ενημέρωσης συσκευής:', error);
+                    statusText.textContent = 'Σφάλμα ενημέρωσης συσκευής: ' + error.message;
+                }
+            }
+
+            // Αποστολή εντολής μέσω UART
+            async function sendCommand(command) {
+                window.parent.postMessage({
+                    type: 'BLUETOOTH_COMMAND',
+                    command: command
+                }, '*');
+            }
+
+            // Κάνε listen για μηνύματα από τον Launcher
+            window.addEventListener('message', function(event) {
+                // Ελέγχουμε ότι το μήνυμα είναι το σωστό type
+                if (event.data.type === 'BLUETOOTH_RAW_DATA') {
+                    console.log("App received raw data:", event.data.data);
+
+                    // ΠΡΟΣΟΜΟΙΩΣΗ Bluetooth event!
+                    // Ο κώδικας σου περιμένει ένα Event object. Ας το φτιάξουμε.
+                    const encoder = new TextEncoder();
+                    const rawData = encoder.encode(event.data.data); // Μετατρέπει το string σε bytes
+
+                    // Δημιουργούμε ένα ψεύτικο Event object που μοιάζει με αυτό του Web Bluetooth API
+                    const fakeEvent = {
+                        target: {
+                            value: rawData // Τοποθετούμε τα encoded bytes
+                        }
+                    };
+
+                    // Καλούμε την ΥΠΑΡΧΟΥΣΑ function handleUartData του app με το ψεύτικο event
+                    if (typeof handleUartData === 'function') {
+                        handleUartData(fakeEvent);
+                    }
+                    else {
+                        console.warn("Η function handleUartData δεν βρέθηκε. Δεν μπορούν να επεξεργαστούν δεδομένα.");
+                    }
+                }
+
+                // Μπορείς να προσθέσεις και άλλα message types εδώ αργότερα
+                // if (event.data.type === 'OTHER_ACTION') { ... }
+            });
+
+            // Χειρισμός εισερχόμενων δεδομένων από UART
+            function handleUartData(event) {
+                const value = event.target.value;
+                const decoder = new TextDecoder();
+                const data = decoder.decode(value);
+
+                dataBuffer += data;
+
+                // Έλεγχος αν έχουμε λάβει πλήρη JSON απάντηση
+                try {
+                    // Προσπαθούμε να βρούμε JSON στο buffer
+                    const jsonStart = dataBuffer.indexOf('{');
+                    const jsonEnd = dataBuffer.lastIndexOf('}');
+
+                    if (jsonStart >= 0 && jsonEnd > jsonStart) {
+                        const jsonString = dataBuffer.substring(jsonStart, jsonEnd + 1);
+                        const jsonData = JSON.parse(jsonString);
+
+                        // Επεξεργασία των δεδομένων
+                        processRetrievedData(jsonData);
+
+                        // Καθαρισμός buffer
+                        dataBuffer = '';
+                    }
+                }
+                catch (e) {
+                    // Αγνοούμε σφάλματα ανάλυσης JSON (ίσως τα δεδομένα δεν είναι ακόμα πλήρη)
+                    console.log('Λήψη δεδομένων:', data);
+                }
+            }
+
+            // Επεξεργασία των δεδομένων που ελήφθησαν από το Espruino
+            function processRetrievedData(data) {
+                if (data && typeof data === 'object') {
+                    timersData = data;
+                    renderTimerList();
+                    statusText.textContent = 'Βρέθηκαν ' + Object.keys(timersData).length + ' χρονομετρητές';
+
+                    // Έλεγχος για ενεργούς timers και ειδοποιήσεις
+                    checkForActiveTimersAndNotify();
+
+                    // Έναρξη/διακοπή auto refresh
+                    manageAutoRefresh();
+                }
+                else {
+                    statusText.textContent = 'Μη έγκυρα δεδομένα από το Espruino';
+                    console.error('Μη έγκυρα δεδομένα:', data);
+                }
+            }
+
+            // Έλεγχος για ενεργούς timers και εμφάνιση ειδοποιήσεων
+            function checkForActiveTimersAndNotify() {
+                const activeTimers = {};
+                let anyTimerCompleted = false;
+
+                Object.keys(timersData).forEach(key => {
+                    const timer = timersData[key];
+
+                    // Αποθήκευση τρέχουσας κατάστασης
+                    activeTimers[key] = timer.active === 1;
+
+                    // Έλεγχος αν ο timer ολοκληρώθηκε
+                    if (lastActiveTimers[key] && !activeTimers[key] && timer.remaining === 0) {
+                        anyTimerCompleted = true;
+                        showBrowserNotification(timer.name || 'Timer ' + key, 'Ο χρονομετρητής ολοκληρώθηκε!');
+                    }
+                });
+
+                // Ενημέρωση της τελευταίας κατάστασης
+                lastActiveTimers = activeTimers;
+
+                return anyTimerCompleted;
+            }
+
+            // Διαχείριση αυτόματης ανανέωσης
+            function manageAutoRefresh() {
+                const hasActiveTimer = Object.values(timersData).some(timer => timer.active === 1);
+
+                if (hasActiveTimer) {
+                    startAutoRefresh();
+                }
+                else {
+                    stopAutoRefresh();
+                }
+            }
+
+            // Έναρξη αυτόματης ανανέωσης
+            function startAutoRefresh() {
+                if (!autoRefreshInterval) {
+                    autoRefreshInterval = setInterval(() => {
+                        refreshData();
+                    }, 5000); // Ανανέωση κάθε 5 δευτερόλεπτα
+
+                    console.log('Auto refresh started');
+                }
+            }
+
+            // Διακοπή αυτόματης ανανέωσης
+            function stopAutoRefresh() {
+                if (autoRefreshInterval) {
+                    clearInterval(autoRefreshInterval);
+                    autoRefreshInterval = null;
+                    console.log('Auto refresh stopped');
+                }
+            }
+
+            // Εμφάνιση ειδοποίησης browser
+            function showBrowserNotification(title, message) {
+                // Έλεγχος αν το browser υποστηρίζει ειδοποιήσεις
+                if (!("Notification" in window)) {
+                    console.log("Αυτό το browser δεν υποστηρίζει ειδοποιήσεις");
+                    return;
+                }
+
+                // Έλεγχος για άδειασμα άδειας
+                if (Notification.permission === "granted") {
+                    // Δημιουργία ειδοποίησης
+                    new Notification(title, { body: message, icon: '/icon-192.png' });
+                }
+                else if (Notification.permission !== "denied") {
+                    // Αίτηση άδειας
+                    Notification.requestPermission().then(permission => {
+                        if (permission === "granted") {
+                            new Notification(title, { body: message, icon: '/icon-192.png' });
+                        }
+                    });
+                }
+            }
+
+            // Αίτηση άδειας για ειδοποιήσεις κατά την φόρτωση
+            if ("Notification" in window && Notification.permission === "default") {
+                Notification.requestPermission();
+            }
+
+            // Απόδοση λίστας χρονομετρητών
+            function renderTimerList() {
+                const timerKeys = Object.keys(timersData);
+
+                if (timerKeys.length === 0) {
+                    timerList.innerHTML = `
+                        <div class="empty-state">
+                            <i class="fas fa-clock"></i>
+                            <p>Δεν βρέθηκαν δεδομένα χρονομετρητών. Πατήστε Ανανέωση για να φορτώσετε τα δεδομένα.</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                timerList.innerHTML = '';
+
+                timerKeys.forEach(key => {
+                    const timer = timersData[key];
+
+                    // Υπολογισμός χρόνου που απομένει σε λεπτά και δευτερόλεπτα
+                    const totalSeconds = Math.ceil(timer.remaining / 1000);
+                    const minutes = Math.floor(totalSeconds / 60);
+                    const seconds = totalSeconds % 60;
+                    const formattedTime = minutes + ":" + (seconds < 10 ? "0" + seconds : seconds);
+
+                    // Κατάσταση χρονομετρητή
+                    let statusClass = 'status-inactive';
+                    let statusText = 'Ανενεργός';
+
+                    if (timer.active === 1) {
+                        if (timer.paused === 1) {
+                            statusClass = 'status-paused';
+                            statusText = 'Σε παύση';
+                        }
+                        else {
+                            statusClass = 'status-active';
+                            statusText = 'Ενεργός';
+                        }
+                    }
+
+                    const timerCard = document.createElement('div');
+                    timerCard.className = 'timer-card';
+                    timerCard.innerHTML = `
+                        <div class="timer-header">
+                            <div class="timer-name">${timer.name || 'Timer ' + key}</div>
+                            <div class="timer-status ${statusClass}">
+                                <i class="fas ${timer.active === 1 ? (timer.paused === 1 ? 'fa-pause' : 'fa-play') : 'fa-stop'}"></i>
+                                <span>${statusText}</span>
+                            </div>
+                        </div>
+                        <div class="timer-info">
+                            <div class="timer-detail">
+                                <span class="detail-label">Συνολικά Λεπτά</span>
+                                <span class="detail-value">${timer.min}</span>
+                            </div>
+                            <div class="timer-detail">
+                                <span class="detail-label">Απομένων Χρόνος</span>
+                                <span class="detail-value">${formattedTime}</span>
+                            </div>
+                            <div class="timer-detail">
+                                <span class="detail-label">Repetitions</span>
+                                <span class="detail-value">${timer.rep}</span>
+                            </div>
+                            <div class="timer-detail">
+                                <span class="detail-label">Buzz</span>
+                                <span class="detail-value">${timer.buzz ? 'Ενεργό' : 'Ανενεργό'}</span>
+                            </div>
+                            <div class="timer-detail">
+                                <span class="detail-label">Buzz Repetitions</span>
+                                <span class="detail-value">${timer.buzzRep}</span>
+                            </div>
+                        </div>
+                        <div class="timer-actions">
+                            ${timer.active === 1 && timer.paused === 0 ? 
+                                `<button class="btn btn-warning pause-timer" data-id="${key}">
+                                    <i class="fas fa-pause"></i> Παύση
+                                </button>` : 
+                                (timer.active === 1 && timer.paused === 1 ? 
+                                    `<button class="btn btn-success resume-timer" data-id="${key}">
+                                        <i class="fas fa-play"></i> Συνέχεια
+                                    </button>` : 
+                                    `<button class="btn btn-success start-timer" data-id="${key}">
+                                        <i class="fas fa-play"></i> Έναρξη
+                                    </button>`)
+                            }
+                            ${timer.active === 1 ? 
+                                `<button class="btn btn-danger stop-timer" data-id="${key}">
+                                    <i class="fas fa-stop"></i> Διακοπή
+                                </button>` : ''
+                            }
+                            <button class="btn btn-secondary edit-timer" data-id="${key}">
+                                <i class="fas fa-edit"></i> Επεξεργασία
+                            </button>
+                        </div>
+                    `;
+
+                    timerList.appendChild(timerCard);
+                });
+
+                // Προσθήκη event listeners για τα κουμπιά
+                document.querySelectorAll('.start-timer').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const timerId = this.getAttribute('data-id');
+                        startTimer(timerId);
+                    });
+                });
+
+                document.querySelectorAll('.pause-timer').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const timerId = this.getAttribute('data-id');
+                        pauseTimer(timerId);
+                    });
+                });
+
+                document.querySelectorAll('.resume-timer').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const timerId = this.getAttribute('data-id');
+                        resumeTimer(timerId);
+                    });
+                });
+
+                document.querySelectorAll('.stop-timer').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const timerId = this.getAttribute('data-id');
+                        stopTimer(timerId);
+                    });
+                });
+
+                document.querySelectorAll('.edit-timer').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const timerId = this.getAttribute('data-id');
+                        openEditModal(timerId);
+                    });
+                });
+            }
+
+            // Έναρξη χρονομετρητή
+            async function startTimer(timerId) {
+                try {
+                    statusText.textContent = 'Εκκίνηση χρονομετρητή ' + timerId + '...';
+                    await sendCommand(`ew.apps.timer.startTimer(${timerId});\n`);
+
+                    // Περιμένουμε και ανανεώνουμε τα δεδομένα
+                    setTimeout(refreshData, 500);
+                }
+                catch (error) {
+                    console.error('Σφάλμα εκκίνησης:', error);
+                    statusText.textContent = 'Σφάλμα εκκίνησης: ' + error.message;
+                }
+            }
+
+            // Παύση χρονομετρητή
+            async function pauseTimer(timerId) {
+                try {
+                    statusText.textContent = 'Παύση χρονομετρητή ' + timerId + '...';
+                    await sendCommand(`ew.apps.timer.pauseTimer(${timerId});\n`);
+
+                    // Περιμένουμε και ανανεώνουμε τα δεδομένα
+                    setTimeout(refreshData, 500);
+                }
+                catch (error) {
+                    console.error('Σφάλμα παύσης:', error);
+                    statusText.textContent = 'Σφάλμα παύσης: ' + error.message;
+                }
+            }
+
+            // Συνέχεια χρονομετρητή
+            async function resumeTimer(timerId) {
+                try {
+                    statusText.textContent = 'Συνέχεια χρονομετρητή ' + timerId + '...';
+                    await sendCommand(`ew.apps.timer.resumeTimer(${timerId});\n`);
+
+                    // Περιμένουμε και ανανεώνουμε τα δεδομένα
+                    setTimeout(refreshData, 500);
+                }
+                catch (error) {
+                    console.error('Σφάλμα συνέχειας:', error);
+                    statusText.textContent = 'Σφάλμα συνέχειας: ' + error.message;
+                }
+            }
+
+            // Διακοπή χρονομετρητή
+            async function stopTimer(timerId) {
+                try {
+                    statusText.textContent = 'Διακοπή χρονομετρητή ' + timerId + '...';
+                    await sendCommand(`ew.apps.timer.stopTimer(${timerId});\n`);
+
+                    // Περιμένουμε και ανανεώνουμε τα δεδομένα
+                    setTimeout(refreshData, 500);
+                }
+                catch (error) {
+                    console.error('Σφάλμα διακοπής:', error);
+                    statusText.textContent = 'Σφάλμα διακοπής: ' + error.message;
+                }
+            }
+
+            // Άνοιγμα modal επεξεργασίας
+            function openEditModal(timerId) {
+                const timer = timersData[timerId];
+                if (!timer) return;
+
+                editingTimerId = timerId;
+                timerIdInput.value = timerId;
+                timerNameInput.value = timer.name || '';
+                timerMinutesInput.value = timer.min;
+                timerBuzzInput.value = timer.buzz;
+                timerBuzzRepInput.value = timer.buzzRep;
+                timerRepInput.value = timer.rep;
+
+                editModal.style.display = 'flex';
+            }
+
+            // Κλείσιμο modal
+            function closeEditModal() {
+                editModal.style.display = 'none';
+                editingTimerId = null;
+                timerNameInput.value = '';
+                timerIdInput.value = '';
+                timerMinutesInput.value = '';
+                timerBuzzInput.value = '1';
+                timerBuzzRepInput.value = '5';
+                timerRepInput.value = '0';
+            }
+
+            // Αποθήκευση αλλαγών
+            async function saveTimer() {
+                if (!editingTimerId) return;
+
+                const newName = timerNameInput.value.trim();
+                const newMinutes = parseInt(timerMinutesInput.value);
+                const newBuzz = parseInt(timerBuzzInput.value);
+                const newBuzzRep = parseInt(timerBuzzRepInput.value);
+                const newRep = parseInt(timerRepInput.value);
+
+                if (!newName || isNaN(newMinutes) || isNaN(newBuzz) || isNaN(newBuzzRep) || isNaN(newRep)) {
+                    alert('Παρακαλώ συμπληρώστε όλα τα πεδία σωστά');
+                    return;
+                }
+
+                // Αποστολή εντολών στο Espruino για ενημέρωση
+                try {
+                    // Ενημέρωση ονόματος
+                    await sendCommand(`ew.apps.timer.state.def[${editingTimerId}].name = "${newName}";\n`);
+
+                    // Ενημέρωση λεπτών
+                    await sendCommand(`ew.apps.timer.state.def[${editingTimerId}].min = ${newMinutes};\n`);
+
+                    // Ενημέρωση buzz
+                    await sendCommand(`ew.apps.timer.state.def[${editingTimerId}].buzz = ${newBuzz};\n`);
+
+                    // Ενημέρωση buzz repetitions
+                    await sendCommand(`ew.apps.timer.state.def[${editingTimerId}].buzzRep = ${newBuzzRep};\n`);
+
+                    // Ενημέρωση repetitions
+                    await sendCommand(`ew.apps.timer.state.def[${editingTimerId}].rep = ${newRep};\n`);
+
+                    statusText.textContent = 'Οι αλλαγές αποθηκεύτηκαν επιτυχώς';
+                }
+                catch (error) {
+                    console.error('Σφάλμα αποστολής εντολών:', error);
+                    statusText.textContent = 'Σφάλμα αποστολής εντολών: ' + error.message;
+                }
+
+                // Επανάληψη απόδοσης λίστας
+                setTimeout(refreshData, 500);
+                closeEditModal();
+            }
+
+            // Event listeners για modal
+            closeBtn.addEventListener('click', closeEditModal);
+            cancelEditBtn.addEventListener('click', closeEditModal);
+            saveTimerBtn.addEventListener('click', saveTimer);
+
+            // Κλείσιμο modal με κλικ έξω από το περιεχόμενο
+            editModal.addEventListener('click', function(e) {
+                if (e.target === editModal) {
+                    closeEditModal();
+                }
+            });
+
+            // Κλείσιμο modal με πλήκρο Escape
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape' && editModal.style.display === 'flex') {
+                    closeEditModal();
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>

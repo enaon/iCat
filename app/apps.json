@@ -2,23 +2,22 @@
 	{ "id": "ew_bangle",
 		"name": "bangle",
 		"icon": "../bangle/eucWatch.png",
-		"version":"2.7",
-		"description": "bangle support",
-		"tags": "bangle",
-		"type":"clock",
+		"version":"2.73",
+		"description": "bangle init watchface",
+		"tags": "bangleJS2",
+		"type":"init",
 		"readme": "README.md",
-	    "needsFeatures":["BANGLEJS2"],
+	    "needsFeatures":["bangleJS2"],
 		"storage": [
-			{"name":"eW.js","url":"../init/init.js"},
+			{"name":"ew.js","url":"../init.js"},
 			{"name":"ew.info","url":"../bangle/eucWatch.info"},
-			{"name":"ew.img","url":"../bangle/eucWatch.img"},
-			{"name":"ew_display","url":"../bangle/lcd_b2.js"}
+			{"name":"ew.img","url":"../bangle/eucWatch.img"}
 		]
 	},
 	{ "id": "ew_init",
 		"name": "init",
 		"icon": "../icon.png",
-		"version":"2.73",
+		"version":"2.81",
 		"description": "init and watchdog. ",
 		"tags": "magic3",
 		"type":"core",
@@ -30,40 +29,58 @@
 		{ "id": "ew_display",
 		"name": "display driver",
 		"icon": "../icon.png",
-		"version":"2.71",
+		"version":"2.73",
 		"description": "lcd driver",
 		"tags": "magic3",
 		"type":"core",
 	    "needsFeatures":["magic3"],
 		"storage": [
-			{"name":"ew_display","url":"../lcd_magic_16.js"}
+			{"name":"ew_display","url":"../lcd_magic_16.js"},
+			{"name":"ew_display_b2","url":"../lcd_b2.js"},
+			{"name":"ew_display_dsd6","url":"../oled_dsd6.js"}
+
 		]
 	},
 	{ "id": "ew_handler",
 		"name": "Handler",
 		"icon": "../icon.png",
-		"version":"2.85",
+		"version":"3.01",
 		"description": "handlers ",
 		"tags": "magic3",
 	    "needsFeatures":["magic3"],
 		"storage": [
 			{"name":"ew_handler","url":"../handler/handler.js"},
-			{"name":"ew_handler_face","url":"../handler/handler_face.js"},
 			{"name":"ew_handler_notify","url":"../handler/handler_notify.js"},
 			{"name":"ew_handler_set","url":"../handler/handler_set.js"},
+			{"name":"ew_handler_batt","url":"../handler/handler_batt.js"},
+			{"name":"ew_handler_comms","url":"../handler/handler_comms.js"}
+		]
+	},
+	{ "id": "ew_handler_extra",
+		"name": "Handler_extra",
+		"icon": "../icon.png",
+		"version":"3.10",
+		"description": "handlers ",
+		"tags": "magic3",
+	    "needsFeatures":["magic3"],
+		"storage": [
+			{"name":"ew_handler_face","url":"../handler/handler_face.js"},
+			{"name":"ew_handler_notify","url":"../handler/handler_notify.js"},
 			{"name":"ew_handler_btn","url":"../handler/handler_btn.js"},
 			{"name":"ew_handler_charge","url":"../handler/handler_charge.js"},
-			{"name":"ew_handler_conn","url":"../handler/handler_conn.js"},
+			{"name":"ew_f_charge","url":"../handler/handler_f_charge.js"},
 			{"name":"ew_handler_touch","url":"../handler/handler_touch.js"},
 			{"name":"ew_handler_touch_716","url":"../handler/handler_touch_716.js"},
 			{"name":"ew_handler_touch_816","url":"../handler/handler_touch_816.js"},
-			{"name":"ew_handler_acc_SC7A20","url":"../handler/handler_acc_SC7A20.js"}
+			{"name":"ew_handler_touch_b2","url":"../handler/handler_touch_b2.js"},
+			{"name":"ew_handler_acc_SC7A20","url":"../handler/handler_acc_SC7A20.js"},
+			{"name":"ew_handler_acc_b2","url":"../handler/handler_acc_b2.js"}
 		]
-	},
+	},	
 	{ "id": "ew_UI",
 		"name": "UI support",
 		"icon": "../icon.png",
-		"version":"2.82",
+		"version":"2.88",
 		"description": "UI",
 		"tags": "magic3",
 		"type":"core",
@@ -77,7 +94,7 @@
 	{ "id": "ew_settings",
 		"name": "Settings",
 		"icon": "../icon.png",
-		"version":"2.88",
+		"version":"2.97",
 		"description": "Settings face",
 		"tags": "magic3",
 		"type":"clock",
@@ -95,7 +112,7 @@
 	{ "id": "ew_logger",
 		"name": "logger",
 		"icon": "../icon.png",
-		"version":"2.71",
+		"version":"2.72",
 		"description": "logger",
 		"tags": "magic3",
 	    "needsFeatures":["magic3"],
@@ -110,18 +127,20 @@
 	{ "id": "ew_clock",
 		"name": "clock",
 		"icon": "../icon.png",
-		"version":"2.80",
+		"version":"2.86",
 		"description": "clock",
 		"tags": "magic3",
 	    "needsFeatures":["magic3"],
 		"storage": [
-			{"name":"ew_f_main","url":"../clock/clock.js"}	
+			{"name":"ew_f_main","url":"../clock/f_clock.js"},
+			{"name":"ew_f_main-set","url":"../clock/f_clock_set.js"}	
+	
 		]
 	},
 	{ "id": "ew_itag",
 		"name": "itag",
 		"icon": "../icon.png",
-		"version":"2.89",
+		"version":"3.05",
 		"description": "itag",
 		"tags": "magic3",
 	    "needsFeatures":["magic3"],
@@ -130,20 +149,47 @@
 			{"name":"ew_f_itag-scan","url":"../itag/f_itag_scan.js"},
 			{"name":"ew_f_itag-dev","url":"../itag/f_itag_dev.js"},
 			{"name":"ew_f_itag-connect","url":"../itag/f_itag_connect.js"},	
-			{"name":"ew_f_itag-set","url":"../itag/f_itag_set.js"}	
+			{"name":"ew_f_itag-connect-set","url":"../itag/f_itag_connect_set.js"},	
+			{"name":"ew_f_itag-scan-set","url":"../itag/f_itag_scan_set.js"},
+			{"name":"ew_f_itag-dev-set","url":"../itag/f_itag_dev_set.js"}	
+
 
 		]
 	},
 		{ "id": "ew_timer",
 		"name": "timer",
 		"icon": "../icon.png",
-		"version":"2.56",
+		"version":"2.59",
 		"description": "timer",
 		"tags": "magic3",
 	    "needsFeatures":["magic3"],
 		"storage": [
 			{"name":"ew_a_timer","url":"../timer/timer.js"},
-			{"name":"ew_f_timer","url":"../timer/f_timer.js"}
+			{"name":"ew_f_timer","url":"../timer/f_timer.js"},
+			{"name":"ew_f_timer-set","url":"../timer/f_timer_set.js"}
+
+		]
+	},
+		{ "id": "ew_torch",
+		"name": "torch",
+		"icon": "../icon.png",
+		"version":"2.58",
+		"description": "torch",
+		"tags": "magic3",
+	    "needsFeatures":["magic3"],
+		"storage": [
+			{"name":"ew_f_torch","url":"../torch/f_torch.js"}
+		]
+	},
+		{ "id": "ew_tag",
+		"name": "ewtag",
+		"icon": "../icon.png",
+		"version":"2.60",
+		"description": "ewtag",
+		"tags": "nano",
+	    "needsFeatures":["nano"],
+		"storage": [
+			{"name":"ew_a_ewtag","url":"../ewtag/ewtag.js"}
 		]
 	}
 

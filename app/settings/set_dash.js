@@ -59,7 +59,7 @@ ew.face[0].d1 = function() {
 			}else{
 			ew.apps.kitty.state.def.auto.clean = 1 - ew.apps.kitty.state.def.auto.clean;
 			if (!ew.apps.kitty.state.def.auto.clean) ew.apps.scale.clean(0);
-			if (ew.def.info) ew.UI.btn.ntfy(1, 1.5, 0, "_bar", 6, "AUTO CLEAN", (ew.apps.kitty.state.def.auto.clean) ? "ENABLED" : "DISABLED", 0, 15);
+			if (ew.def.face.info) ew.UI.btn.ntfy(1, 1.5, 0, "_bar", 6, "AUTO CLEAN", (ew.apps.kitty.state.def.auto.clean) ? "ENABLED" : "DISABLED", 0, 15);
 			ew.UI.btn.c2l("main", "_2x3", 1, "AUTO", "CLEAN", 15, (ew.apps.kitty.state.def.auto.clean) ? 4 : 1);
 			ew.UI.btn.c2l("main", "_2x3", 4, "DELAY", ew.apps.kitty.state.def.auto.delay, 15, (ew.apps.kitty.state.def.auto.clean) ? 6 : 1); //4
 			}
@@ -69,7 +69,7 @@ ew.face[0].d1 = function() {
 			ew.sys.buzz.nav(ew.sys.buzz.type.ok);
 			ew.apps.kitty.state.def.is.sandType++;
 			if (5 <= ew.apps.kitty.state.def.is.sandType) ew.apps.kitty.state.def.is.sandType = 1;
-			if (ew.def.info) ew.UI.btn.ntfy(1, 1.5, 0, "_bar", 6, "SAND TYPE", ew.apps.kitty.state.def.sand[ew.apps.kitty.state.def.is.sandType].name.toUpperCase(), 0, 15);
+			if (ew.def.face.info) ew.UI.btn.ntfy(1, 1.5, 0, "_bar", 6, "SAND TYPE", ew.apps.kitty.state.def.sand[ew.apps.kitty.state.def.is.sandType].name.toUpperCase(), 0, 15);
 			ew.UI.btn.c2l("main", "_2x3", 2, "SAND", ew.apps.kitty.state.def.is.sandType, 15, 6);
 			ew.UI.btn.c2l("main", "_2x3", 5, "SPEED", (19 - (ew.apps.kitty.state.def.sand[ew.apps.kitty.state.def.is.sandType].speed * 10)), 15, 6); //5
 			ew.UI.btn.c2l("main", "_2x3", 3, "PREP", ew.apps.kitty.state.def.sand[ew.apps.kitty.state.def.is.sandType].prep ? "ON" : "OFF", 15, ew.apps.kitty.state.def.sand[ew.apps.kitty.state.def.is.sandType].prep ? 4 : 1);
@@ -77,13 +77,13 @@ ew.face[0].d1 = function() {
 		/*else if (i == 3) {
 			ew.sys.buzz.nav(ew.sys.buzz.type.ok);
 			ew.apps.kitty.state.def.auto.uvc = 1 - ew.apps.kitty.state.def.auto.uvc;
-			if (ew.def.info) ew.UI.btn.ntfy(1, 1.5, 0, "_bar", 6, "TRIGGER UVC", (ew.apps.kitty.state.def.auto.uvc) ? "ENABLED" : "DISABLED", 0, 15);
+			if (ew.def.face.info) ew.UI.btn.ntfy(1, 1.5, 0, "_bar", 6, "TRIGGER UVC", (ew.apps.kitty.state.def.auto.uvc) ? "ENABLED" : "DISABLED", 0, 15);
 			ew.UI.btn.c2l("main", "_2x3", 3, "UVC", ew.apps.kitty.state.def.auto.uvc ? "ON" : "OFF", 15, ew.apps.kitty.state.def.auto.uvc ? 4 : 1);
 		}*/
 		else if (i == 3) {
 			ew.sys.buzz.nav(ew.sys.buzz.type.ok);
 			ew.apps.kitty.state.def.sand[ew.apps.kitty.state.def.is.sandType].prep = 1 - ew.apps.kitty.state.def.sand[ew.apps.kitty.state.def.is.sandType].prep;
-			if (ew.def.info) ew.UI.btn.ntfy(1, 1.5, 0, "_bar", 6, "PREPARE MOTION", (ew.apps.kitty.state.def.auto.uvc) ? "ENABLED" : "DISABLED", 0, 15);
+			if (ew.def.face.info) ew.UI.btn.ntfy(1, 1.5, 0, "_bar", 6, "PREPARE MOTION", (ew.apps.kitty.state.def.auto.uvc) ? "ENABLED" : "DISABLED", 0, 15);
 			ew.UI.btn.c2l("main", "_2x3", 3, "PREP", ew.apps.kitty.state.def.sand[ew.apps.kitty.state.def.is.sandType].prep ? "ON" : "OFF", 15, ew.apps.kitty.state.def.sand[ew.apps.kitty.state.def.is.sandType].prep ? 4 : 1);
 		}
 		else if (i == 4) {

@@ -1,0 +1,97 @@
+δες αυτα τα αρχεια, ειναι τμημα ενος συστήματος για να ελεγχω το ρολοι μου, που ττρέχει εσπρουινο. σου βαζω το κεντρκικό κοντρολ, και ενα φραμε σαν παράδειγμα. 
+
+θα ηθελα να μου φτιαξεις ενα ακομα φραμε, ππου θα ειναι λιγο σπέσιαλ. Τα φραμες που εχω τωρα, αφορου τα αππς που τρεχουν στο ρολόι. Θελω και ενα φραμε πιο κεντρικό, να μπορώ να αλλαψ τις ρυθμνσεις του συστήματος. 
+
+
+οι ρυθμίσεις του ρολογιου/espruino βρισκονται εδω:
+
+ew.def 
+σαν ανιτικείμενο, και εχουν αυτη την μορφή τωρα. 
+
+>ew.def
+={
+  bt: {
+    phyC: "1mbps",
+    phyA: "1mbps",
+    uart: 1, conn: 1, adv: 1, rfTX: 8, intA: 1626,
+    intC: "auto",
+    mtu: 90,
+    addr: "ed:09:83:08:ef:6b"
+   },
+  face: { info: 1, buzz: 1, scrn: 1, txt: 1,
+    size: 0.8, bri: 7,
+    off: {  },
+    bpp: 4 },
+  time: { hr24: 1,
+    timezone: "3"
+   },
+  dev: {
+    touchtype: "0",
+    acctype: "0",
+    acc: 0, accM: 0, board:"MAGIC3",firm:"2.7" },
+  name: "Plug",
+  role: [
+    "tag"
+   ],
+  frce: 0,
+  noWd:0 }
+> 
+
+θελω λοιπόν κατα τhν αρχικη συνδεση, εκει που κοιτάει στο 
+ew.apps
+για να δει αν υπάρχουν apps, να κοιταει και αν υπάρχει το ew.def
+αν υπάρχει, τότε ενα κουμπί στο κεντρικό φραμε, στο κοντρολ, πανω δεξια, αριστερα απο την επιλογή γλώσσας, και δεξια απο το στατους, αναμεσα δηλαδη, να μπορει να καλέσει το φραμε για αλλαγη ρυθμίσεων. 
+
+
+στο φραμε αυτο, που θα ηθελα να ακολουθεί την εμφανιση του υπόλοιπου σιτε, θα ηθελα να μπορω να αλλαξω τις ρυθμνσεις ανα καηγορία, οπως ειναι στο αντικειμενο. 
+
+δηλαδη:
+
+name: xxx // Device name 
+role: ["xxx"] //Device role -- ενας ή παραπανω απο αυτους τους ρόλους: "watch", "litterBox", "tag", "pb", "light", "blind", "pir"
+noWd: true|false // Watchdog Disabled
+frce: true|false //Force name change
+
+face: // Face settings
+να μπορω να αλλαζω αυτα:
+    info: true | false //Show info on actions
+    buzz: true | false //Haptic on navigation
+    scrn: true | false //Display auto turn on
+    txt: true | false // Text on icons
+    size: 0.7-1 //Text size
+    bri: 1-10 //Display brigtness
+και να βλεπω σαν ρεαδ ονλυ αυτα:
+    bpp: 1-4 //Color bit mode 
+    off: {  }, //Face off time -ειναι αντικειμενο που εχει μεσα τιμες ως εξης:
+  
+bt: // BLE Settings
+να μπορω να αλλαζω αυτα:
+    phyC:  "1mbps", //PHY connection mode
+    phyA:  "1mbps" | "2mbps" | "coded" | "coded,1mbps" | "1mbps,coded" //PHY advertising mode
+    uart: true|false  //Nordic Uart service
+    rfTX: -8| -4 | 0 | +4 | +8  //Radio TX power
+    intA: 300-60000 //advertising interval
+    intC: "auto" | 20-1000 //connection interval
+    mtu:  23-131 //MTU
+και να βλεπω σαν ρεαδ ονλυ αυτα:
+    conn: true|false //BT connectable
+    adv: true|false //BT advertising
+    addr: xx:xx:xx:xx:xx:xx //BT address
+
+dev: // Device setings
+να μπορω να αλλαζω αυτα:
+     acc: true|false // Accellerator enabled 
+     accM: 0-5 // Accellerator mode 
+και να βλεπω σαν ρεαδ ονλυ αυτα:
+    touchtype: xxx, //touch controller type
+    acctype: xxx,//accelerator type
+    board: xxx // Board type
+    firm: xxx //firmware Version
+
+time: //Time settings
+να μπορω να αλλαζω αυτα:
+    hr24: true|false //24 hour mode
+    timezone: x // Timezone
+    
+    
+πριν γραψεις κωδικα ομως, σε παρακαλώ να διαβασεις τι ζηταω, και αν εχεις καποιο καλυτερη ιδέα, να μου την προτίνεις

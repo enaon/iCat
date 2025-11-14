@@ -3,41 +3,42 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
     <title>Cat Tracker</title>
     <link rel="manifest" href="Loader/app.webmanifest">
+    <link rel="stylesheet" href="/common.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        :root {
-            --color-primary: #BB86FC;
-            --color-primary-variant: #3700B3;
-            --color-secondary: #03DAC6;
-            --color-background: #121212;
-            --color-surface: #1E1E1E;
-            --color-error: #CF6679;
-            --color-on-primary: #000000;
-            --color-on-secondary: #000000;
-            --color-on-background: #FFFFFF;
-            --color-on-surface: #FFFFFF;
-            --color-on-error: #000000;
-        }
+        /* Συμπληρωματικά styles για Cat Tracker */
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Roboto', sans-serif;
-        }
+        /* <meta name="viewport" content="width=device-width, initial-scale=1.0"> */
 
         body {
-            background-color: var(--color-background);
-            color: var(--color-on-background);
+            overflow-y: auto !important;
+            overflow-x: hidden !important;
             min-height: 100vh;
-            padding: 16px;
+            width: 100%;
+            max-width: 100vw;
         }
 
-        .container {
+        /*.container {
             max-width: 800px;
             margin: 0 auto;
+            padding: 16px;
+        }
+        */
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            /* Μέγιστο πλάτος για desktop */
+            margin: 0 auto;
+            padding: 16px;
+            min-height: 100vh;
         }
 
         header {
@@ -47,6 +48,8 @@
             margin-bottom: 24px;
             padding-bottom: 16px;
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            flex-wrap: wrap;
+            gap: 10px;
         }
 
         h1 {
@@ -57,42 +60,10 @@
             gap: 10px;
         }
 
-        h1 i {
-            color: var(--color-primary);
-        }
-
-        .btn {
-            background-color: var(--color-primary);
-            color: var(--color-on-primary);
-            border: none;
-            border-radius: 20px;
-            padding: 10px 20px;
-            font-size: 14px;
-            font-weight: 500;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            transition: all 0.3s ease;
-        }
-
-        .btn:hover {
-            opacity: 0.9;
-            transform: translateY(-2px);
-        }
-
-        .btn:active {
-            transform: translateY(0);
-        }
-
-        .btn-secondary {
-            background-color: var(--color-surface);
-            color: var(--color-on-surface);
-        }
-
         .header-buttons {
             display: flex;
             gap: 10px;
+            flex-wrap: wrap;
         }
 
         .status {
@@ -104,17 +75,6 @@
             background-color: var(--color-surface);
             border-radius: 12px;
             font-size: 14px;
-        }
-
-        .status-dot {
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            background-color: var(--color-error);
-        }
-
-        .status-dot.connected {
-            background-color: #4CAF50;
         }
 
         .cat-list {
@@ -170,13 +130,9 @@
             flex-wrap: wrap;
         }
 
-        .battery {
-            display: flex;
-            align-items: center;
-            gap: 4px;
-        }
-
-        .location {
+        .battery,
+        .location,
+        .silent {
             display: flex;
             align-items: center;
             gap: 4px;
@@ -188,12 +144,21 @@
             margin-top: 4px;
         }
 
-        .edit-btn {
+        .edit-btn,
+        .delete-btn {
             background: none;
             border: none;
-            color: var(--color-primary);
             cursor: pointer;
             font-size: 18px;
+        }
+
+        .edit-btn {
+            color: var(--color-primary);
+        }
+
+        .delete-btn {
+            color: var(--color-error);
+            margin-left: 8px;
         }
 
         .modal {
@@ -207,6 +172,7 @@
             align-items: center;
             justify-content: center;
             z-index: 1000;
+            padding: 20px;
         }
 
         .modal-content {
@@ -216,6 +182,8 @@
             width: 90%;
             max-width: 500px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            max-height: 90vh;
+            overflow-y: auto;
         }
 
         .modal-header {
@@ -264,55 +232,36 @@
             font-size: 16px;
         }
 
-        .toggle-group {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .toggle-label {
-            margin-bottom: 0;
-        }
-
         .modal-actions {
             display: flex;
             justify-content: flex-end;
             gap: 10px;
+            margin-top: 20px;
         }
 
-        .empty-state {
-            text-align: center;
-            padding: 40px 20px;
-            opacity: 0.7;
+        .btn-danger {
+            background-color: var(--color-error);
+            color: white;
         }
 
-        .empty-state i {
-            font-size: 48px;
-            margin-bottom: 16px;
+        .drag-handle {
+            cursor: grab;
+            margin-right: 10px;
             color: var(--color-primary);
+            font-size: 16px;
         }
 
-        .loading {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 10px;
-            padding: 20px;
+        .drag-handle:active {
+            cursor: grabbing;
         }
 
-        .loading-spinner {
-            width: 24px;
-            height: 24px;
-            border: 3px solid rgba(255, 255, 255, 0.3);
-            border-radius: 50%;
-            border-top-color: var(--color-primary);
-            animation: spin 1s ease-in-out infinite;
+        .cat-card.dragging {
+            opacity: 0.5;
+            background-color: rgba(187, 134, 252, 0.2);
         }
 
-        @keyframes spin {
-            to {
-                transform: rotate(360deg);
-            }
+        .cat-card.drag-over {
+            border: 2px dashed var(--color-primary);
         }
 
         @media (max-width: 600px) {
@@ -324,508 +273,467 @@
             .header-buttons {
                 flex-direction: column;
                 gap: 5px;
+                width: 100%;
+            }
+
+            header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            h1 {
+                margin-bottom: 10px;
+            }
+
+            .btn {
+                font-size: 12px;
+                padding: 8px 12px;
+                width: 100%;
+                justify-content: center;
+            }
+
+            .modal-content {
+                padding: 16px;
+            }
+
+            .modal-actions {
+                flex-direction: column;
+            }
+        }
+
+        /* Νέα CSS για τις μπάρες γατών */
+
+        /* CSS για κάθετες μπάρες */
+
+         .cat-bar-vertical {
+            flex: 1;
+            min-width: 25px; /* Κράτα το κανονικό πλάτος */
+            height: 100px; /* Κράτα το κανονικό ύψος */
+            background: var(--color-primary);
+            border-radius: 4px 4px 0 0;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            align-items: center;
+            margin: 0 2px;
+        }
+
+        .cat-bar-vertical:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(187, 134, 252, 0.3);
+        }
+
+        .cat-bar-vertical.recent-cat {
+            background: linear-gradient(to top, #4CAF50, #81C784);
+        }
+
+        .cat-bar-vertical.medium-cat {
+            background: linear-gradient(to top, var(--color-primary), var(--color-primary-variant));
+        }
+
+        .cat-bar-vertical.old-cat {
+            background: linear-gradient(to top, #f44336, #e57373);
+        }
+
+        .bar-label-vertical {
+            position: absolute;
+            bottom: -25px;
+            left: 50%;
+            transform: translateX(-50%) rotate(-45deg);
+            font-size: 10px;
+            white-space: nowrap;
+            color: var(--color-on-surface);
+            opacity: 0.8;
+            transform-origin: left center;
+            max-width: 60px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .bar-value-vertical {
+            position: absolute;
+            top: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 10px;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 2px 4px;
+            border-radius: 4px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .cat-bar-vertical:hover .bar-value-vertical {
+            opacity: 1;
+        }
+
+        /* Βελτίωση histogram container για κάθετες μπάρες */
+
+        .histogram-container {
+            width: 100%;
+            overflow-x: auto;
+            padding: 10px 0;
+            -webkit-overflow-scrolling: touch; /* Ομαλό scroll σε iOS */
+        }
+        
+        .histogram {
+            display: flex;
+            align-items: flex-end;
+            gap: 2px;
+            min-height: 150px;
+            padding: 20px 10px; /* Πρόσθεσε padding για να φαίνονται καλύτερα οι ακραίες μπάρες */
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+            min-width: min-content; /* Βεβαιώνεται ότι το histogram θα έχει αρκετό πλάτος */
+        }
+        .x-axis {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 40px;
+            padding: 0 10px;
+            font-size: 12px;
+            opacity: 0.7;
+        }
+        /* Βελτίωση scrollbar */
+        .histogram-container::-webkit-scrollbar {
+            height: 6px;
+        }
+        
+        .histogram-container::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+        }
+        
+        .histogram-container::-webkit-scrollbar-thumb {
+            background: var(--color-primary);
+            border-radius: 3px;
+        }
+        
+        /* Πληροφορία για scroll */
+        .chart-info {
+            margin-top: 15px;
+            text-align: center;
+            font-size: 11px;
+            opacity: 0.7;
+        }
+        
+        .chart-info::before {
+            content: "↔️ ";
+            margin-right: 5px;
+        }
+
+
+        .chart-info {
+            margin-top: 20px;
+            text-align: center;
+            font-size: 12px;
+            opacity: 0.7;
+        }
+
+        .color-legend {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 10px;
+            flex-wrap: wrap;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .legend-color {
+            width: 12px;
+            height: 12px;
+            border-radius: 2px;
+        }
+
+        .legend-color.recent-cat {
+            background: #4CAF50;
+        }
+
+        .legend-color.medium-cat {
+            background: var(--color-primary);
+        }
+
+        .legend-color.old-cat {
+            background: #f44336;
+        }
+
+
+        /* Popup styles για εμφάνιση ονόματος γάτας */
+
+        .cat-popup {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.5);
+            background: rgba(0, 0, 0, 0.95);
+            border: 2px solid var(--color-primary);
+            border-radius: 20px;
+            padding: 30px 40px;
+            z-index: 10000;
+            opacity: 0;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(10px);
+            text-align: center;
+            min-width: 200px;
+        }
+
+        .popup-content {
+            color: white;
+        }
+
+        .popup-name {
+            font-size: 32px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: var(--color-primary);
+            text-shadow: 0 2px 10px rgba(187, 134, 252, 0.5);
+        }
+
+        .popup-days {
+            font-size: 18px;
+            opacity: 0.8;
+            color: #81C784;
+        }
+
+
+
+        /* Responsive grid improvements */
+
+ 
+
+
+        @media (min-width: 768px) {
+            .cat-list {
+                grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            }
+
+            .cat-bar {
+                min-width: 6px;
+            }
+
+            .bar-label {
+                font-size: 8px;
+                bottom: -15px;
+            }
+            .cat-popup {
+                padding: 20px 25px;
+                min-width: 160px;
+            }
+
+            .popup-name {
+                font-size: 24px;
+            }
+
+            .popup-days {
+                font-size: 14px;
+            }
+            
+            .cat-bar-vertical {
+                min-width: 20px;
+                height: 80px;
+            }
+
+            .bar-label-vertical {
+                font-size: 8px;
+                bottom: -20px;
+                max-width: 40px;
+            }
+
+            .bar-value-vertical {
+                font-size: 8px;
+                top: -15px;
+            }
+
+        }
+
+        @media (min-width: 1024px) {
+            .container {
+                padding: 24px;
+            }
+
+            .cat-list {
+                grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+                gap: 20px;
+            }
+
+            .cat-bar {
+                min-width: 6px;
+            }
+
+            .bar-label {
+                font-size: 8px;
+                bottom: -15px;
+            }
+            .cat-popup {
+                padding: 25px 30px;
+                border-radius: 16px;
+                min-width: 180px;
+            }
+
+            .popup-name {
+                font-size: 28px;
+            }
+
+            .popup-days {
+                font-size: 16px;
+            }
+                        .cat-bar-vertical {
+                min-width: 20px;
+                height: 80px;
+            }
+
+            .bar-label-vertical {
+                font-size: 8px;
+                bottom: -20px;
+                max-width: 40px;
+            }
+
+            .bar-value-vertical {
+                font-size: 8px;
+                top: -15px;
             }
         }
     </style>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
+
 
 <body>
     <div class="container">
         <header>
-            <h1><i class="fas fa-cat"></i> Cat Tracker</h1>
+            <h1><i class="fas fa-cat"></i> <span id="titleText">Cat Tracker</span></h1>
             <div class="header-buttons">
                 <button id="connectBtn" class="btn" style="display:none;">
-                    <i class="fas fa-bluetooth-b"></i> Σύνδεση
+                    <i class="fas fa-bluetooth-b"></i> <span id="connectText">Σύνδεση</span>
                 </button>
-                <button id="refreshBtn" class="btn" style="display:none;">
-                    <i class="fas fa-sync"></i> Ανανέωση
+                <button id="refreshBtn" class="btn">
+                    <i class="fas fa-sync"></i> <span id="refreshText">Ανανέωση</span>
                 </button>
-                <button id="exportBtn" class="btn btn-secondary" style="display:none;">
-                    <i class="fas fa-download"></i> Export
+                <button id="reorderBtn" class="btn btn-secondary">
+                    <i class="fas fa-sort"></i> <span id="reorderText">Αλλαγή σειράς</span>
                 </button>
-                <button id="importBtn" class="btn btn-secondary" style="display:none;">
-                    <i class="fas fa-upload"></i> Import
+                <button id="exportBtn" class="btn btn-secondary">
+                    <i class="fas fa-download"></i> <span id="exportText">Export</span>
+                </button>
+                <button id="importBtn" class="btn btn-secondary">
+                    <i class="fas fa-upload"></i> <span id="importText">Import</span>
                 </button>
             </div>
         </header>
 
         <div class="status">
-            <div class="status-dot" id="statusDot"></div>
+            <div class="status-dot connected" id="statusDot"></div>
             <span id="statusText">Συνδεδεμένοι μέσω eW Launcher</span>
         </div>
 
-        <div id="catList" class="cat-list">
-            <div class="empty-state">
-                <i class="fas fa-cat"></i>
-                <p>Δεν υπάρχουν καταχωρημένες γάτες. Πατήστε Ανανέωση για να εμφανιστούν τα δεδομένα.</p>
+        <div class="visualization-section">
+            <div class="visualization-header">
+                <!-- <h2 class="visualization-title">
+                    <i class="fas fa-chart-bar"></i>
+                    <span id="vizTitleText">Επισκόπηση Γατών κατά Χρόνο</span>
+                </h2>
+                -->
+
+                <div class="visualization-controls">
+                    <button class="btn btn-secondary" id="toggleVizBtn">
+                        <i class="fas fa-eye"></i>
+                        <span id="toggleVizText">Απόκρυψη Γραφήματος</span>
+                    </button>
+                </div>
+            </div>
+
+            <div id="histogramViz">
+                <div class="histogram-container">
+                    <div class="histogram" id="histogram"></div>
+                    <div class="x-axis" id="xAxis"></div>
+
+                    <!-- </div>
+                  <div class="chart-info">
+                    <p>Αριστερά: Πρόσφατες γάτες | Δεξιά: Παλιές γάτες</p>
+                    <div class="color-legend">
+                        <div class="legend-item">
+                            <div class="legend-color recent-cat"></div>
+                            <span>Σήμερα</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color medium-cat"></div>
+                            <span>1-7 ημέρες</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color old-cat"></div>
+                            <span>Πάνω από 7 ημέρες</span>
+                        </div>
+                    </div>
+                </div>
+               -->
+                </div>
+
+            </div>
+
+            <div id="catList" class="cat-list">
+                <div class="empty-state">
+                    <i class="fas fa-cat"></i>
+                    <p id="noCatsText">Δεν υπάρχουν καταχωρημένες γάτες. Πατήστε Ανανέωση για να εμφανιστούν τα δεδομένα.</p>
+                </div>
             </div>
         </div>
-    </div>
 
-    <div id="editModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2 class="modal-title">Επεξεργασία γάτας</h2>
-                <button class="close-btn">&times;</button>
-            </div>
-            <div class="form-group">
-                <label for="catName">Όνομα γάτας</label>
-                <input type="text" id="catName" placeholder="Πληκτρολογήστε το όνομα">
-            </div>
-            <div class="form-group">
-                <label for="catId">ID iTag (μη επεξεργάσιμο)</label>
-                <input type="text" id="catId" disabled>
-            </div>
-            <div class="form-group">
-                <label for="catSilent">Λειτουργία σιγή</label>
-                <select id="catSilent">
-                    <option value="0">Ενεργό (false)</option>
-                    <option value="1">Σιγή (true)</option>
+        <div id="editModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 class="modal-title" id="editTitleText">Επεξεργασία γάτας</h2>
+                    <button class="close-btn">&times;</button>
+                </div>
+                <div class="form-group">
+                    <label for="catName" id="catNameLabel">Όνομα γάτας</label>
+                    <input type="text" id="catName" placeholder="Πληκτρολογήστε το όνομα">
+                </div>
+                <div class="form-group">
+                    <label for="catId" id="catIdLabel">ID iTag (μη επεξεργάσιμο)</label>
+                    <input type="text" id="catId" disabled>
+                </div>
+                <div class="form-group">
+                    <label for="catSilent" id="silentModeLabel">Λειτουργία σιγή</label>
+                    <select id="catSilent">
+                    <option value="0" id="silentActiveOption">Ενεργό</option>
+                    <option value="1" id="silentInactiveOption">Σιγή</option>
                 </select>
-            </div>
-            <div class="modal-actions">
-                <button id="saveCatBtn" class="btn">Αποθήκευση</button>
-                <button id="cancelEditBtn" class="btn btn-secondary">Ακύρωση</button>
+                </div>
+                <div class="modal-actions">
+                    <button id="saveCatBtn" class="btn"><span id="saveText">Αποθήκευση</span></button>
+                    <button id="cancelEditBtn" class="btn btn-secondary"><span id="cancelText">Ακύρωση</span></button>
+                </div>
             </div>
         </div>
-    </div>
 
-    <input type="file" id="importFile" accept=".json" style="display: none;">
-
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Στοιχεία DOM
-            const connectBtn = document.getElementById('connectBtn');
-            const refreshBtn = document.getElementById('refreshBtn');
-            const exportBtn = document.getElementById('exportBtn');
-            const importBtn = document.getElementById('importBtn');
-            const importFile = document.getElementById('importFile');
-            const statusDot = document.getElementById('statusDot');
-            const statusText = document.getElementById('statusText');
-            const catList = document.getElementById('catList');
-            const editModal = document.getElementById('editModal');
-            const catNameInput = document.getElementById('catName');
-            const catIdInput = document.getElementById('catId');
-            const catSilentInput = document.getElementById('catSilent');
-            const saveCatBtn = document.getElementById('saveCatBtn');
-            const cancelEditBtn = document.getElementById('cancelEditBtn');
-            const closeBtn = document.querySelector('.close-btn');
-
-            let isConnected = true; // Είμαστε πάντα συνδεδεμένοι μέσω Launcher
-            let catsData = [];
-            let editingCatId = null;
-            let dataBuffer = '';
-
-            // Άμεσα ενημέρωσε το UI ότι η σύνδεση είναι active
-            if (statusDot && statusText) {
-                statusDot.classList.add('connected');
-                statusText.textContent = 'Συνδεδεμένοι μέσω eW Launcher';
-            }
-
-            // Εμφάνιση κουμπιών
-            if (refreshBtn) refreshBtn.style.display = 'inline-block';
-            if (exportBtn) exportBtn.style.display = 'inline-block';
-            if (importBtn) importBtn.style.display = 'inline-block';
-
-            // Event listeners
-            refreshBtn.addEventListener('click', function() {
-                refreshData();
-            });
-
-            exportBtn.addEventListener('click', function() {
-                exportData();
-            });
-
-            importBtn.addEventListener('click', function() {
-                importFile.click();
-            });
-
-            importFile.addEventListener('change', function(e) {
-                handleImport(e.target.files[0]);
-            });
-
-            // Ανανέωση δεδομένων
-            async function refreshData() {
-                try {
-                    statusText.textContent = 'Ανάγνωση δεδομένων...';
-                    await sendCommand('Bluetooth.println(JSON.stringify(ew.apps.itag.state.def.store))\n');
-                }
-                catch (error) {
-                    console.error('Σφάλμα ανανέωσης:', error);
-                    statusText.textContent = 'Σφάλμα ανανέωσης: ' + error.message;
-                }
-            }
-
-            // Εξαγωγή δεδομένων
-            function exportData() {
-                if (catsData.length === 0) {
-                    alert('Δεν υπάρχουν δεδομένα για εξαγωγή');
-                    return;
-                }
-
-                // Δημιουργία αντικειμένου με τα δεδομένα για εξαγωγή
-                const exportData = {
-                    cats: catsData,
-                    timestamp: new Date().toISOString(),
-                    version: '1.0'
-                };
-
-                // Δημιουργία JSON string
-                const jsonString = JSON.stringify(exportData, null, 2);
-
-                // Δημιουργία blob και λήψη URL
-                const blob = new Blob([jsonString], { type: 'application/json' });
-                const url = URL.createObjectURL(blob);
-
-                // Δημιουργία link για λήψη
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = `cat_tracker_export_${new Date().toISOString().slice(0, 10)}.json`;
-                document.body.appendChild(a);
-                a.click();
-
-                // Καθαρισμός
-                setTimeout(() => {
-                    document.body.removeChild(a);
-                    URL.revokeObjectURL(url);
-                }, 100);
-
-                statusText.textContent = 'Τα δεδομένα εξήχθησαν επιτυχώς';
-            }
-
-            // Εισαγωγή δεδομένων
-            function handleImport(file) {
-                if (!file) return;
-
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    try {
-                        const importedData = JSON.parse(e.target.result);
-
-                        if (!importedData.cats || !Array.isArray(importedData.cats)) {
-                            throw new Error('Μη έγκυρη μορφή αρχείου');
-                        }
-
-                        if (!confirm(`Θέλετε να εισαγάγετε ${importedData.cats.length} γάτες; Αυτή η ενέργεια θα αντικαταστήσει τις τρέχουσες ρυθμίσεις.`)) {
-                            return;
-                        }
-
-                        // Αποστολή των δεδομένων κατευθείαν στο Espruino
-                        updateEspruinoWithImportedData(importedData.cats);
-                        statusText.textContent = 'Τα δεδομένα εισήχθησαν και εστάλησαν στην συσκευή!';
-
-                    }
-                    catch (error) {
-                        console.error('Σφάλμα εισαγωγής:', error);
-                        alert('Σφάλμα κατά την εισαγωγή: ' + error.message);
-                    }
-                };
-                reader.readAsText(file);
-            }
-
-            // Ενημέρωση Espruino με εισαγόμενα δεδομένα
-            async function updateEspruinoWithImportedData(importedCats) {
-                try {
-                    statusText.textContent = 'Ενημέρωση συσκευής με εισαγόμενα δεδομένα...';
-
-                    // Δημιουργούμε την εντολή για να ορίσουμε όλο τον πίνακα
-                    let command = 'ew.apps.itag.state.def.store = [';
-
-                    // Προσθέτουμε κάθε γάτα στον πίνακα
-                    for (let i = 0; i < importedCats.length; i++) {
-                        if (i > 0) command += ',';
-                        command += JSON.stringify(importedCats[i]);
-                    }
-                    command += '];\n';
-
-                    console.log("Εντολή μήκος:", command.length);
-
-                    // Στέλνουμε την εντολή σε μέρη αν είναι πολύ μεγάλη
-                    const chunkSize = 100;
-                    for (let i = 0; i < command.length; i += chunkSize) {
-                        const chunk = command.substring(i, i + chunkSize);
-                        await sendCommand(chunk);
-                        await new Promise(resolve => setTimeout(resolve, 50));
-                    }
-
-                    // Περιμένουμε να ολοκληρωθεί η εντολή
-                    await new Promise(resolve => setTimeout(resolve, 500));
-
-                    // Ελέγχουμε και αποθηκεύουμε
-                    await sendCommand('if (ew.apps.itag.state.def.store && ew.apps.itag.state.def.store.length > 0) { \n');
-                    await sendCommand('  Bluetooth.println("Αποθηκεύτηκαν " + ew.apps.itag.state.def.store.length + " γάτες");\n');
-                    await sendCommand('} else {\n');
-                    await sendCommand('  Bluetooth.println("Σφάλμα: Ο πίνακας είναι άδειος");\n');
-                    await sendCommand('}\n');
-
-                    // Ανανέωση δεδομένων
-                    await refreshData();
-
-                    statusText.textContent = 'Η συσκευή ενημερώθηκε με τα εισαγόμενα δεδομένα (' + importedCats.length + ' γάτες)';
-                }
-                catch (error) {
-                    console.error('Σφάλμα ενημέρωσης συσκευής:', error);
-                    statusText.textContent = 'Σφάλμα ενημέρωσης συσκευής: ' + error.message;
-                }
-            }
-
-            // Αποστολή εντολής μέσω UART
-            async function sendCommand(command) {
-                window.parent.postMessage({
-                    type: 'BLUETOOTH_COMMAND',
-                    command: command
-                }, '*');
-            }
-
-            // Κάνε listen για μηνύματα από τον Launcher
-            window.addEventListener('message', function(event) {
-                // Ελέγχουμε ότι το μήνυμα είναι το σωστό type
-                if (event.data.type === 'BLUETOOTH_RAW_DATA') {
-                    console.log("App received raw data:", event.data.data);
-
-                    // ΠΡΟΣΟΜΟΙΩΣΗ Bluetooth event!
-                    // Ο κώδικας σου περιμένει ένα Event object. Ας το φτιάξουμε.
-                    const encoder = new TextEncoder();
-                    const rawData = encoder.encode(event.data.data); // Μετατρέπει το string σε bytes
-
-                    // Δημιουργούμε ένα ψεύτικο Event object που μοιάζει με αυτό του Web Bluetooth API
-                    const fakeEvent = {
-                        target: {
-                            value: rawData // Τοποθετούμε τα encoded bytes
-                        }
-                    };
-
-                    // Καλούμε την ΥΠΑΡΧΟΥΣΑ function handleUartData του app με το ψεύτικο event
-                    if (typeof handleUartData === 'function') {
-                        handleUartData(fakeEvent);
-                    }
-                    else {
-                        console.warn("Η function handleUartData δεν βρέθηκε. Δεν μπορούν να επεξεργαστούν δεδομένα.");
-                    }
-                }
-
-                // Μπορείς να προσθέσεις και άλλα message types εδώ αργότερα
-                // if (event.data.type === 'OTHER_ACTION') { ... }
-            });
-
-            // Χειρισμός εισερχόμενων δεδομένων από UART
-            function handleUartData(event) {
-                const value = event.target.value;
-                const decoder = new TextDecoder();
-                const data = decoder.decode(value);
-
-                dataBuffer += data;
-
-                // Έλεγχος αν έχουμε λάβει πλήρη JSON απάντηση
-                try {
-                    // Προσπαθούμε να βρούμε JSON στο buffer
-                    const jsonStart = dataBuffer.indexOf('[');
-                    const jsonEnd = dataBuffer.lastIndexOf(']');
-
-                    if (jsonStart >= 0 && jsonEnd > jsonStart) {
-                        const jsonString = dataBuffer.substring(jsonStart, jsonEnd + 1);
-                        const jsonData = JSON.parse(jsonString);
-
-                        // Επεξεργασία των δεδομένων
-                        processRetrievedData(jsonData);
-
-                        // Καθαρισμός buffer
-                        dataBuffer = '';
-                    }
-                }
-                catch (e) {
-                    // Αγνοούμε σφάλματα ανάλυσης JSON (ίσως τα δεδομένα δεν είναι ακόμα πλήρη)
-                    console.log('Λήψη δεδομένων:', data);
-                }
-            }
-
-            // Επεξεργασία των δεδομένων που ελήφθησαν από το Espruino
-            function processRetrievedData(data) {
-                if (data && Array.isArray(data)) {
-                    catsData = data;
-
-                    // Ενημέρωση των ονομάτων αν είναι απαραίτητο
-                    catsData.forEach(cat => {
-                        if (!cat.name || cat.name === "Unknown") {
-                            cat.name = "Αδέσποτη";
-                        }
-                    });
-
-                    renderCatList();
-                    statusText.textContent = 'Βρέθηκαν ' + catsData.length + ' γάτες';
-                }
-                else {
-                    statusText.textContent = 'Μη έγκυρα δεδομένα από το Espruino';
-                    console.error('Μη έγκυρα δεδομένα:', data);
-                }
-            }
-
-            // Απόδοση λίστας γατών
-            function renderCatList() {
-                if (catsData.length === 0) {
-                    catList.innerHTML = `
-                        <div class="empty-state">
-                            <i class="fas fa-cat"></i>
-                            <p>Δεν βρέθηκαν δεδομένα iTag. Πατήστε Ανανέωση για να φορτώσετε τα δεδομένα.</p>
-                        </div>
-                    `;
-                    return;
-                }
-
-                catList.innerHTML = '';
-
-                catsData.forEach(cat => {
-                    const lastSeen = new Date(cat.lastseen);
-                    const now = new Date();
-                    const diffMs = now - lastSeen;
-                    const diffMins = Math.floor(diffMs / 60000);
-
-                    let locationStatus = 'Σε βόλτα';
-                    let locationIcon = 'fa-walking';
-                    if (diffMins < 5) {
-                        locationStatus = 'Στο σπίτι';
-                        locationIcon = 'fa-house';
-                    }
-
-                    const batteryIcon = cat.batt > 70 ? 'fa-battery-full' :
-                        cat.batt > 40 ? 'fa-battery-half' : 'fa-battery-quarter';
-
-                    const silentStatus = cat.silent ? 'Σιγή (true)' : 'Ενεργό (false)';
-                    const silentIcon = cat.silent ? 'fa-volume-mute' : 'fa-volume-up';
-
-                    const catCard = document.createElement('div');
-                    catCard.className = 'cat-card';
-                    catCard.innerHTML = `
-                        <div class="cat-icon">
-                            <i class="fas fa-cat"></i>
-                        </div>
-                        <div class="cat-info">
-                            <div class="cat-name">${cat.name}</div>
-                            <div class="cat-details">
-                                <div class="battery">
-                                    <i class="fas ${batteryIcon}"></i>
-                                    <span>${cat.batt}%</span>
-                                </div>
-                                <div class="location">
-                                    <i class="fas ${locationIcon}"></i>
-                                    <span>${locationStatus}</span>
-                                </div>
-                                <div class="silent">
-                                    <i class="fas ${silentIcon}"></i>
-                                    <span>${silentStatus}</span>
-                                </div>
-                            </div>
-                            <div class="last-seen">
-                                Τελευταία είδην: ${formatTimeDiff(diffMins)}
-                            </div>
-                        </div>
-                        <button class="edit-btn" data-id="${cat.id}">
-                            <i class="fas fa-edit"></i>
-                        </button>
-                    `;
-
-                    catList.appendChild(catCard);
-                });
-
-                // Προσθήκη event listeners για τα κουμπιά επεξεργασίας
-                document.querySelectorAll('.edit-btn').forEach(btn => {
-                    btn.addEventListener('click', function() {
-                        const catId = this.getAttribute('data-id');
-                        openEditModal(catId);
-                    });
-                });
-            }
-
-            // Μορφοποίηση χρονικού διαστήματος
-            function formatTimeDiff(mins) {
-                if (mins < 1) return 'τώρα';
-                if (mins < 60) return `${mins} λεπτά πριν`;
-                const hours = Math.floor(mins / 60);
-                if (hours < 24) return `${hours} ώρες πριν`;
-                const days = Math.floor(hours / 24);
-                return `${days} μέρες πριν`;
-            }
-
-            // Άνοιγμα modal επεξεργασίας
-            function openEditModal(catId) {
-                const cat = catsData.find(c => c.id === catId);
-                if (!cat) return;
-
-                editingCatId = catId;
-                catIdInput.value = catId;
-                catNameInput.value = cat.name;
-                catSilentInput.value = cat.silent ? "1" : "0";
-
-                editModal.style.display = 'flex';
-            }
-
-            // Κλείσιμο modal
-            function closeEditModal() {
-                editModal.style.display = 'none';
-                editingCatId = null;
-                catNameInput.value = '';
-                catIdInput.value = '';
-                catSilentInput.value = '0';
-            }
-
-            // Αποθήκευση αλλαγών
-            async function saveCatName() {
-                if (!editingCatId) return;
-
-                const newName = catNameInput.value.trim();
-                const newSilent = catSilentInput.value === "1";
-
-                if (!newName) return;
-
-                // Ενημέρωση στο catsData
-                const catIndex = catsData.findIndex(c => c.id === editingCatId);
-                if (catIndex !== -1) {
-                    catsData[catIndex].name = newName;
-                    catsData[catIndex].silent = newSilent;
-                }
-
-                // Αποστολή εντολών στο Espruino για ενημέρωση
-                try {
-                    // Ενημέρωση ονόματος
-                    await sendCommand(`ew.apps.itag.state.def.store.find(cat => cat.id === "${editingCatId}").name = "${newName}";\n`);
-
-                    // Ενημέρωση silent τιμής
-                    await sendCommand(`ew.apps.itag.state.def.store.find(cat => cat.id === "${editingCatId}").silent = ${newSilent};\n`);
-
-                    statusText.textContent = 'Οι αλλαγές αποθηκεύτηκαν επιτυχώς';
-                }
-                catch (error) {
-                    console.error('Σφάλμα αποστολής εντολών:', error);
-                    statusText.textContent = 'Σφάλμα αποστολής εντολών: ' + error.message;
-                }
-
-                // Επανάληψη απόδοσης λίστας
-                renderCatList();
-                closeEditModal();
-            }
-
-            // Event listeners για modal
-            closeBtn.addEventListener('click', closeEditModal);
-            cancelEditBtn.addEventListener('click', closeEditModal);
-            saveCatBtn.addEventListener('click', saveCatName);
-
-            // Κλείσιμο modal με κλικ έξω από το περιεχόμενο
-            editModal.addEventListener('click', function(e) {
-                if (e.target === editModal) {
-                    closeEditModal();
-                }
-            });
-
-            // Κλείσιμο modal με πλήκρο Escape
-            document.addEventListener('keydown', function(e) {
-                if (e.key === 'Escape' && editModal.style.display === 'flex') {
-                    closeEditModal();
-                }
-            });
-        });
-    </script>
+        <div id="deleteConfirmModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 class="modal-title" id="deleteConfirmTitle">Διαγραφή γάτας</h2>
+                    <button class="close-btn">&times;</button>
+                </div>
+                <div class="form-group">
+                    <p id="deleteConfirmText">Είστε σίγουρος ότι θέλετε να διαγράψετε αυτή την γάτα;</p>
+                </div>
+                <div class="modal-actions">
+                    <button id="confirmDeleteBtn" class="btn btn-danger"><span id="deleteText">Διαγραφή</span></button>
+                    <button id="cancelDeleteBtn" class="btn btn-secondary"><span id="cancelDeleteText">Ακύρωση</span></button>
+                </div>
+            </div>
+        </div>
+
+        <input type="file" id="importFile" accept=".json" style="display: none;">
+
+        <script src="/common.js"></script>
+        <script src="app.js"></script>
 </body>
 
 </html>

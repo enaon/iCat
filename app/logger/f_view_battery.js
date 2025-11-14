@@ -23,7 +23,7 @@ ew.face[0] = {
     page: 0,
     view: "session",
     historyKeys: [ "daysLasted", "cleanCycles", "avgDailyLoss", "percentLost"],
-    offms: (ew.def.off[ew.face.appCurr]) ? ew.def.off[ew.face.appCurr] : 60000,
+    offms: (ew.def.face.off[ew.face.appCurr]) ? ew.def.face.off[ew.face.appCurr] : 60000,
     init: function(o) {
         ew.logger.battery.log();
         // variables
@@ -90,7 +90,7 @@ ew.face[0] = {
         this.info(this.data.lastPosition + 1, this.data.graph[this.data.lastPosition]);
         ew.UI.c.end();
 
-        if (!this.data.started && ew.def.info) {
+        if (!this.data.started && ew.def.face.info) {
             ew.UI.btn.ntfy(1, 1.5, 0, "_bar", 6, "BATTERY LOG", "VIEWER", 15, 1);
             this.data.started = 1;
         }

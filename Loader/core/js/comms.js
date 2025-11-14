@@ -256,10 +256,68 @@ const Comms = {
       }
       // Use write with newline here so we wait for it to finish
       //let cmd = '\x10E.showMessage("Erasing...");require("Storage").eraseAll();Bluetooth.println("OK");reset()\n';
-	  let cmd = '\x10require("Storage").eraseAll();Bluetooth.println("OK");reset()\n';
+      console.log("ew- on revove all",device.id,device)
+	    let cmd = '\x10require("Storage").eraseAll();Bluetooth.println("OK");reset()\n';
       Puck.write(cmd, handleResult, true /* wait for newline */);
     });
   },
+  
+    // Remove all apps from the device
+  deleteAllApps : () => {
+    console.log("<COMMS> deleteAllApps start");
+    Progress.show({title:"Deleting all eW apps",percent:"animate",sticky:true});
+    return new Promise((resolve,reject) => {
+      let timeout = 5;
+      function handleResult(result,err) {
+        console.log("<COMMS> deletellApps: received "+JSON.stringify(result));
+        if (result=="" && (timeout--)) {
+          console.log("<COMMS> deleteAllApps: no result - waiting some more ("+timeout+").");
+          // send space and delete - so it's something, but it should just cancel out
+          Puck.write(" \u0008", handleResult, true /* wait for newline */);
+        } else {
+          Progress.hide({sticky:true});
+          if (!result || result.trim()!="OK") {
+            if (!result) result = "No response";
+            else result = "Got "+JSON.stringify(result.trim());
+            return reject(err || result);
+          } else resolve();
+        }
+      }
+      // Use write with newline here so we wait for it to finish
+      //let cmd = '\x10E.showMessage("Erasing...");require("Storage").eraseAll();Bluetooth.println("OK");reset()\n';
+      console.log("ew- on delete all",device.id,device)
+	    let cmd = '\x10  require("Storage").list(/^ew/).forEach(appKey => {require("Storage").erase(appKey);});;Bluetooth.println("OK");reset()\n';
+      Puck.write(cmd, handleResult, true /* wait for newline */);
+    });
+  },
+    deleteSettings : () => {
+    console.log("<COMMS> deleteSettings start");
+    Progress.show({title:"Deleting Settings",percent:"animate",sticky:true});
+    return new Promise((resolve,reject) => {
+      let timeout = 5;
+      function handleResult(result,err) {
+        console.log("<COMMS> deleteSettings: received "+JSON.stringify(result));
+        if (result=="" && (timeout--)) {
+          console.log("<COMMS> deleteSettings: no result - waiting some more ("+timeout+").");
+          // send space and delete - so it's something, but it should just cancel out
+          Puck.write(" \u0008", handleResult, true /* wait for newline */);
+        } else {
+          Progress.hide({sticky:true});
+          if (!result || result.trim()!="OK") {
+            if (!result) result = "No response";
+            else result = "Got "+JSON.stringify(result.trim());
+            return reject(err || result);
+          } else resolve();
+        }
+      }
+      // Use write with newline here so we wait for it to finish
+      //let cmd = '\x10E.showMessage("Erasing...");require("Storage").eraseAll();Bluetooth.println("OK");reset()\n';
+      console.log("ew- on delete all",device.id,device)
+	    let cmd = '\x10  require("Storage").erase(ew.json);;Bluetooth.println("OK");reset()\n';
+      Puck.write(cmd, handleResult, true /* wait for newline */);
+    });
+  },
+  
   // Set the time on the device
   setTime : () => {
     let d = new Date();
@@ -309,7 +367,7 @@ const Comms = {
   },
   readSettings : (file,id) => {
 		return new Promise((resolve,reject) => {
-			//let cmd = '\x03\x10';
+			let cmd = '\x03\x10';
 			cmd = '';
 			cmd += "require('Storage').readJSON('"+file+".json',1)."+id+"\n";
 			Puck.eval(cmd, (resp,err) => {

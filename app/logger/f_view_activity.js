@@ -11,7 +11,7 @@ ew.UI.nav.back.replaceWith(() => {
 ew.face[0] = {
     data: { source: 0, name: 0, key: 0, key_1: 0, key_2: 0, key_3: 0, lowLimit: 0, hiLimit: 0, fields: 0, totLowField: 0, ref: 0, style: 0, lastPosition: 0 },
     run: false,
-    offms: (ew.def.off[ew.face.appCurr]) ? ew.def.off[ew.face.appCurr] : 60000,
+    offms: (ew.def.face.off[ew.face.appCurr]) ? ew.def.face.off[ew.face.appCurr] : 60000,
     init: function(o) { //{ data: "tpmsLog" + sensor, name: sensor, key: "psi", lowL: tpms.def.list[sensor].lowP, hiL: tpms.def.list[sensor].hiP });
         // variables
         this.data.key = o.key;
@@ -53,7 +53,7 @@ ew.face[0] = {
 
         this.info(this.data.source[this.data.lastPosition][o.key], this.data.source[this.data.lastPosition][o.key_2], this.lowField(this.data.source[this.data.lastPosition][o.key_3]).toUpperCase(), this.data.source[this.data.lastPosition][o.key_4]);
         
-        if (!this.data.started && ew.def.info) {
+        if (!this.data.started && ew.def.face.info) {
             ew.UI.btn.ntfy(1, 1.5, 0, "_bar", 6, "LAST 24HOURS", "ACTIVITY", 15, 1);
             this.data.started = 1;
         }
@@ -70,7 +70,7 @@ ew.face[0] = {
         g.setCol(0, 15);
         g.fillRect({ x: 0, y: 70, x2: 235, y2: 180, r: 10 });
 
-        /*if ( ew.def.info ) {
+        /*if ( ew.def.face.info ) {
 			g.setFont("Teletext10x18Ascii");
             g.setCol(1, 1);
             g.drawString("GRAMS", 60 - g.stringWidth("GRAMS") / 2, 75);

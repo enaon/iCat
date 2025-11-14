@@ -8,7 +8,6 @@
 ew.is.dddm = 16;
 
 
-if (process.env.BOARD=="MAGIC3") D7.write(1); // turns off HR red led + power up i2c chips
 //MAGIC3/Rock/QY03 LCD pins
 const CS=D3;
 const DC=D47;
@@ -94,7 +93,7 @@ function init(bppi) {
 
   }
 
-  var bpp = (require("Storage").read("ew.json") && require("Storage").readJSON("ew.json").sys.bpp) ? require("Storage").readJSON("ew.json").sys.bpp : 1;
+  var bpp =(require("Storage").read("ew.json") && require("Storage").readJSON("ew.json").sys) ? require("Storage").readJSON("ew.json").sys.face.bpp : 1;
   //var bpp=4;
   var g = Graphics.createArrayBuffer(240, 280, bpp,{msb:false});
   var pal;
@@ -186,7 +185,7 @@ function init(bppi) {
   };
 
   g.bri = {
-    lv: (require("Storage").readJSON("ew.json", 1) && require("Storage").readJSON("ew.json", 1).sys) ? require("Storage").readJSON("ew.json", 1).sys.bri : 3,
+    lv: (require("Storage").readJSON("ew.json", 1) && require("Storage").readJSON("ew.json", 1).sys) ? require("Storage").readJSON("ew.json", 1).sys.face.bri : 3,
     set: function(o) {
       if (o) this.lv = o;
       else { this.lv++; if (this.lv > 7) this.lv = 1;
@@ -195,7 +194,7 @@ function init(bppi) {
         digitalWrite(BL, (this.lv == 0) ? 0 : 1);
       else
         analogWrite(BL, (this.lv * 42.666) / 256, { freq: 60 });
-      ew.def.bri = o;
+      ew.def.face.bri = o;
       return o;
     }
   };

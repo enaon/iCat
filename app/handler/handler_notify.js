@@ -20,7 +20,7 @@ ew.notify.alert = function(type, event, alert, persist) {
 		this.log[type].unshift(event);
 	}
 	if (26 <= this.log[type].length) this.log[type].pop();
-	if (ew.def.scrn || g.isOn) {
+	if (ew.def.face.scrn || g.isOn) {
 		//ew.face.off(8000);
 		if (ew.face[0].bar) {
 			if (!g.isOn && (ew.face.appCurr != "main" || ew.face.pageCurr != 0)) ew.face.go("main", 0);

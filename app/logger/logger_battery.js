@@ -212,7 +212,7 @@ function updateDischargeRate() {
 
 function calculateMahPerCycle() {
   const isScaleActive = ew.apps.kitty.state.def.is.scale || 0;
-  const isScreenOn = ew.def.scrn || 0;
+  const isScreenOn = ew.def.face.scrn || 0;
   const isAutoLightOn = ew.apps.kitty.state.def.auto.light || 0;
 
   if (isScaleActive && isAutoLightOn && isScreenOn ) {

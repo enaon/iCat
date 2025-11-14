@@ -89,7 +89,7 @@ let DEVICEINFO = [{
     img: "https://loader.eucwatch.com/tools/assets/images/dsd6.jpg"
   },
   {
-    id: "EW_NANO",
+    id: "NANO",
     name: "nano",
     features: ["nano"],
     img: "https://loader.eucwatch.com/tools/assets/images/eucLight.jpg"

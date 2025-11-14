@@ -12,13 +12,13 @@ ew.face[0] = {
     cache: { source: 0, style: 0, loop: 1, pos: -1, lastPos: 0, currentDay: Date().getDate(), currentMonth: Date().getMonth(), currentYear: Date().getFullYear(),graphUpdate :1 },
     run: false,
     dbg: 0,
-    offms: (ew.def.off[ew.face.appCurr]) ? ew.def.off[ew.face.appCurr] : 60000,
+    offms: (ew.def.face.off[ew.face.appCurr]) ? ew.def.face.off[ew.face.appCurr] : 60000,
     init: function(o) {
         g.setFontAlign(-1,-1)
         // vars
         this.cache.monthsId = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
         this.cache.daysId = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
-        this.cache.hoursId = (ew.def.hr24) ? ["00:00 - 01:00", "01:00 - 02:00", "02:00 - 03:00", "03:00 - 04:00", "04:00 - 05:00", "05:00 - 06:00", "06:00 - 07:00", "07:00 - 08:00", "08:00 - 09:00", "09:00 - 10:00", "10:00 - 11:00", "11:00 - 12:00", "12:00 - 13:00", "13:00 - 14:00", "14:00 - 15:00", "15:00 - 16:00", "16:00 - 17:00", "17:00 - 18:00", "18:00 - 19:00", "19:00 - 20:00", "20:00 - 21:00", "21:00 - 22:00", "22:00 - 23:00", "23:00 - 00:00"] : ["12:00 - 1:00 AM", "1:00 - 2:00 AM", "2:00 - 3:00 AM", "3:00 - 4:00 AM", "4:00 - 5:00 AM", "5:00 - 6:00 AM", "6:00 - 7:00 AM", "7:00 - 8:00 AM", "8:00 - 9:00 AM", "9:00 - 10:00 AM", "10:00 - 11:00 AM", "11:00 - 11:59 AM", "12:00 - 1:00 PM", "1:00 - 2:00 PM", "2:00 - 3:00 PM", "3:00 - 4:00 PM", "4:00 - 5:00 PM", "5:00 - 6:00 PM", "6:00 - 7:00 PM", "7:00 - 8:00 PM", "8:00 - 9:00 PM", "9:00 - 10:00 PM", "10:00 - 11:00 PM", "11:00 - 11:59 PM"];
+        this.cache.hoursId = (ew.def.time.hr24) ? ["00:00 - 01:00", "01:00 - 02:00", "02:00 - 03:00", "03:00 - 04:00", "04:00 - 05:00", "05:00 - 06:00", "06:00 - 07:00", "07:00 - 08:00", "08:00 - 09:00", "09:00 - 10:00", "10:00 - 11:00", "11:00 - 12:00", "12:00 - 13:00", "13:00 - 14:00", "14:00 - 15:00", "15:00 - 16:00", "16:00 - 17:00", "17:00 - 18:00", "18:00 - 19:00", "19:00 - 20:00", "20:00 - 21:00", "21:00 - 22:00", "22:00 - 23:00", "23:00 - 00:00"] : ["12:00 - 1:00 AM", "1:00 - 2:00 AM", "2:00 - 3:00 AM", "3:00 - 4:00 AM", "4:00 - 5:00 AM", "5:00 - 6:00 AM", "6:00 - 7:00 AM", "7:00 - 8:00 AM", "8:00 - 9:00 AM", "9:00 - 10:00 AM", "10:00 - 11:00 AM", "11:00 - 11:59 AM", "12:00 - 1:00 PM", "1:00 - 2:00 PM", "2:00 - 3:00 PM", "3:00 - 4:00 PM", "4:00 - 5:00 PM", "5:00 - 6:00 PM", "6:00 - 7:00 PM", "7:00 - 8:00 PM", "8:00 - 9:00 PM", "9:00 - 10:00 PM", "10:00 - 11:00 PM", "11:00 - 11:59 PM"];
         this.cache.data = ew.logger.kitty.getStats();
 
         //
@@ -35,7 +35,7 @@ ew.face[0] = {
         if (!check)
             check = this.select_years();
         if (!check) {
-            notify.alert("error", { body: "NO LOGS FOUND", title: "LOGGER ERROR" }, 0, 1);
+            ew.notify.alert("error", { body: "NO LOGS FOUND", title: "LOGGER ERROR" }, 0, 1);
             //ew.face.go("main", 0);
         }
 
@@ -117,7 +117,7 @@ ew.face[0] = {
         //ew.logger.kitty.getStats("allTime", "total")
         this.info("total", this.view.total);
 
-        if (!this.cache.started && ew.def.info) {
+        if (!this.cache.started && ew.def.face.info) {
             ew.UI.btn.ntfy(1, 1.5, 0, "_bar", 6, "CLEANING CYCLES", "LOG VIEWER", 15, 1);
             this.cache.started = 1;
         }

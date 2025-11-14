@@ -702,7 +702,7 @@ htmlToArray(document.querySelectorAll(".btn.updateapps")).map(button => button.a
 }));
 connectMyDeviceBtn.addEventListener("click", () => {
   if (connectMyDeviceBtn.classList.contains('is-connected')) {
-    Puck.write('require("Storage").erase("devmode");setTimeout(()=>{reset();},2500);\n').then(()=>{  //ew
+    Puck.write('require("Storage").erase("devmode");setTimeout(()=>{E.reboot();},2500);\n').then(()=>{  //ew
 	    setTimeout(() => {
 	      Comms.disconnectDevice();
       }, 1000);
@@ -949,11 +949,14 @@ if (btn) btn.addEventListener("click",event=>{
 btn = document.getElementById("installall");
 if (btn) btn.addEventListener("click",event=>{ 
     let installSet="ALL"
-    console.log("ew-2",device.id,device)
+    console.log("ew-install all",device.id,device)
 
     if (device.id=="MAGIC3") installSet="Magic3"
-    else if (device.id=="DSD6") installSet="DSD6"
-    else if (device.id=="EW_NANO") installSet="nano"
+    else if (device.id=="ROCK") installSet="Magic3"
+        else if (device.id=="DSD6") installSet="DSD6"
+    else if (device.id=="NANO") installSet="Nano"
+    else if (device.id=="BANGLEJS2") installSet="BangleJS2"
+
     else { 
           installSet="Magic3"
           //Progress.hide({sticky:true});
@@ -964,6 +967,35 @@ if (btn) btn.addEventListener("click",event=>{
     }).catch(err=>{
     Progress.hide({sticky:true});
     showToast("FULL Install failed, "+err,"error");
+  });
+});
+
+btn = document.getElementById("deleteall");
+if (btn) btn.addEventListener("click",event=>{
+  showPrompt("Delete All","Really delete all eW app?. Bangle Apps will not be deleted.").then(() => {
+    return Comms.deleteAllApps();
+  }).then(()=>{
+    Progress.hide({sticky:true});
+    device.appsInstalled = [];
+    showToast("All apps deleted","success");
+    return getInstalledApps(true);
+  }).catch(err=>{
+    Progress.hide({sticky:true});
+    showToast("App removal failed, "+err,"error");
+  });
+});
+btn = document.getElementById("deleteSettings");
+if (btn) btn.addEventListener("click",event=>{
+  showPrompt("Delete Settings","Really delete ew Settings?").then(() => {
+    return Comms.deleteSettings();
+  }).then(()=>{
+    Progress.hide({sticky:true});
+    device.appsInstalled = [];
+    showToast("Settings deleted","success");
+    return getInstalledApps(true);
+  }).catch(err=>{
+    Progress.hide({sticky:true});
+    showToast("Settings failed, "+err,"error");
   });
 });
 /*
