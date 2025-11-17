@@ -544,6 +544,7 @@ ew.UI = {
 	},
 	bar: function(i) {
 		"ram"
+		ew.is.UIpri = 0;
 		ew.is.bar = 1;
 		ew.is.slide = 0;
 		ew.UI.btn.ntfy(0, 1.3, 1);

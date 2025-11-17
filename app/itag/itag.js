@@ -60,8 +60,8 @@ ew.apps.itag = {
                 //{ serviceData: { uuid: 0xfe2c } }, // google
             ],
             phy: phy[phyR],
-            interval: (ew.apps.itag.state.def.set.phy == 2) ? 900 : 300,
-            window: (ew.apps.itag.state.def.set.phy == 2) ? 300 : 100,
+            interval: (ew.apps.itag.state.def.set.phy == 2) ? 900 : 600,
+            window: (ew.apps.itag.state.def.set.phy == 2) ? 300 : 300,
             active: false
         });
 

@@ -144,7 +144,7 @@ else {
   // ---- start ----
 
   if (process.env.BOARD == "MAGIC3" || process.env.BOARD == "ROCK" || process.env.BOARD == "BANGLEJS2") {
-    digitalPulse(ew.pin.BUZZ, ew.pin.BUZ0, [100, 30, 100]);
+    digitalPulse(ew.pin.BUZZ, ew.pin.BUZ0, [100, 30, 50]);
     setTimeout(function() {
       ew.face.go('main', 0);
       setTimeout(function() {
@@ -153,6 +153,6 @@ else {
         ew.sys.acc.updt(ew.def.dev.tilt+ew.def.dev.tap);
       }, 1000);
       digitalPulse(ew.pin.BUZZ, ew.pin.BUZ0, 100);
-    }, 400);
+    }, 200);
   }
 }

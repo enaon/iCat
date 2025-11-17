@@ -3,7 +3,7 @@
 ew.UI.nav.next.replaceWith(() => {
     ew.sys.buzz.nav(ew.sys.buzz.type.ok);
 
-    if (ew.UI.ntid ) {
+    if (ew.UI.ntid && !ew.is.UIpri) {
         clearTimeout(ew.UI.ntid);
         ew.UI.ntid = 0;
     }
@@ -11,12 +11,12 @@ ew.UI.nav.next.replaceWith(() => {
         ew.face[0].page = 1;
     else
         ew.face[0].page++;
-    ew.face[0].init();
+    ew.face[0].init(ew.face[0].page);
 
 });
 ew.UI.nav.back.replaceWith(() => {
     ew.sys.buzz.nav(ew.sys.buzz.type.ok);
-    if (ew.UI.ntid ) {
+    if (ew.UI.ntid && !ew.is.UIpri) {
         clearTimeout(ew.UI.ntid);
         ew.UI.ntid = 0;
     }
@@ -24,7 +24,7 @@ ew.UI.nav.back.replaceWith(() => {
         ew.face[0].page = 5;
     else
         ew.face[0].page--;
-    ew.face[0].init();
+    ew.face[0].init(ew.face[0].page);
 
 });
 
@@ -38,7 +38,16 @@ ew.face[0] = {
     init: function(o) {
         ew.def.face.off[ew.face.appCurr] = this.offms;
         this.rep = 0;
-        this.page = o || this.page;
+       
+        if (o === undefined) {
+            let earliest = this.active();
+            if (earliest !== null) {
+              this.page = earliest;
+            }
+        } else {
+            this.page = o;
+        }
+
         ew.apps.timer.state.pos = this.page;
 
         ew.UI.c.start(1, 1);
@@ -100,6 +109,24 @@ ew.face[0] = {
         }, 1000, this);
     },
 
+    active: function() {
+        let earliestTimer = null;
+        let minRemaining = Infinity;
+        
+        for (let i = 1; i <= 5; i++) {
+            let status = ew.apps.timer.getTimerStatus(i);
+            if (status.active && !status.paused) {
+                let remaining = status.remainingMinutes * 60 + status.remainingSeconds;
+                if (remaining < minRemaining) {
+                    minRemaining = remaining;
+                    earliestTimer = i;
+                }
+            }
+        }
+        
+        return earliestTimer;
+    },
+    
     info: function(min) {
 
         // values
@@ -203,7 +230,7 @@ ew.face[0] = {
 
 
                     ew.UI.btn.img("bar", "_bar", 4, "pause", ew.apps.timer.getTimerStatus(this.page).paused ? "RESUME" : "PAUSE", 15, ew.apps.timer.getTimerStatus(this.page).paused ? 13 : 0);
-                    if (ew.def.face.info) ew.UI.btn.ntfy(1, 1.5, 0, "_bar", 6, "TIMER", ew.apps.timer.getTimerStatus(this.page).paused ? "PAUSED" : "RESUMED", 0, 15);
+                    if (ew.def.face.info) ew.UI.btn.ntfy(1, 1.5, 0, "_bar", 6, ew.apps.timer.state.def[this.page].name.toUpperCase(), ew.apps.timer.getTimerStatus(this.page).paused ? "PAUSED" : "RESUMED", 0, 15);
                     //}
                     //else
                     //if (ew.def.face.info) ew.UI.btn.ntfy(1, 1.5, 0, "_bar", 6, "LONG HOLD", "PAUSE/RESUME", 0, 15);
@@ -211,11 +238,11 @@ ew.face[0] = {
                 }
                 else if (i == 5) {
                     if (l) {
-                        if (ew.def.face.info) ew.UI.btn.ntfy(1, 1.5, 0, "_bar", 6, "TIMER", "RESTARTED", 0, 15, 0, 0, 0);
+                        if (ew.def.face.info) ew.UI.btn.ntfy(1, 1.5, 0, "_bar", 6, ew.apps.timer.state.def[this.page].name.toUpperCase(), "RESTARTED", 0, 15, 0, 0, 0);
                         ew.apps.timer.restartTimer(this.page);
                     }
                     else {
-                        if (ew.def.face.info) ew.UI.btn.ntfy(1, 1.5, 0, "_bar", 6, "TIMER", "STOPPED", 0, 15, 0, 0, 0);
+                        if (ew.def.face.info) ew.UI.btn.ntfy(1, 1.5, 0, "_bar", 6, ew.apps.timer.state.def[this.page].name.toUpperCase(), "STOPPED", 0, 15, 0, 0, 0);
                         ew.apps.timer.stopTimer(ew.face[0].page);
                     }
 
@@ -250,7 +277,7 @@ ew.face[0] = {
                 }
                 //start timer
                 else if (i == 6) {
-                    if (ew.def.face.info) ew.UI.btn.ntfy(1, 1.5, 0, "_bar", 6, "TIMER", "STARTED", 0, 15,0,0,0);
+                    if (ew.def.face.info) ew.UI.btn.ntfy(1, 1.5, 0, "_bar", 6, ew.apps.timer.state.def[this.page].name.toUpperCase(), "STARTED", 0, 15,0,0,0);
                     ew.apps.timer.startTimer(ew.face[0].page);
                     ew.face[0].init();
                 }

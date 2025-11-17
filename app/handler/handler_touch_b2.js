@@ -77,7 +77,7 @@ ew.sys.TC = {
 
 				if (!this.nav) {
 					if (this.dbg) console.log("tc nav short fire:", data);
-					if (ew.UI.ntid && !ew.is.UIpri && !ew.is.bar ) {
+					if (ew.UI.ntid && !ew.is.UIpri && !ew.is.bar  && 116 < data.y) {
 	        			clearTimeout(ew.UI.ntid);
 	        			ew.UI.ntid = 0;
 	        			ew.UI.rtb();
@@ -163,7 +163,7 @@ ew.sys.TC = {
 					this.val.tmp = 0;
 					if (this.val.up < this.val.cur) this.val.cur = (this.val.loop) ? this.val.dn : this.val.up;
 					else if (this.val.cur < this.val.dn) this.val.cur = (this.val.loop) ? this.val.up : this.val.dn;
-					ew.sys.buzz.nav(15);
+					ew.sys.buzz.nav(10);
 					ew.UI.c.tcBar(this.side, this.val.cur);
 				}
 			}

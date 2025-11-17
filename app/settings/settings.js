@@ -1,4 +1,14 @@
 //settings
+//
+ew.UI.nav.next.replaceWith((x, y) => {
+	ew.sys.buzz.nav(ew.sys.buzz.type.na);
+});
+ew.UI.nav.back.replaceWith((x, y) => {
+
+	ew.sys.buzz.nav(ew.sys.buzz.type.na);
+});
+
+
 
 ew.face[0] = {
 	run: false,
@@ -104,12 +114,13 @@ ew.face[0] = {
 						ew.sys.buzz.nav(ew.sys.buzz.type.ok);
 						ew.UI.btn.ntfy(0, 2, 1, "_bar", 6, "", "", 15, 0);
 						if (i == 4) {
+							
 							ew.def.dev.tilt = 1 - ew.def.dev.tilt;
 							ew.UI.btn.img("bar", "_bar", 4, "tilt", "TILT", 15, ew.def.dev.tilt ? 4 : 1);
 							ew.def.dev.acc = ew.def.dev.tilt + ew.def.dev.tap ? 1 : 0;
 							ew.UI.btn.img("main", "_2x3", 5, "wakeScreen", "WAKE", ew.def.dev.acc ? 15 : 3, ew.def.dev.acc ? 4 : 1);
 							ew.sys.acc.updt(ew.def.dev.tilt + ew.def.dev.tap);
-							if (ew.def.face.info) ew.UI.btn.ntfy(1, 0, 0, "_bar", 6, "TILT", ew.def.dev.tilt ? "ENABLED" : "DISABED", 0, 15);
+							if (ew.def.face.info) {ew.is.bar = 0;ew.UI.btn.ntfy(1, 0, 0, "_bar", 6, "TILT", ew.def.dev.tilt ? "ENABLED" : "DISABED", 0, 15);}
 
 						}
 						else if (i == 5) {
@@ -118,7 +129,7 @@ ew.face[0] = {
 							ew.def.dev.acc = ew.def.dev.tilt + ew.def.dev.tap ? 1 : 0;
 							ew.UI.btn.img("main", "_2x3", 5, "wakeScreen", "WAKE", ew.def.dev.acc ? 15 : 3, ew.def.dev.acc ? 4 : 1);
 							ew.sys.acc.updt(ew.def.dev.tilt + ew.def.dev.tap);
-							if (ew.def.face.info) ew.UI.btn.ntfy(1, 0, 0, "_bar", 6, "DOUBLE TAP", ew.def.dev.tap ? "ENABLED" : "DISABED", 0, 15);
+							if (ew.def.face.info) {ew.is.bar = 0;ew.UI.btn.ntfy(1, 0, 0, "_bar", 6, "DOUBLE TAP", ew.def.dev.tap ? "ENABLED" : "DISABED", 0, 15);}
 
 						}
 					};

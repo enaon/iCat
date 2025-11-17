@@ -50,7 +50,7 @@ ew.sys.acc = {
 			Bangle.accelWr(0x1f, 0x04); //tap report on int1
 			Bangle.accelWr(0x1c, 0x30); //enable int1
 			 Bangle.accelWr(0x2A, 0x00); // TLT = 0 (no delay)
-			Bangle.accelWr(0x2B, 0x08); // TWS = 40ms (small window)
+			Bangle.accelWr(0x2B, 0x28); // TWS = 40ms (small window)
 			//Bangle.accelWr(0x24, 0x03); //enable tap/double tap reporting
 			Bangle.accelWr(0x24, 0x01); //enable only tap reporting
 			//Bangle.accelWr(0x18, 0x84); //opp mode-low current-int1-2g-tap
@@ -71,7 +71,7 @@ ew.sys.acc = {
 			Bangle.accelWr(0x33,0x2A);//TILT_ANGLE_HL -default value 
 			//Bangle.accelWr(0x33, 0x1E); //TILT_ANGLE_HL
 			Bangle.accelWr(0x2A, 0x00); // TLT = 0 (no delay)
-			Bangle.accelWr(0x2B, 0x08); // TWS = 40ms (small window)
+			Bangle.accelWr(0x2B, 0x28); // TWS = 40ms (small window)
 			Bangle.accelWr(0x1f, 0x05); //tilt -tap report on int1
 			Bangle.accelWr(0x1c, 0x30); //enable int1
 			//Bangle.accelWr(0x18, 0x85); //opp mode-low current-int1-tilt-2g

@@ -1,7 +1,7 @@
 //itag connect set
 
 ew.UI.nav.next.replaceWith(() => {
-    if (ew.UI.ntid) {
+    if (ew.UI.ntid && !ew.is.UIpri) {
         clearTimeout(ew.UI.ntid);
         ew.UI.ntid = 0;
     }
@@ -9,7 +9,7 @@ ew.UI.nav.next.replaceWith(() => {
     ew.face.go("itag-connect", 0);
 });
 ew.UI.nav.back.replaceWith(() => {
-    if (ew.UI.ntid) {
+    if (ew.UI.ntid && !ew.is.UIpri) {
         clearTimeout(ew.UI.ntid);
         ew.UI.ntid = 0;
     }
@@ -106,11 +106,11 @@ ew.face[0] = {
                 ew.sys.buzz.nav(ew.sys.buzz.type.ok);
                 ew.UI.btn.ntfy(1, 3, 0, "_bar", 6, "INTERVAL", "-MS-", 15, 6, 1);
                 ew.is.slide = 1;
-                ew.sys.TC.val = { cur: this.int, dn: 300, up: 60000, tmp: 0 };
+                ew.sys.TC.val = { cur: this.int, dn: 300, up: 60000, tmp: 0, fire:1, len: 1 };
                 ew.UI.c.tcBar = (a, b, r) => {
                     let val = this.int
                     ew.UI.btn.ntfy(0, 2, 1);
-                    if (11 < r && ew.sys.TC.val.dn < val && val < ew.sys.TC.val.up) val = val + (a * (20 < r ? 10 : 5));
+                    if (11 < r && ew.sys.TC.val.dn < val && val < ew.sys.TC.val.up) val = val + (a * (100 < r ? 50 : 25));
                     else val = b
                     ew.sys.TC.val.cur = val;
                     //

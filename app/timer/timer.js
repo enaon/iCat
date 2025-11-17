@@ -1,11 +1,11 @@
 ew.apps.timer = {
   state: {
     def: {
-      1: { min: 5, active: 0, buzz: 1, buzzRep: 5, buzzDelay: 2000, snooze: 5, rep: 0, repLeft: 0, remaining: 0, paused: 0, name: "Timer 1" },
-      2: { min: 10, active: 0, buzz: 1, buzzRep: 5, buzzDelay: 2000, snooze: 5, rep: 0, repLeft: 0, remaining: 0, paused: 0, name: "Timer 2" },
-      3: { min: 15, active: 0, buzz: 1, buzzRep: 5, buzzDelay: 2000, snooze: 5, rep: 0, repLeft: 0, remaining: 0, paused: 0, name: "Timer 3" },
-      4: { min: 20, active: 0, buzz: 1, buzzRep: 5, buzzDelay: 2000, snooze: 5, rep: 0, repLeft: 0, remaining: 0, paused: 0, name: "Timer 4" },
-      5: { min: 25, active: 0, buzz: 1, buzzRep: 5, buzzDelay: 2000, snooze: 5, rep: 0, repLeft: 0, remaining: 0, paused: 0, name: "Timer 5" }
+      1: { min: 5, active: 0, buzz: 1, buzzRep: 5, buzzDelay: 2000, snooze: 5, wake: 0, rep: 0, repLeft: 0, remaining: 0, paused: 0, name: "Timer 1" },
+      2: { min: 10, active: 0, buzz: 1, buzzRep: 5, buzzDelay: 2000, snooze: 5, wake: 0, rep: 0, repLeft: 0, remaining: 0, paused: 0, name: "Timer 2" },
+      3: { min: 15, active: 0, buzz: 1, buzzRep: 5, buzzDelay: 2000, snooze: 5, wake: 0, rep: 0, repLeft: 0, remaining: 0, paused: 0, name: "Timer 3" },
+      4: { min: 20, active: 0, buzz: 1, buzzRep: 5, buzzDelay: 2000, snooze: 5, wake: 0, rep: 0, repLeft: 0, remaining: 0, paused: 0, name: "Timer 4" },
+      5: { min: 25, active: 0, buzz: 1, buzzRep: 5, buzzDelay: 2000, snooze: 5, wake: 0, rep: 0, repLeft: 0, remaining: 0, paused: 0, name: "Timer 5" }
     },
     tid: {
       1: { timer: 0, interval: 0, buzz: 0 },
@@ -14,7 +14,7 @@ ew.apps.timer = {
       4: { timer: 0, interval: 0, buzz: 0 },
       5: { timer: 0, interval: 0, buzz: 0 }
     },
-    page:1
+    page: 1
   },
 
 
@@ -25,7 +25,7 @@ ew.apps.timer = {
 
       // Αν δεν υπάρχει repLeft, το δημιουργούμε από το rep
       if (timer.repLeft === undefined) {
-        timer.repLeft = timer.rep > 0 ? timer.rep   : 0;
+        timer.repLeft = timer.rep > 0 ? timer.rep : 0;
       }
 
       if (timer.active === 1 && timer.paused === 0) {
@@ -141,11 +141,44 @@ ew.apps.timer = {
 
     return true;
   },
+  /*
+    // Εσωτερική συνάρτηση ολοκλήρωσης timer
+    _timerComplete: function(timerId) {
+      var timer = this.state.def[timerId];
+      var tid = this.state.tid[timerId];
+      // Clean up intervals
+      if (tid.interval) {
+        clearInterval(tid.interval);
+        tid.interval = 0;
+      }
 
-  // Εσωτερική συνάρτηση ολοκλήρωσης timer
+      tid.timer = 0;
+      timer.active = 0;
+      timer.paused = 0;
+      timer.remaining = 0;
+
+      // Trigger buzzer if enabled
+      if (timer.buzz) {
+        this._triggerBuzzer(timerId, timer.buzzRep, timer.buzzDelay);
+      }
+
+      // Handle repetitions
+      if (timer.repLeft > 0) {
+        timer.repLeft--; // Μείωση των επαναλήψεων που απομένουν
+        if (timer.repLeft >= 0) {
+          // Επαναφορά και εκκίνηση timer
+          timer.remaining = timer.min * 60000;
+          timer.active = 1;
+          this._startTimer(timerId, timer.remaining);
+        }
+      }
+    },
+  */
+  // Also modify the _timerComplete function to restore original time after snooze
   _timerComplete: function(timerId) {
     var timer = this.state.def[timerId];
     var tid = this.state.tid[timerId];
+
     // Clean up intervals
     if (tid.interval) {
       clearInterval(tid.interval);
@@ -155,7 +188,9 @@ ew.apps.timer = {
     tid.timer = 0;
     timer.active = 0;
     timer.paused = 0;
-    timer.remaining = 0;
+
+    // RESTORE ORIGINAL TIME - This is important!
+    timer.remaining = timer.min * 60000;
 
     // Trigger buzzer if enabled
     if (timer.buzz) {
@@ -166,13 +201,15 @@ ew.apps.timer = {
     if (timer.repLeft > 0) {
       timer.repLeft--; // Μείωση των επαναλήψεων που απομένουν
       if (timer.repLeft >= 0) {
-        // Επαναφορά και εκκίνηση timer
+        // Επαναφορά και εκκίνηση timer με τον αρχικό χρόνο
         timer.remaining = timer.min * 60000;
         timer.active = 1;
         this._startTimer(timerId, timer.remaining);
       }
     }
   },
+
+
 
   // Εσωτερική συνάρτηση για buzzer με repetitions
   _triggerBuzzer: function(timerId, repetitions, delay) {
@@ -192,7 +229,7 @@ ew.apps.timer = {
         ew.sys.buzz.alrm([100, 200, 200]);
         count++;
         tid.buzz = setTimeout(() => { buzz(timer); }, delay, timer);
-        ew.apps.timer._alert(timerId,timer.name);
+        ew.apps.timer._alert(timerId, timer.name);
       }
     }
     //if (ew.face.appCurr === "timer") ew.face[0].init();
@@ -200,30 +237,37 @@ ew.apps.timer = {
     tid.buzz = 1; // Mark as active
     buzz(timer);
   },
-  _alert: function(timerId,name){
-    
-      ew.UI.btn.ntfy(1, 2, 0, "_bar", 6, name.toUpperCase(), "", 13, 15, true,false,false);
-          ew.UI.c.bar._ntfy=function(){
-            ew.UI.btn.ntfy(1, 3, 0, "_bar", 6,"", "", 15, 0, false, false, true);
-            ew.UI.c.start(0,1);
-            ew.UI.btn.img("bar", "_bar", 4, "snooze", "SNOOZE", 15,  4);
-            ew.UI.btn.img("bar", "_bar", 5, "confirm", "STOP", 0, 14);
-            ew.UI.c.end();
-            ew.UI.c.bar._bar = function(i, l) {
-              ew.is.UIpri=0;
-              ew.sys.buzz.nav(ew.sys.buzz.type.ok);
-              if(i==4){
-                ew.apps.timer.snoozeTimer(timerId);
-                if (ew.def.face.info) ew.UI.btn.ntfy(1, 1.5, 0, "_bar", 6, name.toUpperCase(), "SNOOZE", 0, 15);
+  _alert: function(timerId, name) {
+    if (ew.apps.timer.state.def[timerId].wake && !g.isOn)
+      ew.face.go(ew.face.appCurr, 0)
 
-            }else{
-              ew.apps.timer.stopTimer(timerId);
-              if (ew.def.face.info) ew.UI.btn.ntfy(1, 1.5, 0, "_bar", 6, "STOPPED", "", 0, 15);
-              
-            }
-          };
-  };
-  
+    ew.UI.btn.ntfy(1, 2, 0, "_bar", 6, name.toUpperCase(), "", 15, 13, true, false, false);
+    ew.UI.c.bar._ntfy = function() {
+      ew.UI.btn.ntfy(1, 3, 0, "_bar", 6, "", "", 15, 0, false, false, true);
+      ew.UI.c.start(0, 1);
+      if (!ew.apps.timer.state.def[timerId].rep) {
+        ew.UI.btn.img("bar", "_bar", 4, "snooze", "SNOOZE", 15, 4);
+        ew.UI.btn.img("bar", "_bar", 5, "confirm", "MUTE", 0, 14);
+      }
+      else
+        ew.UI.btn.img("bar", "_bar", 6, "confirm", "MUTE", 0, 14);
+      ew.UI.c.end();
+      ew.UI.c.bar._bar = function(i, l) {
+        ew.is.UIpri = 0;
+        ew.sys.buzz.nav(ew.sys.buzz.type.ok);
+        if (i == 4) {
+          ew.apps.timer.snoozeTimer(timerId);
+          if (ew.def.face.info) ew.UI.btn.ntfy(1, 1.5, 0, "_bar", 6, name.toUpperCase(), "SNOOZE", 0, 15);
+
+        }
+        else {
+          ew.apps.timer.stopBuzz(timerId);
+          if (ew.def.face.info) ew.UI.btn.ntfy(1, 1.5, 0, "_bar", 6, "MUTED", "", 0, 15);
+
+        }
+      };
+    };
+
   },
 
   // Σταμάτημα buzz για συγκεκριμένο timer
@@ -335,7 +379,26 @@ ew.apps.timer = {
     };
   },
 
-  // Snooze function
+  /*  // Snooze function
+    snoozeTimer: function(timerId) {
+      if (timerId < 1 || timerId > 5) return false;
+
+      var timer = this.state.def[timerId];
+      if (timer.active) return false;
+
+      this.stopTimer(timerId);
+      this.setTimer(timerId, timer.snooze, timer.buzz, timer.buzzRep, timer.buzzDelay, timer.rep, timer.name);
+      this.startTimer(timerId);
+      return true;
+    },
+
+    // Vibration function
+    vibrate: function(pattern) {
+      ew.sys.buzz.alrm(pattern || [100, 100, 100]);
+    },
+    
+  */
+
   snoozeTimer: function(timerId) {
     print(timerId);
     if (timerId < 1 || timerId > 5) return false;
@@ -343,16 +406,21 @@ ew.apps.timer = {
     var timer = this.state.def[timerId];
     if (timer.active) return false;
 
-    this.stopTimer(timerId);
-    this.setTimer(timerId, timer.snooze, timer.buzz, timer.buzzRep, timer.buzzDelay, timer.rep, timer.name);
-    this.startTimer(timerId);
+    // Stop any current buzzing
+    this.stopBuzz(timerId);
+
+    // Instead of changing the default settings, just start a new timer
+    // with the snooze duration WITHOUT modifying the permanent settings
+    timer.remaining = timer.snooze * 60000; // Set remaining time to snooze duration
+    timer.active = 1;
+    timer.paused = 0;
+
+    // Start the timer with snooze duration
+    this._startTimer(timerId, timer.remaining);
+
     return true;
   },
 
-  // Vibration function
-  vibrate: function(pattern) {
-    ew.sys.buzz.alrm(pattern || [100, 100, 100]);
-  },
 
   // Επανεκκίνηση timer
   restartTimer: function(timerId) {

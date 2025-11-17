@@ -2,12 +2,12 @@
 
 ew.UI.nav.next.replaceWith(()=>{
 	ew.sys.buzz.nav(ew.sys.buzz.type.ok);
-	if (ew.UI.ntid) {clearTimeout(ew.UI.ntid);ew.UI.ntid=0;}
+	if (ew.UI.ntid && !ew.is.UIpri) {clearTimeout(ew.UI.ntid);ew.UI.ntid=0;}
 	ew.face.go("timer",0);
 });
 ew.UI.nav.back.replaceWith(()=>{
 	ew.sys.buzz.nav(ew.sys.buzz.type.ok);
-	if (ew.UI.ntid) {clearTimeout(ew.UI.ntid);ew.UI.ntid=0;}
+	if (ew.UI.ntid && !ew.is.UIpri) {clearTimeout(ew.UI.ntid);ew.UI.ntid=0;}
 		ew.face.go("itag-scan",0);
 });
 if (ew.def.face.bri<3) ew.UI.theme.current= ew.UI.theme.white;
@@ -329,7 +329,6 @@ ew.face[0] = {
 	clear : function(){
 		if  (process.env.BOARD==="BANGLEJS2" && ew.face.appCurr==="main" && ew.face.appPrev === "main" && ew.face.pageCurr === -1){
 			ew.UI.btn.ntfy(1,2,0,"_bar",6,"SLEEP","",0,15);
-				console.log("keep clock");
 			return true;
 		}
 		this.run=false;

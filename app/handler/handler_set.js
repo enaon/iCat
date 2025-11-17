@@ -212,5 +212,7 @@ ew.sys.on('hour', function(x){
         setTimeout=(()=>{
         ew.sys.updt();
         },120000);
-	}	
+	}
+	if (ew.def.time.hour) ew.sys.buzz.nav([100,500,100]);
+		
 });

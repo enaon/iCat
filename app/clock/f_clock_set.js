@@ -38,7 +38,7 @@ ew.face[0] = {
         ew.UI.btn.c2l("main", "_2x3", 1, "MODE", ew.def.time.hr24?"24":"12", 15, ew.def.time.hr24?4:6);
         ew.UI.btn.c2l("main", "_2x3", 2, "ZONE", ew.def.time.timezone+"" , 15, 1);
         //ew.UI.btn.c2l("main", "_2x3", 3, "ZONE", ew.apps.timer.state.def[this.timer].buzzDelay , 15, 1);
-        //ew.UI.btn.c2l("main", "_2x3", 4, "REP", ew.apps.timer.state.def[this.timer].rep, 15, 1);
+        ew.UI.btn.c2l("main", "_2x3", 4, "BUZZ", ew.def.time.hour?"ON":"OFF", 15, ew.def.time.hour?4:1);
 
         ew.UI.c.end();
 
@@ -49,7 +49,7 @@ ew.face[0] = {
                 if (ew.def.face.info) ew.UI.btn.ntfy(1, 1.5, 0, "_bar", 6, "TIME MODE",ew.def.time.hr24?"24 HOUR":"PM/AM", 0, 15);
                 ew.UI.btn.c2l("main", "_2x3", 1, "MODE", ew.def.time.hr24?"24":"12", 15, ew.def.time.hr24?4:6);
                 }
-            if (i == 2) {
+            else if (i == 2) {
                 ew.sys.buzz.nav(ew.sys.buzz.type.ok);
                 ew.UI.btn.ntfy(1, 3, 0, "_bar", 6, "<  TIMEZONE  >", "", 15, 6, 1);
                 ew.is.slide = 1;
@@ -64,6 +64,15 @@ ew.face[0] = {
                     ew.UI.btn.c2l("main", "_2x3", 2, "ZONE", ew.def.time.timezone+"" , 15, 1);
                 };
             }
+            else if (i == 4) {
+                ew.sys.buzz.nav(ew.sys.buzz.type.ok);
+                if (ew.def.time.hour===undefined) ew.def.time.hour=0;
+                ew.def.time.hour= 1-ew.def.time.hour;
+                if (ew.def.face.info) ew.UI.btn.ntfy(1, 1.5, 0, "_bar", 6, "BUZZ ON HOUR",ew.def.time.hour?"ENABLED":"DISABLED", 0, 15);
+                ew.UI.btn.c2l("main", "_2x3", 4, "BUZZ", ew.def.time.hour?"ON":"OFF", 15, ew.def.time.hour?4:1);
+            }
+            
+
            
         };
     },

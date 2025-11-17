@@ -1,7 +1,7 @@
 //itag connected viewer
 
 ew.UI.nav.next.replaceWith(() => {
-    if (ew.UI.ntid) {
+    if (ew.UI.ntid && !ew.is.UIpri) {
         clearTimeout(ew.UI.ntid);
         ew.UI.ntid = 0;
     }
@@ -9,7 +9,7 @@ ew.UI.nav.next.replaceWith(() => {
     ew.face[0].page2();
 });
 ew.UI.nav.back.replaceWith(() => {
-    if (ew.UI.ntid) {
+    if (ew.UI.ntid && !ew.is.UIpri) {
         clearTimeout(ew.UI.ntid);
         ew.UI.ntid = 0;
     }
