@@ -128,3 +128,4 @@ class EWLauncherCommon {
 
 // Αρχικοποίηση κοινών λειτουργιών
 const ewCommon = new EWLauncherCommon();
+window.ewCommon = ewCommon;
