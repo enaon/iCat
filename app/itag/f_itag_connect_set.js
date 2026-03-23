@@ -1,22 +1,9 @@
 //itag connect set
 
 ew.UI.nav.next.replaceWith(() => {
-    if (ew.UI.ntid && !ew.is.UIpri) {
-        clearTimeout(ew.UI.ntid);
-        ew.UI.ntid = 0;
-    }
-    ew.sys.buzz.nav(ew.sys.buzz.type.ok);
-    ew.face.go("itag-connect", 0);
+    ew.sys.buzz.nav(ew.sys.buzz.type.na);
 });
-ew.UI.nav.back.replaceWith(() => {
-    if (ew.UI.ntid && !ew.is.UIpri) {
-        clearTimeout(ew.UI.ntid);
-        ew.UI.ntid = 0;
-    }
-    ew.sys.buzz.nav(ew.sys.buzz.type.ok);
-    ew.face.go("itag-connect", 0);
-
-});
+ew.UI.nav.back.replaceWith(ew.UI.nav.next);
 
 ew.face[0] = {
     run: false,
@@ -48,7 +35,7 @@ ew.face[0] = {
                 this.uart = r.v.uart;
 
                 ew.UI.ele.ind(0, 0, 0, 0);
-                ew.UI.ele.fill("_main", 9, 0);
+                ew.UI.ele.fill("_main", 12, 0);
 
                 ew.UI.c.start(1, 0);
                 ew.UI.btn.c2l("main", "_2x3", 1, "GAIN", r.v.rfTX + "dB", 15, 4);
@@ -168,7 +155,7 @@ ew.face[0] = {
     itag: function() {
 
         ew.UI.ele.ind(0, 0, 0, 0);
-        ew.UI.ele.fill("_main", 9, 0);
+        ew.UI.ele.fill("_main", 12, 0);
         
         ew.UI.c.start(1, 0);
         ew.UI.btn.c2l("main", "_2x3", 1, "SLNT", this.dev.silent?"ON":"OFF", 15, this.dev.silent?4:1);
@@ -190,7 +177,10 @@ ew.face[0] = {
         ew.is.bar = 0;
         ew.UI.c.start(0, 1);
         ew.UI.c.end();
-        ew.UI.btn.c2l("main", "_bar", 6,  ew.face.appCurr.toUpperCase(), "",15, 0, 1.3);
+        ew.UI.ele.fill("_bar", 6, 0);
+        ew.UI.btn.img("bar", "_bar", 6, "ew_i_"+ew.face.appCurr.split("-")[0]+".img", ew.face.appCurr.split("-")[0].toUpperCase(), 15, 0,0.8,1,1);
+        //ew.UI.btn.img("bar", "_bar", 6, "ew_i_"+ew.face.appCurr.split("-")[0]+".img", "", 15, 0,1.4,0,0);
+        //ew.UI.btn.c2l("main", "_bar", 6,  ew.face.appCurr.toUpperCase(), "",15, 1, 1.3);
     },
 
 
@@ -199,7 +189,7 @@ ew.face[0] = {
         if (this.dev.board != undefined) ew.comm.mstr.set("ew.bt.intA", this.int, "i");
         if (this.tid) clearTimeout(this.tid);
         this.tid = 0;
-        if (ew.apps.itag.state.focus || (ew.apps.itag.state.def.set.persist && ew.face.appCurr === "itag-scan") || (ew.face.appCurr.startsWith("itag") && !ew.face.pageCurr)) return;
+        if (ew.apps.itag.state.focus || (ew.apps.itag.state.def.set.persist && ew.face.appCurr === "itag") || (ew.face.appCurr.startsWith("itag") && !ew.face.pageCurr)) return;
         else ew.apps.itag.stopScan();
         return true;
     },

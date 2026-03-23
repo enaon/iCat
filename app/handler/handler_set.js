@@ -6,13 +6,29 @@ ew.sys.cron = {
 	event: {
 		//date:()=>{ setTimeout(() =>{ ew.sys.emit('dateChange',Date().getDate());ew.sys.cron.event.date();},(Date(Date().getFullYear(),Date().getMonth(),Date().getDate()+1)-Date()));},
 		hour: () => {
+			const nextHour=3600000 - (Date.now() % 3600000);
 			setTimeout(() => {
-				ew.sys.emit('hour', Date().getHours());
+				ew.sys.emit('hour', new Date().getHours());
+				if (ew.dbg) console.log("ew: cron emits hourly event");
 				ew.sys.cron.event.hour();
-			}, (Date(Date().getFullYear(), Date().getMonth(), Date().getDate(), Date().getHours() + 1, 0, 1) - Date()));
+			},nextHour);
 		},
-		//min: ()=>{setTimeout(() =>{ ew.sys.emit('min',Date().getMinutes());ew.sys.cron.event.min();},(Date(Date().getFullYear(),Date().getMonth(),Date().getDate(),Date().getHours(),Date().getMinutes()+1)-Date()));},
-		//sec:()=>{setTimeout(() =>{ ew.sys.emit('sec',Date().getSeconds());ew.sys.cron.event.sec();},(Date(Date().getFullYear(),Date().getMonth(),Date().getDate(),Date().getHours(),Date().getMinutes(),Date().getSeconds()+1)-Date()));},
+		/*min: ()=>{
+			const nextMin = 60000 - (Date.now() % 60000);
+			setTimeout(() =>{
+				ew.sys.emit('min',new Date().getMinutes());
+				ew.sys.cron.event.min();
+				
+			},nextMin);
+		},
+		sec:()=>{
+			const nextSec = 1000 - (Date.now() % 1000);
+			setTimeout(() =>{
+				ew.sys.emit('sec',new Date().getSeconds());
+				ew.sys.cron.event.sec();
+			},nextSec);
+		},
+		*/
 	},
 	task: {
 
@@ -70,15 +86,19 @@ ew.sys.reset = function(c) {
 			"code":"123456",
 		},
 		"face": {
+			"main":"clock",
 			"info": 1,
 			"buzz": 1,
 			"scrn": 1,
 			"txt": 0,
-			"size": 0.85,
+			"size": 0.91,
 			"buzz": 1,
 			"bri": 7,
 			"off": {},
-			"bpp": 4
+			"bpp": 4,
+			"left":"itag",
+			"rght":"timer",
+			"btnL":"torch"
 		},
 		"time": {
 			"hr24": 1,
@@ -117,16 +137,17 @@ else ew.def = 0;
 
 if (!ew.def || ew.def.name == "eucLight") {
 	ew.sys.reset();
-	setTimeout(() => { reset(); }, 3000);
+	setTimeout(() => { E.reboot(); }, 3000);
 }
 
-ew.is = {
-	bt: 0,
-	ondc: 0,
-	btsl: 0,
-	boot: getTime(),
-	lowBattery: 0
-};
+
+ew.is.bt= 0;
+ew.is.ondc= 0;
+ew.is.btsl= 0;
+ew.is.boot= getTime();
+ew.is.lowBattery= 0;
+if (!ew.def.face.main) ew.def.face.main="clock";
+
 
 // ---- buzzer ----
 
@@ -208,10 +229,14 @@ if (ew.def.face.size && ew.UI) {
 
 // ---- auto save defaults ----
 ew.sys.on('hour', function(x){
-    if (x === 0) {
-        setTimeout=(()=>{
-        ew.sys.updt();
-        },120000);
+    if (x === 0  ) {
+    	if ( ew.sys.batt(1) < 25) {
+    		if (ew.UI) ew.UI.btn.ntfy(1, 2, 0, "_bar", 6, "AUTO SAVE", "LOW BAT", 15, 13);
+    	}else{
+	        setTimeout(()=>{
+	        	ew.sys.updt();
+	        },120000);
+    	}
 	}
 	if (ew.def.time.hour) ew.sys.buzz.nav([100,500,100]);
 		

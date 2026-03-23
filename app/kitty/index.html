@@ -1,0 +1,844 @@
+<!DOCTYPE html>
+<html lang="el">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <title>Kitty Settings</title>
+    <link rel="stylesheet" href="/common.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            overflow-y: auto !important;
+            overflow-x: hidden !important;
+            min-height: 100vh;
+            width: 100%;
+            max-width: 100vw;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 16px;
+            min-height: 100vh;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        h1 {
+            font-size: 24px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .header-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 24px;
+            padding: 12px 16px;
+            background-color: var(--color-surface);
+            border-radius: 12px;
+            font-size: 14px;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .tab-btn {
+            padding: 8px 16px;
+            background: var(--color-surface);
+            border: none;
+            border-radius: 6px;
+            color: var(--color-on-surface);
+            font-size: 15px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .tab-btn.active {
+            background: var(--color-primary);
+            color: #000;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .settings-group {
+            background: var(--color-surface);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .group-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--color-primary);
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .setting-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .setting-item:last-child {
+            border-bottom: none;
+        }
+
+        .setting-label {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: var(--color-on-surface);
+            font-size: 16px;
+        }
+
+        .setting-label i {
+            width: 24px;
+            color: var(--color-primary);
+        }
+
+        .setting-label small {
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 12px;
+            margin-left: 8px;
+        }
+
+        .checkbox {
+            width: 52px;
+            height: 28px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 14px;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .checkbox.active {
+            background: var(--color-primary);
+        }
+
+        .checkbox::after {
+            content: '';
+            position: absolute;
+            width: 24px;
+            height: 24px;
+            background: white;
+            border-radius: 12px;
+            top: 2px;
+            left: 2px;
+            transition: all 0.2s;
+        }
+
+        .checkbox.active::after {
+            left: 26px;
+        }
+
+        select,
+        input[type="number"] {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--color-on-surface);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 16px;
+            min-width: 120px;
+        }
+
+        .slider-container {
+            flex: 1;
+            max-width: 250px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .slider-container input[type="range"] {
+            flex: 1;
+            height: 4px;
+            -webkit-appearance: none;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 2px;
+        }
+
+        .slider-container input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            background: var(--color-primary);
+            border-radius: 10px;
+            cursor: pointer;
+        }
+
+        .slider-value {
+            min-width: 45px;
+            text-align: center;
+            color: var(--color-primary);
+            font-weight: 600;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-top: 16px;
+        }
+
+        .info-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 16px;
+        }
+
+        .info-label {
+            font-size: 12px;
+            opacity: 0.7;
+            margin-bottom: 8px;
+        }
+
+        .info-value {
+            font-size: 24px;
+            font-weight: 600;
+            color: var(--color-primary);
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 12px;
+            margin-top: 24px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: var(--color-primary);
+            color: #000;
+        }
+
+        .btn-primary:hover {
+            background: var(--color-primary);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--color-on-surface);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .btn-success {
+            background: #4CAF50;
+            color: white;
+        }
+
+        .btn-warning {
+            background: #c0392b;
+            color: white;
+        }
+
+        .badge {
+            padding: 4px 8px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .badge-success {
+            background: rgba(76, 175, 80, 0.2);
+            color: #4CAF50;
+        }
+
+        /* State Tab Styles */
+
+        .state-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .state-card {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 12px;
+            padding: 16px;
+        }
+
+        .state-card-title {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--color-primary);
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .state-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.02);
+            font-size: 13px;
+        }
+
+        .state-row:last-child {
+            border-bottom: none;
+        }
+
+        .state-label {
+            opacity: 0.7;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .state-value {
+            font-weight: 500;
+            color: var(--color-primary);
+        }
+
+        .state-value-badge {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+        }
+
+        .status-led {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 6px;
+        }
+
+        .led-red {
+            background: #ff4444;
+            box-shadow: 0 0 5px #ff4444;
+        }
+
+        .led-green {
+            background: #4CAF50;
+            box-shadow: 0 0 5px #4CAF50;
+        }
+
+        .led-yellow {
+            background: #ffbb33;
+            box-shadow: 0 0 5px #ffbb33;
+        }
+
+        .led-blue {
+            background: #33b5e5;
+            box-shadow: 0 0 5px #33b5e5;
+        }
+
+        .led-gray {
+            background: #666;
+        }
+
+        .refresh-indicator {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.5);
+            margin-bottom: 16px;
+        }
+
+        .spinner {
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            from {
+                transform: rotate(0deg);
+            }
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        @media (max-width: 600px) {
+            .header-buttons {
+                flex-direction: column;
+                width: 100%;
+            }
+
+            header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .tabs {
+                flex-direction: column;
+            }
+
+            .tab-btn {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .setting-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 12px;
+            }
+
+            .slider-container {
+                max-width: 100%;
+                width: 100%;
+            }
+
+            select,
+            input[type="number"] {
+                width: 100%;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+            }
+
+            .action-buttons .btn {
+                width: 100%;
+            }
+
+            .info-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .state-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .status {
+            display: none;
+        }
+
+        #stateRefreshSpinner {
+            width: 20px;
+            display: inline-block;
+            text-align: center;
+            opacity: 1;
+            transition: opacity 0.2s;
+        }
+
+        #stateRefreshSpinner.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-cat"></i> <span id="titleText">Kitty</span></h1>
+            <div class="header-buttons">
+                <button id="refreshBtn" class="btn btn-primary">
+                    <i class="fas fa-sync-alt"></i> <span id="refreshText">Ανανέωση</span>
+                </button>
+                <button id="saveBtn" class="btn btn-secondary">
+                    <i class="fas fa-save"></i> <span id="saveText">Αποθήκευση</span>
+                </button>
+                <button id="manualCleanBtn" class="btn btn-success">
+                    <i class="fas fa-broom"></i> <span id="manualCleanText">Καθαρισμός</span>
+                </button>
+                <button id="emptyBtn" class="btn btn-warning">
+                    <i class="fas fa-trash-alt"></i> <span id="emptyText">Άδειασμα</span>
+                </button>
+            </div>
+        </header>
+
+        <div class="status">
+            <div class="status-dot connected" id="statusDot"></div>
+            <span id="statusText">Συνδεδεμένοι μέσω eW Launcher</span>
+        </div>
+
+        <div class="tabs">
+            <button class="tab-btn active" data-tab="main">
+                <i class="fas fa-cog"></i> <span id="mainTabText">Κύριες</span>
+            </button>
+            <button class="tab-btn" data-tab="sand">
+                <i class="fas fa-cube"></i> <span id="sandTabText">Άμμος</span>
+            </button>
+            <button class="tab-btn" data-tab="advanced">
+                <i class="fas fa-microchip"></i> <span id="advancedTabText">Για προχωρημένους</span>
+            </button>
+            <button class="tab-btn" data-tab="stats">
+                <i class="fas fa-chart-bar"></i> <span id="statsTabText">Στατιστικά</span>
+            </button>
+            <button class="tab-btn" data-tab="state">
+                <i class="fas fa-heartbeat"></i> <span id="stateTabText">Κατάσταση</span>
+            </button>
+        </div>
+
+        <!-- Main Settings Tab -->
+        <div class="tab-content active" id="mainTab">
+            <div class="settings-group">
+                <div class="group-title">
+                    <i class="fas fa-robot"></i>
+                    <span id="autoCleanTitle">Αυτόματος Καθαρισμός</span>
+                </div>
+                <div class="setting-item">
+                    <div class="setting-label">
+                        <i class="fas fa-power-off"></i>
+                        <span id="autoCleanLabel">Αυτόματος καθαρισμός</span>
+                    </div>
+                    <div class="checkbox" id="autoClean" onclick="window.toggleCheckbox('autoClean')"></div>
+                </div>
+                <div class="setting-item">
+                    <div class="setting-label">
+                        <i class="fas fa-hourglass-half"></i>
+                        <span id="delayLabel">Καθυστέρηση</span>
+                        <small id="minutesLabel">λεπτά</small>
+                    </div>
+                    <div class="slider-container">
+                        <input type="range" id="autoDelay" min="1" max="20" value="3">
+                        <span class="slider-value" id="autoDelayValue">3</span>
+                    </div>
+                </div>
+                <div class="setting-item">
+                    <div class="setting-label">
+                        <i class="fas fa-pause-circle"></i>
+                        <span id="autoPauseLabel">Αυτόματη παύση</span>
+                        <small id="pauseScaleLabel">(down scale)</small>
+                    </div>
+                    <div class="checkbox" id="autoPause" onclick="window.toggleCheckbox('autoPause')"></div>
+                </div>
+                <div class="setting-item">
+                    <div class="setting-label">
+                        <i class="fas fa-sun"></i>
+                        <span id="autoLightLabel">Αυτόματο φως</span>
+                    </div>
+                    <div class="checkbox" id="autoLight" onclick="window.toggleCheckbox('autoLight')"></div>
+                </div>
+            </div>
+
+            <div class="settings-group">
+                <div class="group-title">
+                    <i class="fas fa-shield-alt"></i>
+                    <span id="uvcTitle">UV-C Λάμπα</span>
+                </div>
+                <div class="setting-item">
+                    <div class="setting-label">
+                        <i class="fas fa-radiation"></i>
+                        <span id="uvcLabel">Ενεργοποίηση UV-C</span>
+                    </div>
+                    <div class="checkbox" id="uvc" onclick="window.toggleCheckbox('uvc')"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sand Settings Tab -->
+        <div class="tab-content" id="sandTab">
+            <div class="settings-group">
+                <div class="group-title">
+                    <i class="fas fa-cube"></i>
+                    <span id="sandTypeTitle">Τύπος Άμμου</span>
+                </div>
+                <div class="setting-item">
+                    <div class="setting-label">
+                        <i class="fas fa-tint"></i>
+                        <span id="sandTypeLabel">Τύπος</span>
+                    </div>
+                    <select id="sandType">
+                        <option value="1">Bentonite</option>
+                        <option value="2">Silicone</option>
+                        <option value="3">Pellet</option>
+                        <option value="4">Tofu</option>
+                    </select>
+                </div>
+                <div class="setting-item">
+                    <div class="setting-label">
+                        <i class="fas fa-forward"></i>
+                        <span id="prepLabel">Prepare Motion</span>
+                    </div>
+                    <div class="checkbox" id="sandPrep" onclick="window.toggleCheckbox('sandPrep')"></div>
+                </div>
+                <div class="setting-item">
+                    <div class="setting-label">
+                        <i class="fas fa-tachometer-alt"></i>
+                        <span id="speedLabel">Ταχύτητα</span>
+                        <small id="speedRangeLabel">1-9</small>
+                    </div>
+                    <div class="slider-container">
+                        <input type="range" id="sandSpeed" min="1" max="9" value="1">
+                        <span class="slider-value" id="sandSpeedValue">1</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="settings-group">
+                <div class="group-title">
+                    <i class="fas fa-chart-line"></i>
+                    <span id="sandLimitsTitle">Όρια Άμμου</span>
+                </div>
+                <div class="setting-item">
+                    <div class="setting-label">
+                        <i class="fas fa-arrow-up"></i>
+                        <span id="maxSandLabel">Μέγιστο</span>
+                    </div>
+                    <input type="number" id="sandMax" min="100" max="5000" step="100">
+                </div>
+                <div class="setting-item">
+                    <div class="setting-label">
+                        <i class="fas fa-arrow-down"></i>
+                        <span id="minSandLabel">Ελάχιστο</span>
+                    </div>
+                    <input type="number" id="sandMin" min="100" max="5000" step="100">
+                </div>
+            </div>
+        </div>
+
+        <!-- Advanced Settings Tab -->
+        <div class="tab-content" id="advancedTab">
+            <div class="settings-group">
+                <div class="group-title">
+                    <i class="fas fa-microchip"></i>
+                    <span id="hardwareTitle">Hardware</span>
+                </div>
+                <div class="setting-item">
+                    <div class="setting-label">
+                        <i class="fas fa-weight"></i>
+                        <span id="scaleLabel">Ζυγαριά</span>
+                    </div>
+                    <div class="checkbox" id="hwScale" onclick="window.toggleCheckbox('hwScale')"></div>
+                </div>
+                <div class="setting-item">
+                    <div class="setting-label">
+                        <i class="fas fa-ruler"></i>
+                        <span id="tofLabel">Αισθητήρας ToF</span>
+                    </div>
+                    <div class="checkbox" id="hwTof" onclick="window.toggleCheckbox('hwTof')"></div>
+                </div>
+                <div class="setting-item">
+                    <div class="setting-label">
+                        <i class="fas fa-lock"></i>
+                        <span id="lidLabel">Καπάκι</span>
+                    </div>
+                    <div class="checkbox" id="hwLid" onclick="window.toggleCheckbox('hwLid')"></div>
+                </div>
+                <div class="setting-item">
+                    <div class="setting-label">
+                        <i class="fas fa-wave-square"></i>
+                        <span id="vibratorLabel">Δονητής</span>
+                    </div>
+                    <div class="checkbox" id="hwVibrator" onclick="window.toggleCheckbox('hwVibrator')"></div>
+                </div>
+                <div class="setting-item">
+                    <div class="setting-label">
+                        <i class="fas fa-bolt"></i>
+                        <span id="voltMonLabel">Παρακολούθηση τάσης</span>
+                    </div>
+                    <div class="checkbox" id="hwVoltMon" onclick="window.toggleCheckbox('hwVoltMon')"></div>
+                </div>
+            </div>
+
+            <div class="settings-group">
+                <div class="group-title">
+                    <i class="fas fa-sliders-h"></i>
+                    <span id="calibrationTitle">Calibration</span>
+                </div>
+                <div class="setting-item">
+                    <div class="setting-label">
+                        <i class="fas fa-draw-polygon"></i>
+                        <span id="clbLabel">Ball Calibration</span>
+                        <small id="clbRangeLabel">-9 έως 0</small>
+                    </div>
+                    <div class="slider-container">
+                        <input type="range" id="calibration" min="-9" max="0" value="0" step="1">
+                        <span class="slider-value" id="calibrationValue">0</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="settings-group">
+                <div class="group-title">
+                    <i class="fas fa-ruler-vertical"></i>
+                    <span id="tofSettingsTitle">Ρυθμίσεις ToF</span>
+                </div>
+                <div class="setting-item">
+                    <div class="setting-label">
+                        <span id="tofEmptyLabel">Τιμή Empty</span>
+                    </div>
+                    <input type="number" id="tofEmpty" step="0.1" value="43.5">
+                </div>
+                <div class="setting-item">
+                    <div class="setting-label">
+                        <span id="tofFullLabel">Τιμή Full</span>
+                    </div>
+                    <input type="number" id="tofFull" step="0.1" value="35">
+                </div>
+                <div class="setting-item">
+                    <div class="setting-label">
+                        <span id="tofLostLabel">Τιμή Lost</span>
+                    </div>
+                    <input type="number" id="tofLost" step="0.1" value="6553.5">
+                </div>
+            </div>
+
+            <div class="settings-group">
+                <div class="group-title">
+                    <i class="fas fa-clock"></i>
+                    <span id="scheduleTitle">Προγραμματισμός</span>
+                </div>
+                <div class="setting-item">
+                    <div class="setting-label">
+                        <span id="scheduleEnableLabel">Ενεργός προγραμματισμός</span>
+                    </div>
+                    <div class="checkbox" id="scheduleEnable" onclick="window.toggleCheckbox('scheduleEnable')"></div>
+                </div>
+                <div class="setting-item">
+                    <div class="setting-label">
+                        <span id="scheduleHoursLabel">Ώρες</span>
+                    </div>
+                    <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                        <input type="number" id="hour1" min="0" max="23" value="2" style="width: 70px;">
+                        <input type="number" id="hour2" min="0" max="23" value="8" style="width: 70px;">
+                        <input type="number" id="hour3" min="0" max="23" value="15" style="width: 70px;">
+                        <input type="number" id="hour4" min="0" max="23" value="20" style="width: 70px;">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stats Tab -->
+        <div class="tab-content" id="statsTab">
+            <div class="settings-group">
+                <div class="group-title">
+                    <i class="fas fa-chart-pie"></i>
+                    <span id="statsTitle">Στατιστικά Λειτουργίας</span>
+                </div>
+                <div class="info-grid">
+                    <div class="info-card">
+                        <div class="info-label" id="totalCyclesLabel">Συνολικοί κύκλοι</div>
+                        <div class="info-value" id="totalCycles">0</div>
+                    </div>
+                    <div class="info-card">
+                        <div class="info-label" id="todayCyclesLabel">Σήμερα</div>
+                        <div class="info-value" id="todayCycles">0</div>
+                    </div>
+                    <div class="info-card">
+                        <div class="info-label" id="failCountLabel">Αποτυχίες</div>
+                        <div class="info-value" id="failCount">0</div>
+                    </div>
+                    <div class="info-card">
+                        <div class="info-label" id="wasteLevelLabel">Επίπεδο απορριμμάτων</div>
+                        <div class="info-value" id="wasteLevel">0%</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="settings-group">
+                <div class="group-title">
+                    <i class="fas fa-battery-three-quarters"></i>
+                    <span id="powerStatusTitle">Κατάσταση Ισχύος</span>
+                </div>
+                <div class="info-grid">
+                    <div class="info-card">
+                        <div class="info-label" id="batteryLabel">Μπαταρία</div>
+                        <div class="info-value" id="batteryLevel">0%</div>
+                    </div>
+                    <div class="info-card">
+                        <div class="info-label" id="powerBankLabel">Power Bank</div>
+                        <div class="info-value" id="powerStatus">
+                            <span class="badge" id="powerBadge">OFF</span>
+                        </div>
+                    </div>
+                    <div class="info-card">
+                        <div class="info-label" id="chargingLabel">Φόρτιση</div>
+                        <div class="info-value" id="chargingStatus">
+                            <span class="badge" id="chargingBadge">Όχι</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- State Tab (Νέα) -->
+        <div class="tab-content" id="stateTab">
+            <div class="refresh-indicator">
+                <i class="fas fa-sync-alt spinner" id="stateRefreshSpinner" style="display: none;"></i>
+                <span id="stateLastUpdate">Τελευταία ενημέρωση: --:--:--</span>
+                <span id="stateUpdateStatus" style="color: var(--color-primary);"></span>
+            </div>
+
+            <div class="state-grid" id="stateContainer">
+                <!-- Τα δεδομένα θα μπουν εδώ δυναμικά από το JavaScript -->
+            </div>
+        </div>
+
+        <!--<div class="refresh-indicator">
+            <i class="fas fa-sync-alt spinner" id="stateRefreshSpinner"></i>
+            <span id="stateLastUpdate">Τελευταία ενημέρωση: --:--:--</span>
+            <span id="stateUpdateStatus" style="color: var(--color-primary);"></span>
+        </div>
+        -->
+
+    </div>
+
+    <script src="app.js"></script>
+</body>
+
+</html>

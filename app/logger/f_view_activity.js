@@ -5,7 +5,7 @@ ew.UI.nav.next.replaceWith(() => {
 });
 ew.UI.nav.back.replaceWith(() => {
     ew.sys.buzz.nav(ew.sys.buzz.type.ok);
-    ew.face.go("main", 0);
+    ew.face.go(ew.def.face.main, 0);
 });
 
 ew.face[0] = {

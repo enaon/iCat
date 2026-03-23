@@ -3,8 +3,8 @@ ew.def.dev.acctype = "b2";
 
 ew.sys.acc = {
 	state: 0,
-	tap:{t1:0,t2:0,t4:0,t8:0,t16:0,t32:0},
-	tid:0,
+	tap: { t1: 0, t2: 0, t4: 0, t8: 0, t16: 0, t32: 0 },
+	tid: 0,
 	regDump: function(reg) {
 		val = Bangle.accelRd(reg, 1)[0];
 		return val.toString(10) + " 0x" + val.toString(16) + " %" + val.toString(2);
@@ -17,7 +17,7 @@ ew.sys.acc = {
 		if (!i) {
 			this.stop();
 			return;
-		} 
+		}
 		if (ew.tid.acc) {
 			clearWatch(ew.tid.acc);
 			ew.tid.acc = 0;
@@ -35,13 +35,13 @@ ew.sys.acc = {
 			//Bangle.accelWr(0x32,0x0C); //22 degrees -default value 
 			//Bangle.accelWr(0x32,0x03); //6 degrees
 			Bangle.accelWr(0x32, 0x08); //14.5 degrees
-			Bangle.accelWr(0x33,0x2A);//TILT_ANGLE_HL -default value 
+			Bangle.accelWr(0x33, 0x2A); //TILT_ANGLE_HL -default value 
 			//Bangle.accelWr(0x33, 0x1E); //TILT_ANGLE_HL
 			Bangle.accelWr(0x1f, 0x01); //tilt report on int1
 			Bangle.accelWr(0x1c, 0x30); //enable int1
 			Bangle.accelWr(0x18, 0x81); //opp mode-low current-int1-tilt
 		}
-		
+
 		// ---- tap  low curent----			
 		else if (i === 2) {
 			//Bangle.accelWr(0x18, 0x04); //standby mode-low current-int1-2g-tap
@@ -49,8 +49,8 @@ ew.sys.acc = {
 			//Bangle.accelWr(0x18, 0x1C); //standby mode-low current-int1-8g-tap
 			Bangle.accelWr(0x1f, 0x04); //tap report on int1
 			Bangle.accelWr(0x1c, 0x30); //enable int1
-			 Bangle.accelWr(0x2A, 0x00); // TLT = 0 (no delay)
-			Bangle.accelWr(0x2B, 0x28); // TWS = 40ms (small window)
+			Bangle.accelWr(0x2A, 0x00); // TLT = 0 (no delay)
+			Bangle.accelWr(0x2B, 0x14); // TWS = 40ms (small window)
 			//Bangle.accelWr(0x24, 0x03); //enable tap/double tap reporting
 			Bangle.accelWr(0x24, 0x01); //enable only tap reporting
 			//Bangle.accelWr(0x18, 0x84); //opp mode-low current-int1-2g-tap
@@ -59,7 +59,7 @@ ew.sys.acc = {
 
 		}
 		// ---- tilt & tap  low curent ----
-		else if (i ===3) {
+		else if (i === 3) {
 			//Bangle.accelWr(0x18, 0x05); //standby mode-low current-int1-tilt-2g
 			Bangle.accelWr(0x18, 0x0D); //standby mode-low current-int1-tilt-4g
 			//Bangle.accelWr(0x18, 0x0D); //standby mode-low current-int1-tilt-8g
@@ -68,10 +68,10 @@ ew.sys.acc = {
 			//Bangle.accelWr(0x32,0x0C); //22 degrees -default value 
 			//Bangle.accelWr(0x32,0x03); //6 degrees
 			Bangle.accelWr(0x32, 0x08); //14.5 degrees
-			Bangle.accelWr(0x33,0x2A);//TILT_ANGLE_HL -default value 
+			Bangle.accelWr(0x33, 0x2A); //TILT_ANGLE_HL -default value 
 			//Bangle.accelWr(0x33, 0x1E); //TILT_ANGLE_HL
 			Bangle.accelWr(0x2A, 0x00); // TLT = 0 (no delay)
-			Bangle.accelWr(0x2B, 0x28); // TWS = 40ms (small window)
+			Bangle.accelWr(0x2B, 0x14); // TWS = 40ms (small window)
 			Bangle.accelWr(0x1f, 0x05); //tilt -tap report on int1
 			Bangle.accelWr(0x1c, 0x30); //enable int1
 			//Bangle.accelWr(0x18, 0x85); //opp mode-low current-int1-tilt-2g
@@ -115,7 +115,7 @@ ew.sys.acc = {
 		this.state = i ? i : 6;
 		if (ew.sys.acc.dbg) console.log("acc, this.state:", this.state);
 
-		ew.tid.acc = setWatch((s)=>{
+		ew.tid.acc = setWatch((s) => {
 			if (s.state) {
 				let state = Bangle.accelRd(0x10, 4);
 				if (ew.sys.acc.dbg) console.log("acc, reg state, state[2]:", state, state[2]);
@@ -124,6 +124,7 @@ ew.sys.acc = {
 					if (state[0] === 8) {
 						Bangle.accelWr(0x19, 0x37); //tilt axis mask - good on the DSD6
 						if (!g.isOn) {
+							//ew.def.dev.bl=1;
 							ew.face.go(ew.face.appCurr, 0, ew.face.pageArg);
 						}
 						else ew.face.off();
@@ -141,28 +142,30 @@ ew.sys.acc = {
 				// tap
 				else {
 					// single
-					if (state[3] === 4 ) {
-						let dir= state[2];
+					if (state[3] === 4) {
+						let dir = state[2];
 						if (!this.tid) {
-        					this.tid=setTimeout(()=>{
-        						this.tid=0;
-								
-        						this.tap={t1:0,t2:0,t4:0,t8:0,t16:0,t32:0};
-        					},300);
-    					}
-						if (ew.sys.acc.dbg) console.log("acc, this.tap:",this.tap);
-    					this.tap["t"+dir] ++;
-    					if (dir === 32 || dir === 1 || dir === 4 )  this.tap={t1:0,t2:0,t4:0,t8:0,t16:0,t32:0};
-    					else if (!g.isOn && this.tap.t2===2 || this.tap.t8===2 || (this.tap.t2===1 && this.tap.t8===1) ) ew.face.go(ew.face.appCurr,0, ew.face.pageArg);
-						else if (this.tap.t16===2) ew.sys.emit("button","long");
+							this.tid = setTimeout(() => {
+								this.tid = 0;
+
+								this.tap = { t1: 0, t2: 0, t4: 0, t8: 0, t16: 0, t32: 0 };
+							}, 300);
+						}
+						if (ew.sys.acc.dbg) console.log("acc, this.tap:", this.tap);
+						this.tap["t" + dir]++;
+						if (dir === 32 || dir === 1 || dir === 4) this.tap = { t1: 0, t2: 0, t4: 0, t8: 0, t16: 0, t32: 0 };
+						else if (!g.isOn && this.tap.t2 === 2 || this.tap.t8 === 2 || (this.tap.t2 === 1 && this.tap.t8 === 1)) ew.face.go(ew.face.appCurr, 0, ew.face.pageArg);
+						//else if (!ew.def.dev.bl && process.env.BOARD == "BANGLEJS2" ) {ew.def.dev.bl=1;g.bri.set(ew.def.face.bri);} 
+						else if (ew.def.dev.ttap && this.tap.t16 === 2) ew.sys.emit("button", "long");
 						//ew.sys.emit("tap", state[2]);
 					}
 					// double
-					else if (state[3] === 8 && state[2] == 2){
-						if (ew.sys.acc.dbg) console.log("acc, double tap:"+state);
+					else if (state[3] === 8 && state[2] == 2) {
+						if (ew.sys.acc.dbg) console.log("acc, double tap:" + state);
 						if (!g.isOn) {
 							ew.face.go(ew.face.appCurr, 0, ew.face.pageArg);
-						}else ew.face.off();
+						}
+						else ew.face.off();
 						//ew.sys.emit("tap", "double", state[2]);
 					}
 				}
@@ -186,14 +189,46 @@ ew.sys.acc = {
 		//		Bangle.accelWr(0x1A,0x00); //cntrl3 slow
 	},
 	updt: function(mode) {
-			if (ew.def.dev.acc) 
+		/*	if (ew.def.dev.acc) 
 				ew.sys.acc.start(mode);
 			else 
 				ew.sys.acc.stop();
+		*/
 	}
 };
 
 
+Bangle.on('faceUp', function(up) {
+	if (!ew.def.dev.tilt) return;
+	if (up) {
+		if (!g.isOn) {
+			ew.face.go(ew.face.appCurr, 0, ew.face.pageArg);
+		}
+		else ew.face.off();
+	}
+	else {
+
+		let tout = ew.def.face.off[ew.face.appCurr];
+		if (!tout || (tout && tout <= 60000))
+			ew.face.off(1500);
+	}
+
+});
+
+
+Bangle.on('tap', function(data) {
+	if ( !data.double) return;
+
+	if (ew.def.dev.tap && data.dir === "front" ) {
+		if (!g.isOn) {
+			ew.face.go(ew.face.appCurr, 0, ew.face.pageArg);
+		}
+		else ew.face.off();
+	}
+	else if ( data.dir=="right" && ew.def.dev.ttap ) ew.sys.emit("button", "long");
+
+
+});
 
 /*
 

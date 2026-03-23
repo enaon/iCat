@@ -61,7 +61,7 @@ document.addEventListener('DOMContentLoaded', function() {
             syncConfirm: "Θέλετε να συγχρονίσετε την τρέχουσα ώρα του browser στη συσκευή;",
             syncing: "Συγχρονισμός ώρας...",
             syncSuccess: "Η ώρα συγχρονίστηκε επιτυχώς",
-            syncError: "Σφάλμα συγχρονισμού ώρας",            
+            syncError: "Σφάλμα συγχρονισμού ώρας",
             exportSettings: "Εξαγωγή",
             importSettings: "Εισαγωγή",
             saveSettings: "Αποθήκευση",
@@ -134,11 +134,11 @@ document.addEventListener('DOMContentLoaded', function() {
             timeHr24: "24 Hour Mode",
             timeTimezone: "Timezone",
             syncTime: "Sync Browser Time",
-            syncTimeInfo: "Sync current browser time to device", 
+            syncTimeInfo: "Sync current browser time to device",
             syncConfirm: "Do you want to sync current browser time to device?",
             syncing: "Syncing time...",
             syncSuccess: "Time synced successfully",
-            syncError: "Time sync error",            
+            syncError: "Time sync error",
             exportSettings: "Export",
             importSettings: "Import",
             saveSettings: "Save",
@@ -150,7 +150,7 @@ document.addEventListener('DOMContentLoaded', function() {
             statusConnected: "Connected via eW Launcher",
             statusReading: "Reading data...",
             statusRefreshing: "Refreshing...",
-            resetDevice: "Reboot", 
+            resetDevice: "Reboot",
             resetConfirm: "Are you sure you want to reset the device? This action cannot be undone.",
             resetting: "Resetting...",
             resetSuccess: "Device reset successfully",
@@ -207,19 +207,19 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             });
         }
-        
+
         // UART Checkbox warning
         const btUartCheckbox = document.getElementById('btUart');
         if (btUartCheckbox) {
             btUartCheckbox.addEventListener('change', handleUartToggle);
         }
-        
+
         // time sync
-         const syncTimeBtn = document.getElementById('syncTimeBtn');
+        const syncTimeBtn = document.getElementById('syncTimeBtn');
         if (syncTimeBtn) {
             syncTimeBtn.addEventListener('click', syncTime);
         }
-    
+
         // reset
         const resetDeviceBtn = document.getElementById('resetDeviceBtn');
         if (resetDeviceBtn) {
@@ -242,7 +242,7 @@ document.addEventListener('DOMContentLoaded', function() {
         // Parent messages
         window.addEventListener('message', handleParentMessage);
     }
-    
+
 
     function handleParentMessage(event) {
         console.log("Settings app received message:", event.data);
@@ -303,40 +303,40 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('noWd').checked = settings.noWd === 1;
         document.getElementById('frce').checked = settings.frce === 1;
 
-        // Face settings
+        // Face settings - χρησιμοποίησε optional chaining με fallback
         document.getElementById('faceInfo').checked = settings.face?.info === 1;
-        document.getElementById('faceBuzz').checked = settings.face?.buzz === 1;
+        document.getElementById('faceBuzz').checked = settings.face.buzz === 1;
         document.getElementById('faceScrn').checked = settings.face?.scrn === 1;
         document.getElementById('faceTxt').checked = settings.face?.txt === 1;
-        document.getElementById('faceSize').value = settings.face?.size || 0.8;
-        document.getElementById('faceBri').value = settings.face?.bri || 7;
-        document.getElementById('faceBpp').value = settings.face?.bpp || 4;
+        document.getElementById('faceSize').value = settings.face?.size ?? 0.8;
+        document.getElementById('faceBri').value = settings.face?.bri ?? 7;
+        document.getElementById('faceBpp').value = settings.face?.bpp ?? 4;
 
         // Bluetooth settings
-        document.getElementById('btPhyC').value = settings.bt ?.phyC || '1mbps';
-        document.getElementById('btPhyA').value = settings.bt ?.phyA || '1mbps';
-        document.getElementById('btUart').checked = settings.bt ?.uart === 1;
-        document.getElementById('btRfTX').value = settings.bt ?.rfTX || 8;
-        document.getElementById('btIntA').value = settings.bt ?.intA || 1626;
-        document.getElementById('btIntC').value = settings.bt ?.intC || 'auto';
-        document.getElementById('btMtu').value = settings.bt ?.mtu || 90;
-        document.getElementById('btConn').value = settings.bt ?.conn === 1 ? 'TRUE' : 'FALSE';
-        document.getElementById('btAdv').value = settings.bt ?.adv === 1 ? 'TRUE' : 'FALSE';
-        document.getElementById('btAddr').value = settings.bt ?.addr || '';
-        document.getElementById('btCode').value = settings.bt?.code || '';
+        document.getElementById('btPhyC').value = settings.bt?.phyC ?? '1mbps';
+        document.getElementById('btPhyA').value = settings.bt?.phyA ?? '1mbps';
+        document.getElementById('btUart').checked = settings.bt?.uart === 1;
+        document.getElementById('btRfTX').value = settings.bt?.rfTX ?? 8;
+        document.getElementById('btIntA').value = settings.bt?.intA ?? 1626;
+        document.getElementById('btIntC').value = settings.bt?.intC ?? 'auto';
+        document.getElementById('btMtu').value = settings.bt?.mtu ?? 90;
+        document.getElementById('btConn').value = settings.bt?.conn === 1 ? 'TRUE' : 'FALSE';
+        document.getElementById('btAdv').value = settings.bt?.adv === 1 ? 'TRUE' : 'FALSE';
+        document.getElementById('btAddr').value = settings.bt?.addr ?? '';
+        document.getElementById('btCode').value = settings.bt?.code ?? '';
         document.getElementById('btPair').checked = settings.bt?.pair === 1;
 
         // Device settings
-        document.getElementById('devAcc').checked = settings.dev ?.acc === 1;
-        document.getElementById('devAccM').value = settings.dev ?.accM || 0;
-        document.getElementById('devTouchType').value = settings.dev ?.touchtype || '0';
-        document.getElementById('devAccType').value = settings.dev ?.acctype || '0';
-        document.getElementById('devBoard').value = settings.dev ?.board || '';
-        document.getElementById('devFirm').value = settings.dev ?.firm || '';
+        document.getElementById('devAcc').checked = settings.dev?.acc === 1;
+        document.getElementById('devAccM').value = settings.dev?.accM ?? 0;
+        document.getElementById('devTouchType').value = settings.dev?.touchtype ?? '0';
+        document.getElementById('devAccType').value = settings.dev?.acctype ?? '0';
+        document.getElementById('devBoard').value = settings.dev?.board ?? '';
+        document.getElementById('devFirm').value = settings.dev?.firm ?? '';
 
         // Time settings
-        document.getElementById('timeHr24').checked = settings.time ?.hr24 === 1;
-        document.getElementById('timeTimezone').value = settings.time ?.timezone || '3';
+        document.getElementById('timeHr24').checked = settings.time?.hr24 === 1;
+        document.getElementById('timeTimezone').value = settings.time?.timezone ?? '3';
 
         updateRangeValue();
     }
@@ -394,49 +394,50 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function collectFormData() {
-        return {
-            name: document.getElementById('deviceName').value,
-            role: currentRoles,
-            noWd: document.getElementById('noWd').checked ? 1 : 0,
-            frce: document.getElementById('frce').checked ? 1 : 0,
-            face: {
-                info: document.getElementById('faceInfo').checked ? 1 : 0,
-                buzz: document.getElementById('faceBuzz').checked ? 1 : 0,
-                scrn: document.getElementById('faceScrn').checked ? 1 : 0,
-                txt: document.getElementById('faceTxt').checked ? 1 : 0,
-                size: parseFloat(document.getElementById('faceSize').value),
-                bri: parseInt(document.getElementById('faceBri').value),
-                bpp: systemSettings.face ?.bpp || 4,
-                off: systemSettings.face ?.off || {}
-            },
-            bt: {
-                phyC: document.getElementById('btPhyC').value,
-                phyA: document.getElementById('btPhyA').value,
-                uart: document.getElementById('btUart').checked ? 1 : 0,
-                rfTX: parseInt(document.getElementById('btRfTX').value),
-                intA: parseInt(document.getElementById('btIntA').value),
-                intC: document.getElementById('btIntC').value,
-                mtu: parseInt(document.getElementById('btMtu').value),
-                conn: systemSettings.bt ?.conn || 1,
-                adv: systemSettings.bt ?.adv || 1,
-                addr: systemSettings.bt ?.addr || '',
-                code: document.getElementById('btCode').value,
-                pair: document.getElementById('btPair').checked ? 1 : 0
+        // systemSettings as base
+        const updatedSettings = JSON.parse(JSON.stringify(systemSettings)); // Deep copy
 
-            },
-            dev: {
-                touchtype: systemSettings.dev ?.touchtype || '0',
-                acctype: systemSettings.dev ?.acctype || '0',
-                acc: document.getElementById('devAcc').checked ? 1 : 0,
-                accM: parseInt(document.getElementById('devAccM').value),
-                board: systemSettings.dev ?.board || '',
-                firm: systemSettings.dev ?.firm || ''
-            },
-            time: {
-                hr24: document.getElementById('timeHr24').checked ? 1 : 0,
-                timezone: document.getElementById('timeTimezone').value
-            }
-        };
+        // General settings
+        if (document.getElementById('deviceName')) updatedSettings.name = document.getElementById('deviceName').value;
+        if (currentRoles) updatedSettings.role = currentRoles;
+        if (document.getElementById('noWd')) updatedSettings.noWd = document.getElementById('noWd').checked ? 1 : 0;
+        if (document.getElementById('frce')) updatedSettings.frce = document.getElementById('frce').checked ? 1 : 0;
+
+        // Face settings 
+        if (!updatedSettings.face) updatedSettings.face = {};
+        if (document.getElementById('faceInfo')) updatedSettings.face.info = document.getElementById('faceInfo').checked ? 1 : 0;
+        if (document.getElementById('faceBuzz')) updatedSettings.face.buzz = document.getElementById('faceBuzz').checked ? 1 : 0;
+        if (document.getElementById('faceScrn')) updatedSettings.face.scrn = document.getElementById('faceScrn').checked ? 1 : 0;
+        if (document.getElementById('faceTxt')) updatedSettings.face.txt = document.getElementById('faceTxt').checked ? 1 : 0;
+        if (document.getElementById('faceSize')) updatedSettings.face.size = parseFloat(document.getElementById('faceSize').value);
+        if (document.getElementById('faceBri')) updatedSettings.face.bri = parseInt(document.getElementById('faceBri').value);
+        if (document.getElementById('faceBpp')) updatedSettings.face.bpp = parseInt(document.getElementById('faceBpp').value);
+        // Κράτα το face.off όπως ήταν
+
+        // Bluetooth settings
+        if (!updatedSettings.bt) updatedSettings.bt = {};
+        if (document.getElementById('btPhyC')) updatedSettings.bt.phyC = document.getElementById('btPhyC').value;
+        if (document.getElementById('btPhyA')) updatedSettings.bt.phyA = document.getElementById('btPhyA').value;
+        if (document.getElementById('btUart')) updatedSettings.bt.uart = document.getElementById('btUart').checked ? 1 : 0;
+        if (document.getElementById('btRfTX')) updatedSettings.bt.rfTX = parseInt(document.getElementById('btRfTX').value);
+        if (document.getElementById('btIntA')) updatedSettings.bt.intA = parseInt(document.getElementById('btIntA').value);
+        if (document.getElementById('btIntC')) updatedSettings.bt.intC = document.getElementById('btIntC').value;
+        if (document.getElementById('btMtu')) updatedSettings.bt.mtu = parseInt(document.getElementById('btMtu').value);
+        if (document.getElementById('btCode')) updatedSettings.bt.code = document.getElementById('btCode').value;
+        if (document.getElementById('btPair')) updatedSettings.bt.pair = document.getElementById('btPair').checked ? 1 : 0;
+
+
+        // Device settings
+        if (!updatedSettings.dev) updatedSettings.dev = {};
+        if (document.getElementById('devAcc')) updatedSettings.dev.acc = document.getElementById('devAcc').checked ? 1 : 0;
+        if (document.getElementById('devAccM')) updatedSettings.dev.accM = parseInt(document.getElementById('devAccM').value);
+
+        // Time settings
+        if (!updatedSettings.time) updatedSettings.time = {};
+        if (document.getElementById('timeHr24')) updatedSettings.time.hr24 = document.getElementById('timeHr24').checked ? 1 : 0;
+        if (document.getElementById('timeTimezone')) updatedSettings.time.timezone = document.getElementById('timeTimezone').value;
+
+        return updatedSettings;
     }
 
     async function saveSettings() {
@@ -487,7 +488,7 @@ document.addEventListener('DOMContentLoaded', function() {
             await sendCommand('Bluetooth.println("System settings saved");\n');
             // update
             await sendCommand('\x10ew.sys.updt();\n');
-            
+
 
         }
         catch (error) {
@@ -624,91 +625,93 @@ document.addEventListener('DOMContentLoaded', function() {
 
         console.log("Language applied successfully!");
     }
-    
-    
+
+
     async function resetDevice() {
         const t = translations[currentLanguage];
-        
+
         if (!confirm(t.resetConfirm)) {
             return;
         }
-        
+
         try {
             const resetDeviceBtn = document.getElementById('resetDeviceBtn');
             const originalText = resetDeviceBtn.innerHTML;
-            
+
             // Απενεργοποίηση κουμπιού και εμφάνιση loading
             resetDeviceBtn.disabled = true;
             resetDeviceBtn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> ${t.resetting}`;
-            
+
             // Αποστολή reset command
             await sendCommand('\x10ew.sys.updt(10);\n');
-            
+
             // Μικρή καθυστέρηση για να δούμε το μήνυμα
             await new Promise(resolve => setTimeout(resolve, 2000));
-            
+
             alert(t.resetSuccess);
-            
+
             // Επαναφορά κουμπιού
             resetDeviceBtn.disabled = false;
             resetDeviceBtn.innerHTML = originalText;
-            
-        } catch (error) {
+
+        }
+        catch (error) {
             console.error('Reset error:', error);
             alert(t.resetError + ': ' + error.message);
-            
+
             // Επαναφορά κουμπιού σε περίπτωση σφάλματος
             const resetDeviceBtn = document.getElementById('resetDeviceBtn');
             resetDeviceBtn.disabled = false;
             resetDeviceBtn.innerHTML = `<i class="fas fa-power-off"></i> ${t.resetDevice}`;
         }
     }
-    
+
     async function syncTime() {
         const t = translations[currentLanguage];
-        
+
         if (!confirm(t.syncConfirm)) {
             return;
         }
-        
+
         try {
             const syncTimeBtn = document.getElementById('syncTimeBtn');
             const originalText = syncTimeBtn.innerHTML;
-            
+
             // Απενεργοποίηση κουμπιού και εμφάνιση loading
             syncTimeBtn.disabled = true;
             syncTimeBtn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> ${t.syncing}`;
-            
+
             // Λήψη τρέχουσας ώρας browser και timezone
             const now = new Date();
             const timestamp = Math.floor(now.getTime() / 1000); // Unix timestamp in seconds
             const timezoneOffset = -now.getTimezoneOffset() / 60; // Timezone offset in hours
-            
+
             // Δημιουργία εντολών για να οριστεί η ώρα και timezone
             const commands = [
                 `setTime(${timestamp});\n`,
                 `E.setTimeZone(${timezoneOffset});\n`
             ];
-            
+
             // Αποστολή όλων των εντολών
             for (const command of commands) {
                 await sendCommand(command);
                 await new Promise(resolve => setTimeout(resolve, 100)); // Μικρή καθυστέρηση μεταξύ εντολών
             }
-            
+
             // Επιβεβαίωση
             await sendCommand('console.log("Time synced - UTC: " + getTime() + ", Local: " + (getTime()+E.getTimeZone()*3600));\n');
-            
+
             alert(t.syncSuccess);
-            
+
             // Επαναφορά κουμπιού
             syncTimeBtn.disabled = false;
             syncTimeBtn.innerHTML = originalText;
-            
-        } catch (error) {
+
+        }
+        catch (error) {
             console.error('Time sync error:', error);
             alert(t.syncError + ': ' + error.message);
-            
+
             // Επαναφορά κουμπιού σε περίπτωση σφάλματος
             const syncTimeBtn = document.getElementById('syncTimeBtn');
             syncTimeBtn.disabled = false;
@@ -749,12 +752,12 @@ document.addEventListener('DOMContentLoaded', function() {
     function handleUartToggle(event) {
         const t = translations[currentLanguage];
         const isChecked = event.target.checked;
-        
+
         // Αν προσπαθεί να απενεργοποιήσει το UART (uncheck)
         if (!isChecked) {
             // Εμφάνιση προειδοποιητικού μηνύματος
             const userConfirmed = confirm(t.btUartDisableWarning);
-            
+
             // Αν ο χρήστης ακυρώσει, επαναφορά του checkbox
             if (!userConfirmed) {
                 event.target.checked = true; // Επαναφορά σε checked
@@ -762,11 +765,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 return false;
             }
         }
-        
+
         // Αν είναι checked ή ο χρήστης επιβεβαίωσε, συνεχίζει κανονικά
         return true;
     }
-   
+
     // Make functions available globally for inline handlers
     window.removeRole = removeRole;
 });

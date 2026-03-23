@@ -7,7 +7,6 @@ ew.is.dddm = 16;
 global.color = Uint16Array([0x000, 0x1084, 0x5B2F, 0xce9b, 0x001D, 0x3299, 0x0842, 0x0F6A, 0x3ADC, 0xF81F, 2220, 0x07FF, 115, 0xd800, 0xFFE0, 0xFFFF]);
 global.theme = [0, 1, 2, 3, 4, 5, 4, 7, 8, 9, 10, 11, 12, 13, 14, 15];
 
-
 g.col = Uint16Array([g.theme.bg, g.theme.bg2, g.theme.bgH, 0xce9b, 0x001D, 0x3299, 2220, 0x0F6A, 0xce9b, 0x0F6A, 0x00ff, 0xfff, 0xf00, 0xff000, 0x07FF, g.theme.fg]);
 //0x07FF thalasi anoikto
 //0x3ADC thalasi 2
@@ -35,22 +34,31 @@ g.isOn = false;
 g.setFontAlign(-1, -1);
 
 
-g.on = function() { this.isOn = true;
-  g.bri.set(ew.def.face.bri); };
-g.off = function() { this.isOn = false;
-  Bangle.setLCDBrightness(0); };
+g.on = function(o) {
+  if (!o) this.isOn = true;
+  if (ew.def.dev.bl) g.bri.set(ew.def.face.bri);
+  else Bangle.setLCDBrightness(0);
+  ew.UI.btn.ntfy(1, 0.5, 0, "_bar", 6, "AWAKE", "", 0, 15);
+
+};
+g.off = function(o) {
+  if (!o) this.isOn = false;
+  Bangle.setLCDBrightness(0);
+  if (ew.def.face.info)
+    ew.UI.btn.ntfy(1, 2, 0, "_bar", 6, "SLEEP", "", 0, 15);
+};
 
 g.bri = {
-    lv: (require("Storage").readJSON("ew.json", 1) && require("Storage").readJSON("ew.json", 1).sys) ? require("Storage").readJSON("ew.json", 1).sys.face.bri : 3,
-    set: function(o) {
-      if (o) this.lv = o;
-      else { this.lv++; if (this.lv > 10) this.lv = 1;
-        o = this.lv; }
-      Bangle.setLCDBrightness(o/10);
-      ew.def.face.bri = o;
-      return o;
+  lv: (require("Storage").readJSON("ew.json", 1) && require("Storage").readJSON("ew.json", 1).sys) ? require("Storage").readJSON("ew.json", 1).sys.face.bri : 3,
+  set: function(o) {
+    if (o) this.lv = o;
+    else {
+      this.lv++;
+      if (this.lv > 10) this.lv = 1;
+      o = this.lv;
     }
-  };
-exports = {
-  g: g
+    Bangle.setLCDBrightness(o / 10);
+    ew.def.face.bri = o;
+    return o;
+  }
 };

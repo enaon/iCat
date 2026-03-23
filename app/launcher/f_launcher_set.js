@@ -1,182 +1,147 @@
-//itag connected viewer
+// launcher_set face - QUICK LINKS SETTINGS
 
 ew.UI.nav.next.replaceWith(() => {
-    if (ew.UI.ntid) {
-        clearTimeout(ew.UI.ntid);
-        ew.UI.ntid = 0;
-    }
     ew.sys.buzz.nav(ew.sys.buzz.type.ok);
-    ew.face.go("itag-dev", 0);
+    ew.face[0].page = ew.face[0].page == 1 ? 2 : 1;
+    ew.face[0].init();
 });
-ew.UI.nav.back.replaceWith(() => {
-    if (ew.UI.ntid) {
-        clearTimeout(ew.UI.ntid);
-        ew.UI.ntid = 0;
-    }
-    ew.sys.buzz.nav(ew.sys.buzz.type.ok);
-    ew.face.go("itag-dev", 0);
 
+ew.UI.nav.back.replaceWith(() => {
+    ew.sys.buzz.nav(ew.sys.buzz.type.ok);
+    ew.face[0].page = ew.face[0].page == 1 ? 2 : 1;
+    ew.face[0].init();
 });
 
 ew.face[0] = {
     run: false,
-    offms: (ew.def.face.off[ew.face.appCurr]) ? ew.def.face.off[ew.face.appCurr] : 60000,
-    init: function(c) {
-        ew.def.face.off[ew.face.appCurr] = this.offms;
+    page: 1,
+    offms: (ew.def.face.off[ew.face.appCurr]) ? ew.def.face.off[ew.face.appCurr] : 15000,
 
-        if (ew.apps.itag.state.def.set.scanAll) {
-            ew.face.go("itag-dev", 0);
-            ew.UI.btn.ntfy(0, 1, 0, "_bar", 6, "SCAN ALL IS", "ENABLED", 15, 13);
+    init() {
+        if (!ew.def.face.off[ew.face.appCurr]) ew.def.face.off[ew.face.appCurr] = this.offms;
+        if (!ew.apps.launcher.state.selP){
+            ew.UI.nav.dn();
+            ew.UI.btn.ntfy(1, 1, 0, "_bar", 6,"NO APP", "SELECTED", 15, 13);
             return;
         }
-        // header
-        //ew.UI.ele.fill("_header", 6, 0);
 
+        // Πάρε το τρέχον επιλεγμένο app από το launcher
+        this.selectedApp = null;
+        this.curL = ew.apps.launcher.state[ew.apps.launcher.state.curL];
+        this.selectedIdx = ew.apps.launcher.state.def.pos;
+        if (this.selectedIdx < this.curL.length) {
+            this.selectedApp = this.curL[this.selectedIdx];
+        }
 
-        ew.UI.c.start(1, 0);
-        ew.UI.ele.fill("_main", 9, 0);
-        ew.UI.btn.c2l("main", "_2x3", 1, "ADD", ew.apps.itag.state.def.set.storeLock ? "OFF" : "ON", 15, ew.apps.itag.state.def.set.storeLock ? 1 : 4);
-        ew.UI.btn.c2l("main", "_2x3", 2, "HIDDEN", ew.apps.itag.state.def.set.showHidden ? "ON" : "OFF", 15, ew.apps.itag.state.def.set.showHidden ? 4 : 1);
+        if (this.page === 1) {
+            this.page1();
+        }
+        else {
+            this.page2();
+        }
+        this.bar();
 
-        ew.UI.btn.img("main", "_2x3", 3, "move", "MOVE", 15, 4);
-        ew.UI.btn.c2l("main", "_2x3", 4, ew.apps.itag.state.def.set.showHidden?"UNHIDE":"HIDE", "", 15, ew.apps.itag.state.def.set.showHidden?4:9,0.8);
+        this.run = true;
+    },
 
-        ew.UI.btn.img("main", "_2x3", 6, "trash", "DEL", 15, 13);
+    show() {},
+
+    page1() {
+        ew.UI.ele.ind(1, 2, 0, 15);
+
+        ew.UI.c.start(1, 1);
+        ew.UI.ele.fill("_main", 12, 0);
+
+        print("page", this.selectedApp)
+        // Δείξε το επιλεγμένο app
+        if (this.selectedApp) {
+            ew.UI.btn.c2l("main", "_header",6, this.selectedApp.name, "", 15, 0 , 1);
+        }
+        else {
+            ew.UI.btn.c2l("main", "_header", 6, "NO APP", "", 15, 13 , 1);
+        }
+
+        // Τα 3 κουμπιά για quick links
+        ew.UI.btn.c2l("main", "_2x3", 4, "LEFT", "", 15, 1, 0.6);
+        ew.UI.btn.c2l("main", "_2x3", 5, "BTN", "", 15, 1, 0.6);
+        ew.UI.btn.c2l("main", "_2x3", 6, "RIGHT", "", 15, 1, 0.);
+
         ew.UI.c.end();
 
-        ew.UI.c.main._2x3 = (i) => {
-            if (i == 1) {
-                ew.sys.buzz.nav(ew.sys.buzz.type.ok);
-                ew.apps.itag.state.def.set.storeLock = 1 - ew.apps.itag.state.def.set.storeLock;
-                ew.UI.btn.c2l("main", "_2x3", 1, "ADD", ew.apps.itag.state.def.set.storeLock ? "OFF" : "ON", 15, ew.apps.itag.state.def.set.storeLock ? 1 : 4);
-                if (ew.def.face.info) ew.UI.btn.ntfy(0, 1, 0, "_bar", 6, "ADDING DEVICES", ew.apps.itag.state.def.set.storeLock ? "DISABLED" : "ENABLED", 0, 15);
-                return;
-            }
-            if (i == 2) {
-                ew.sys.buzz.nav(ew.sys.buzz.type.ok);
-    
-                ew.apps.itag.state.def.set.showHidden = 1 - ew.apps.itag.state.def.set.showHidden;
-                if (!ew.apps.itag.state.def.hiddenOrder.length && ew.apps.itag.state.def.set.showHidden) {
-                    ew.apps.itag.state.def.set.showHidden = 0;
-                     ew.UI.btn.ntfy(0, 1, 0, "_bar", 6, "HIDDEN LIST", "IS EMPTY", 15, 13);
-                     return;
-                }
-                ew.face.go("itag-dev", 0);
-                if (ew.def.face.info) ew.UI.btn.ntfy(0, 1, 0, "_bar", 6, "HIDDEN LIST", ew.apps.itag.state.def.set.showHidden ? "ENABLED" : "DISABLED", 0, 15);
-                return;
-            }
-            if (i == 3) {
-                ew.sys.buzz.nav(ew.sys.buzz.type.ok);
-                ew.apps.itag.state.move = ew.apps.itag.state.def.set.pos;
-                ew.face.go("itag-dev", 0, "move");
-                if (ew.def.face.info) ew.UI.btn.ntfy(0, 0.5, 0, "_bar", 6, "MOVE", "ENABLED", 0, 15);
-                return;
-            }
-            if (i == 4) {
-                ew.sys.buzz.nav(ew.sys.buzz.type.ok);
-                ew.is.bar = 1;
-                ew.is.slide = 0;
-                ew.UI.btn.ntfy(0, 1.5, 1, "_bar", 6, "", "", 15, 0);
-                ew.UI.c.start(0, 1);
-                ew.UI.btn.c2l("bar", "_bar", 6, ew.apps.itag.state.def.set.showHidden?"PRESS TO UNHIDE":"PRESS TO HIDE", "", 15, ew.apps.itag.state.def.set.showHidden?4:9,1.4);
-                ew.UI.c.end();
-                ew.UI.c.bar._bar = (i) => {
-                    ew.sys.buzz.nav(ew.sys.buzz.type.ok);
-                    if (i == 6) {
-                        let array=ew.apps.itag.state.def.set.showHidden?ew.apps.itag.state.def.hiddenOrder: ew.apps.itag.state.def.storeOrder;
-                        let dev=ew.apps.itag.state.def.store[array[ew.apps.itag.state.def.set.pos]];
-                        let name=dev.name;
-                        let id= dev.id;
-                        if (ew.apps.itag.state.def.set.showHidden){
-                          ew.apps.itag.state.def.hiddenOrder.splice(ew.apps.itag.state.def.set.pos, 1);  
-                            ew.apps.itag.state.def.storeOrder.push(dev.id);
-                            if (!ew.apps.itag.state.def.hiddenOrder.length) ew.apps.itag.state.def.set.showHidden=0;
-                        }else{
-                          ew.apps.itag.state.def.storeOrder.splice(ew.apps.itag.state.def.set.pos, 1);  
-                          ew.apps.itag.state.def.hiddenOrder.push(dev.id);
-                        }
-                        ew.face.go("itag-dev", 0);
-                        ew.UI.btn.ntfy(1, 1, 0, "_bar", 6, name.toUpperCase(), ew.apps.itag.state.def.set.showHidden?"UNHIDDEN":"HIDEN", 15,9);
-                    }
-                }
-                return
-            }
-            if (i == 6) {
-                ew.sys.buzz.nav(ew.sys.buzz.type.ok);
-                ew.is.bar = 1;
-                ew.is.slide = 0;
-                ew.UI.btn.ntfy(0, 1.5, 1, "_bar", 6, "", "", 15, 0);
-                ew.UI.c.start(0, 1);
-                ew.UI.btn.img("bar", "_bar", 6, "trash", "DELETE?", 15, 13);
-                ew.UI.c.end();
-                ew.UI.c.bar._bar = (i) => {
-                    ew.sys.buzz.nav(ew.sys.buzz.type.ok);
-                    if (i == 6) {
-                        let dev = ew.apps.itag.state.def.store[ew.apps.itag.state.def.storeOrder[ew.apps.itag.state.def.set.pos]];
-                        let name = dev.name;
-                        delete ew.apps.itag.state.def.store[dev.id];
-                        ew.apps.itag.state.def.storeOrder.splice(ew.apps.itag.state.def.set.pos, 1);
-                        ew.face.go("itag-dev", 0);
-                        ew.UI.btn.ntfy(1, 1, 0, "_bar", 6, name.toUpperCase(), "DELETED", 15, 13);
-                    }
+        ew.UI.c.main._2x3 = (i, l) => {
+            if (!l) return; // Μόνο long press
 
-                };
-                return;
+            ew.sys.buzz.nav(ew.sys.buzz.type.ok);
+
+            // Θέσε το quick link
+            if (i >= 4 && i <= 6) {
+                let position = i === 4 ? "left" : (i === 5 ? "btnL" : "rght");
+                
+                ew.def.face[position]=this.selectedApp.id;
+                //ew.apps.launcher.link(position, this.selectedApp);
+                ew.UI.btn.ntfy(1, 1, 0, "_bar", 6,
+                    "QUICK LINK SET", position.toUpperCase(), 0, 15);
+
             }
-        }
-        //this.bar();
-        //this.info( )
+        };
     },
-    show: function(o) {},
-    getVal: function(val) {
-        const device = ew.apps.itag.state.def.store.find(item => item.id === ew.apps.itag.state.ble.id);
-        return device ? device[val] : null;
+
+    page2() {
+        ew.UI.ele.ind(2, 2, 0, 15);
+
+        ew.UI.c.start(1, 1);
+        ew.UI.ele.fill("_main", 12, 0);
+
+        let links = ew.apps.launcher.state.def.link;
+
+        // Δείξε τα τρέχοντα quick links
+        ew.UI.btn.c2l("main", "_2x3", 1, "LEFT", links.l ? links.l.name : "EMPTY", 15, links.l ? 4 : 1, 0.7);
+        ew.UI.btn.c2l("main", "_2x3", 2, "CENTER", links.c ? links.c.name : "EMPTY", 15, links.c ? 4 : 1, 0.7);
+        ew.UI.btn.c2l("main", "_2x3", 3, "RIGHT", links.r ? links.r.name : "EMPTY", 15, links.r ? 4 : 1, 0.7);
+
+        // Κουμπί για clear
+        ew.UI.btn.c2l("main", "_2x3", 5, "CLEAR", "ALL", 15, 13, 1.5);
+
+        ew.UI.c.end();
+
+        ew.UI.c.main._2x3 = (i, l) => {
+            ew.sys.buzz.nav(ew.sys.buzz.type.ok);
+
+            if (i == 5) {
+                // Clear all quick links
+                ew.apps.launcher.state.def.link = { left: null, center: null, right: null };
+                ew.UI.btn.ntfy(1, 1, 0, "_bar", 6, "QUICK LINKS", "CLEARED", 15, 13);
+                this.init();
+            }
+            else if (i >= 1 && i <= 3) {
+                // Clear specific quick link
+                let position = i === 1 ? "l" : (i === 2 ? "c" : "f");
+                ew.apps.launcher.link(position, null);
+                ew.UI.btn.ntfy(1, 1, 0, "_bar", 6,
+                    position.toUpperCase(), "CLEARED", 15, 13);
+                this.init();
+            }
+        };
     },
-    info: function(batt, id) {
-        g.setCol(0, 1);
-        g.fillRect({ x: 0, y: 55, x2: 235, y2: 180, r: 10 });
-        g.setCol(1, 15);
-        g.setFont("LECO1976Regular22", 3);
 
-        if (!ew.apps.itag.state.connected) {
-            ew.UI.btn.c2l("main", "_main", 6, "WAIT", "", 15, 1, 2);
-            return;
-        }
-
-
-        // values
-        let l = g.stringWidth(batt) / 2;
-        g.drawString(batt, 120 - l, 85);
-
-        // units
-        g.setFont("Teletext10x18Ascii");
-        g.drawString("%", 140 + l - g.stringWidth("%") / 2, 115);
-
-        // id
-        g.setCol(1, 14);
-        //g.setFont("LECO1976Regular22");
-        g.drawString(id, 120 - g.stringWidth(id) / 2, 156); //
-
-        g.flip();
-
-
-    },
-    bar: function() {
-        ew.UI.bar();
+    bar() {
         ew.is.bar = 0;
+        ew.UI.c.start(0, 1);
+        ew.UI.c.end();
+        ew.UI.ele.fill("_bar", 6, 0);
+
+        let pageText = this.page === 1 ? "SET" : "VIEW";
+        ew.UI.btn.img("bar", "_bar", 6, "ew_i_"+ew.face.appCurr.split("-")[0]+".img", "", 15, 0,1.4,0,0);
+        
+        //ew.UI.btn.c2l("main", "_bar", 6, pageText, "", 15, 1, 1.3);
     },
 
-
-    clear: function(o) {
-        ew.is.slide = 0; /*TC.removeAllListeners();*/
+    clear() {
         if (this.tid) clearTimeout(this.tid);
         this.tid = 0;
-        if (ew.apps.itag.state.focus || (ew.apps.itag.state.def.set.persist && ew.face.appCurr === "itag-scan") || (ew.face.appCurr.startsWith("itag") && !ew.face.pageCurr)) return;
-        else ew.apps.itag.stopScan();
-        return true;
     },
-    off: function(o) {
+
+    off() {
         g.off();
-        this.clear(o);
     }
 };

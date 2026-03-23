@@ -15,8 +15,10 @@ ew.face[0] = {
 	    
         ew.is.bri = ew.def.face.bri;
         g.bri.set( (process.env.BOARD == "BANGLEJS2")?10:7);
-        ew.UI.btn.c2l("main", "_header", 6, "" , "", 3, 15, 3);
-        ew.UI.btn.img("main", "_main", 12, "torch" , "", 3, 15, 1);
+        //ew.UI.btn.c2l("main", "_header", 6, "" , "", 3, 15, 3);
+        ew.UI.btn.img("main", "_main", 15, "ew_i_torch.img" , "", 3, 15, 2);
+        //ew.UI.ele.ind(0,0, 15, 15);
+
         this.bar();
 
     },

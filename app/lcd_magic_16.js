@@ -172,7 +172,7 @@ function init(bppi) {
     this.isOn = true;
     cmd(0x11);
     delayms(10);
-    this.bri.set(this.bri.lv);   
+    this.bri.set(this.bri.lv); 
   };
   
   g.off = function() {
@@ -186,7 +186,7 @@ function init(bppi) {
 
   g.bri = {
     lv: (require("Storage").readJSON("ew.json", 1) && require("Storage").readJSON("ew.json", 1).sys) ? require("Storage").readJSON("ew.json", 1).sys.face.bri : 3,
-    set: function(o) {
+    set: function(o,t) {
       if (o) this.lv = o;
       else { this.lv++; if (this.lv > 7) this.lv = 1;
         o = this.lv; }
@@ -194,7 +194,7 @@ function init(bppi) {
         digitalWrite(BL, (this.lv == 0) ? 0 : 1);
       else
         analogWrite(BL, (this.lv * 42.666) / 256, { freq: 60 });
-      ew.def.face.bri = o;
+      if (!t) ew.def.face.bri = o;
       return o;
     }
   };

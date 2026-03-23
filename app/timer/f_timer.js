@@ -30,29 +30,27 @@ ew.UI.nav.back.replaceWith(() => {
 
 ew.face[0] = {
     run: false,
-    page: 1,
+    //page: 1,
     val:0,
     offms: (ew.def.face.off[ew.face.appCurr]) ? ew.def.face.off[ew.face.appCurr] : 60000,
-    coord: (process.env.BOARD == "BANGLEJS2") ? { "txt":[40],"main": [0, 35, 176, 125], "clear": [5, 35, 170, 100], "rep": [88, 105], "time": [55, 55, 87, 92, 45, 51, 55] } : 
+    coord: (process.env.BOARD == "BANGLEJS2") ? { "txt":[40],"main": [0, 30, 176, 115], "clear": [3, 30, 170, 113], "rep": [88,96], "time": [55, 55, 87, 92, 40, 46, 50] } : 
     { "txt":[55],"main": [0, 55, 240, 185], "clear": [5, 55, 235, 160], "rep": [120, 167], "time": [77, 87, 140, 124, 82, 87, 85] },
     init: function(o) {
         ew.def.face.off[ew.face.appCurr] = this.offms;
         this.rep = 0;
        
-        if (o === undefined) {
-            let earliest = this.active();
+        if (o && o !== "jump" ) this.page = o;
+        else {
+             let earliest = this.active();
             if (earliest !== null) {
               this.page = earliest;
-            }
-        } else {
-            this.page = o;
+            }else this.page=ew.apps.timer.state.pos||1;      
         }
-
         ew.apps.timer.state.pos = this.page;
 
         ew.UI.c.start(1, 1);
-        ew.UI.ele.ind(this.page, 5, 0, 3);
-        ew.UI.ele.coord("main", "_main", 6);
+        ew.UI.ele.ind(this.page, 5, 0, 15);
+        ew.UI.ele.coord("main", "_main", 9);
         ew.UI.c.end();
 
         // button hander
@@ -85,7 +83,8 @@ ew.face[0] = {
             let rep = ew.apps.timer.getTimerStatus(this.page).repetitions;
             if (rep) {
                 g.setCol(1, 15);
-                g.setFont("Teletext10x18Ascii");
+                //g.setFont("Teletext10x18Ascii");
+                g.setFont("Vector",18);
                 g.drawString("Repeat: " + rep, this.coord.rep[0] - g.stringWidth("Repeat: " + rep) / 2, this.coord.rep[1]);
             }
 
@@ -93,7 +92,7 @@ ew.face[0] = {
         // info
         this.info(ew.apps.timer.getTimerStatus(this.page).minutes);
         // header
-        ew.UI.btn.c2l("main", "_headerS", 6, ew.apps.timer.getTimerStatus(this.page).name, "", 15, 0, 1.5);
+        ew.UI.btn.c2l("main", "_header", 6, ew.apps.timer.getTimerStatus(this.page).name, "", 15, 0, 1.5);
 
         this.bar();
         this.run = 1;
@@ -103,8 +102,9 @@ ew.face[0] = {
         if (!this.run) return;
 
         this.info();
+        if (this.tid) clearTimeout(this.tid);
         this.tid = setTimeout(function(t) {
-            t.tid = -1;
+            t.tid = 0;
             t.show();
         }, 1000, this);
     },
@@ -176,7 +176,8 @@ ew.face[0] = {
             let rep = ew.apps.timer.getTimerStatus(this.page).repetitions;
 
             if (rep) {
-                g.setFont("Teletext10x18Ascii");
+                //g.setFont("Teletext10x18Ascii");
+                g.setFont("Vector",18);
                 g.drawString("Rep.Left: " + repL + "/" + rep, this.coord.rep[0] - g.stringWidth("Rep.Left: " + repL + "/" + rep) / 2, this.coord.rep[1]);
             }
 
@@ -221,7 +222,7 @@ ew.face[0] = {
             ew.UI.c.bar._bar = (i, l) => {
                 ew.sys.buzz.nav(ew.sys.buzz.type.ok);
 
-                if (i == 4) {
+                if (i == 4 && l) {
                     //if (l) {
                     if (ew.apps.timer.getTimerStatus(this.page).paused)
                         ew.apps.timer.resumeTimer(this.page);
@@ -236,17 +237,19 @@ ew.face[0] = {
                     //if (ew.def.face.info) ew.UI.btn.ntfy(1, 1.5, 0, "_bar", 6, "LONG HOLD", "PAUSE/RESUME", 0, 15);
 
                 }
-                else if (i == 5) {
-                    if (l) {
-                        if (ew.def.face.info) ew.UI.btn.ntfy(1, 1.5, 0, "_bar", 6, ew.apps.timer.state.def[this.page].name.toUpperCase(), "RESTARTED", 0, 15, 0, 0, 0);
-                        ew.apps.timer.restartTimer(this.page);
-                    }
-                    else {
+                else if (i == 5 && l) {
+                    //if (l) //{
+                       // if (ew.def.face.info) ew.UI.btn.ntfy(1, 1.5, 0, "_bar", 6, ew.apps.timer.state.def[this.page].name.toUpperCase(), "RESTARTED", 0, 15, 0, 0, 0);
+                       // ew.apps.timer.restartTimer(this.page);
+                   // }
+                    //else {
                         if (ew.def.face.info) ew.UI.btn.ntfy(1, 1.5, 0, "_bar", 6, ew.apps.timer.state.def[this.page].name.toUpperCase(), "STOPPED", 0, 15, 0, 0, 0);
                         ew.apps.timer.stopTimer(ew.face[0].page);
-                    }
+                   // }
 
                 }
+                 else  ew.UI.btn.ntfy(0, 1.5, 0, "_bar", 6, "USE", "LONG PRESS", 0, 15,0,0,0);
+                    
                 g.flip();
             };
         }
@@ -261,31 +264,20 @@ ew.face[0] = {
             // bar buttons
             ew.UI.c.bar._bar = (i, l) => {
                 ew.sys.buzz.nav(ew.sys.buzz.type.ok);
-                // set time
-                if (i == 4) {
-                    ew.UI.btn.ntfy(1, 3, 0, "_bar", 6, " <  SET TIME  >", "", 15, 6, 1);
-                    ew.sys.TC.val = { cur: ew.apps.timer.state.def[ew.face[0].page].min, dn: 1, up: 1440, tmp: 0, fire: 1, reverce: 0, loop: 1 };
-                    ew.UI.c.tcBar = (a, b, r) => {
-                        if (11 < r && 29 < b && b < 1440) b = b + (a * (20 < r ? 10 : 5));
-                        ew.sys.TC.val.cur = b;
-                        ew.apps.timer.state.def[ew.face[0].page].min = b;
-                        this.info(b);
-                        ew.UI.btn.ntfy(0, 2, 1);
-
-                    };
-                    ew.is.slide = 1;
-                }
                 //start timer
-                else if (i == 6) {
+                if (l){ 
                     if (ew.def.face.info) ew.UI.btn.ntfy(1, 1.5, 0, "_bar", 6, ew.apps.timer.state.def[this.page].name.toUpperCase(), "STARTED", 0, 15,0,0,0);
                     ew.apps.timer.startTimer(ew.face[0].page);
                     ew.face[0].init();
-                }
+                
+                }else  ew.UI.btn.ntfy(0, 1.5, 0, "_bar", 6, "USE", "LONG PRESS", 0, 15,0,0,0);
+
             };
         }
     },
     clear: function(o) {
         ew.is.slide = 0;
+        if ( ew.face.appCurr=="timer" && ew.apps.timer.getTimerStatus(this.page).active ) return true;
         if (this.tid) clearTimeout(this.tid);
         this.tid = 0;
         return true;

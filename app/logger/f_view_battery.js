@@ -35,8 +35,8 @@ ew.face[0] = {
         this.data.lastPosition = this.data.fields - 1;
         // UI control Start
         ew.UI.c.start(1, 1);
-        ew.UI.btn.c2l("main", "_headerS", 4, "SESSION", "", 15, 0, 0.9);
-        ew.UI.btn.c2l("main", "_headerS", 5, "HISTORY", "", 2, 0, 0.7);
+        ew.UI.btn.c2l("main", "_header", 4, "SESSION", "", 15, 0, 0.9);
+        ew.UI.btn.c2l("main", "_header", 5, "HISTORY", "", 2, 0, 0.7);
         ew.UI.ele.coord("main", "_main", 4);
         ew.UI.ele.coord("main", "_main", 5);
 
@@ -60,8 +60,8 @@ ew.face[0] = {
                 this.data.lastPosition = 0;
             }
 
-            ew.UI.btn.c2l("main", "_headerS", 4, "SESSION", "", i == 4 ? 15 : 2, i == 4 ? 0 : 0, i == 4 ? 0.9 : 0.7);
-            ew.UI.btn.c2l("main", "_headerS", 5, "HISTORY", "", i == 5 ? 15 : 2, i == 5 ? 0 : 0, i == 5 ? 0.9 : 0.7);
+            ew.UI.btn.c2l("main", "_header", 4, "SESSION", "", i == 4 ? 15 : 2, i == 4 ? 0 : 0, i == 4 ? 0.9 : 0.7);
+            ew.UI.btn.c2l("main", "_header", 5, "HISTORY", "", i == 5 ? 15 : 2, i == 5 ? 0 : 0, i == 5 ? 0.9 : 0.7);
 
             this.fixed(this.page);
             this.info(this.data.lastPosition + 1, this.data.graph[this.data.lastPosition]);

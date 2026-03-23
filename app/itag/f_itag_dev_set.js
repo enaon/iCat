@@ -1,25 +1,17 @@
-//itag connected viewer
+//itag store settings
 
 ew.UI.nav.next.replaceWith(() => {
-    if (ew.UI.ntid && !ew.is.UIpri) {
-        clearTimeout(ew.UI.ntid);
-        ew.UI.ntid = 0;
-    }
-    ew.sys.buzz.nav(ew.sys.buzz.type.ok);
-    ew.face.go("itag-dev", 0);
+    ew.sys.buzz.nav(ew.sys.buzz.type.na);
 });
-ew.UI.nav.back.replaceWith(() => {
-    if (ew.UI.ntid && !ew.is.UIpri) {
-        clearTimeout(ew.UI.ntid);
-        ew.UI.ntid = 0;
-    }
-    ew.sys.buzz.nav(ew.sys.buzz.type.ok);
-    ew.face.go("itag-dev", 0);
-
-});
-
+ew.UI.nav.back.replaceWith(ew.UI.nav.next);
 ew.face[0] = {
     run: false,
+    data:{
+        img:{
+        trash:"mEwwI1yg/4AocP/gFDhkMApE//4ABAo4PCAUIACAv4FQATkGAQMYXwSgBYAUBAoPgdsg",
+        move:"mEwwIYWAok4Aok8Aok+Aok/AouAAonAAongAonwAon4Aon8AQP/AAP+gF/AoX/AovAAongAonwAon4Aon8AoqldFJZZDLQMfAokPAokHAokDDokBJopQFRowFEh4FEg4FEgYFEgIFEgB6FvjoKjgFEhB9IA=",    
+        }
+    },    
     offms: (ew.def.face.off[ew.face.appCurr]) ? ew.def.face.off[ew.face.appCurr] : 60000,
     init: function(c) {
         if (!ew.def.face.off[ew.face.appCurr])  ew.def.face.off[ew.face.appCurr] = this.offms;
@@ -38,19 +30,13 @@ ew.face[0] = {
     show: function(o) {return;},
             
     page1: function() {
-
-       
-        // header
-        //ew.UI.ele.fill("_header", 6, 0);
-
-
         ew.UI.c.start(1, 0);
-        ew.UI.ele.fill("_main", 9, 0);
+        ew.UI.ele.fill("_main", 12, 0);
         ew.UI.btn.c2l("main", "_2x3", 1, "ADD", ew.apps.itag.state.def.set.storeLock ? "OFF" : "ON", 15, ew.apps.itag.state.def.set.storeLock ? 1 : 4);
         ew.UI.btn.c2l("main", "_2x3", 2, "HIDDEN", ew.apps.itag.state.def.set.showHidden ? "ON" : "OFF", 15, ew.apps.itag.state.def.set.showHidden ? 4 : 1);
-        ew.UI.btn.img("main", "_2x3", 3, "move", "MOVE", 15, 4);
-        ew.UI.btn.c2l("main", "_2x3", 4, ew.apps.itag.state.def.set.showHidden ? "UNHIDE" : "HIDE", "", 15, ew.apps.itag.state.def.set.showHidden ? 4 : 9, 0.8);
-        ew.UI.btn.img("main", "_2x3", 6, "trash", "DEL", 15, 13);
+        ew.UI.btn.img("main", "_2x3", 3, "move.face", "MOVE", 15, 4);
+        ew.UI.btn.c2l("main", "_2x3", 4, ew.apps.itag.state.def.set.showHidden ? "UNHIDE" : "HIDE", "", ew.apps.itag.state.def.set.showHidden ?15:0, ew.apps.itag.state.def.set.showHidden ? 4 : 9, 0.8);
+        ew.UI.btn.img("main", "_2x3", 6, "trash.face", "DEL", 15, 13);
         ew.UI.c.end();
 
         ew.UI.c.main._2x3 = (i, l) => {
@@ -87,7 +73,7 @@ ew.face[0] = {
                 ew.is.slide = 0;
                 ew.UI.btn.ntfy(0, 1.5, 1, "_bar", 6, "", "", 15, 0);
                 ew.UI.c.start(0, 1);
-                ew.UI.btn.c2l("bar", "_bar", 6, ew.apps.itag.state.def.set.showHidden ? "PRESS TO UNHIDE" : "PRESS TO HIDE", "", 15, ew.apps.itag.state.def.set.showHidden ? 4 : 9, 1.4);
+                ew.UI.btn.c2l("bar", "_bar", 6, ew.apps.itag.state.def.set.showHidden ? "PRESS TO UNHIDE" : "PRESS TO HIDE", "", ew.apps.itag.state.def.set.showHidden ?15:0, ew.apps.itag.state.def.set.showHidden ? 4 : 9, 1.4);
                 ew.UI.c.end();
                 ew.UI.c.bar._bar = (i) => {
                     ew.sys.buzz.nav(ew.sys.buzz.type.ok);
@@ -106,7 +92,7 @@ ew.face[0] = {
                             ew.apps.itag.state.def.hiddenOrder.push(dev.id);
                         }
                         ew.face.go("itag-dev", 0);
-                        ew.UI.btn.ntfy(1, 1, 0, "_bar", 6, name.toUpperCase(), ew.apps.itag.state.def.set.showHidden ? "UNHIDDEN" : "HIDEN", 15, 9);
+                        ew.UI.btn.ntfy(1, 1, 0, "_bar", 6, name.toUpperCase(), ew.apps.itag.state.def.set.showHidden ? "UNHIDDEN" : "HIDEN", 0, 9);
                     }
                 };
                 return;
@@ -137,7 +123,7 @@ ew.face[0] = {
                     ew.is.slide = 0;
                     ew.UI.btn.ntfy(0, 1.5, 1, "_bar", 6, "", "", 15, 0);
                     ew.UI.c.start(0, 1);
-                    ew.UI.btn.img("bar", "_bar", 6, "trash", "DELETE?", 15, 13);
+                    ew.UI.btn.img("bar", "_bar", 6, "trash.face", "DELETE?", 15, 13);
                     ew.UI.c.end();
                     ew.UI.c.bar._bar = (i) => {
                         ew.sys.buzz.nav(ew.sys.buzz.type.ok);
@@ -167,7 +153,9 @@ ew.face[0] = {
         ew.is.bar = 0;
         ew.UI.c.start(0, 1);
         ew.UI.c.end();
-        ew.UI.btn.c2l("main", "_bar", 6,  ew.face.appCurr.toUpperCase(), "",15, 0, 1.3);
+        ew.UI.ele.fill("_bar", 6, 0);
+        ew.UI.btn.img("bar", "_bar", 6, "ew_i_"+ew.face.appCurr.split("-")[0]+".img", ew.face.appCurr.split("-")[0].toUpperCase(), 15, 0,0.8,1,1);
+        //ew.UI.btn.c2l("main", "_bar", 6,  ew.face.appCurr.toUpperCase(), "",15, 1, 1.3);
     },
 
     clear: function(o) {

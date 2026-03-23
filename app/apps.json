@@ -2,7 +2,7 @@
 	{ "id": "ew_bangle",
 		"name": "bangle",
 		"icon": "../bangle/eucWatch.png",
-		"version":"2.75",
+		"version":"2.79",
 		"description": "bangle init watchface",
 		"tags": "bangleJS2",
 		"type":"init",
@@ -17,7 +17,7 @@
 	{ "id": "ew_init",
 		"name": "init",
 		"icon": "../icon.png",
-		"version":"2.83",
+		"version":"2.86",
 		"description": "init and watchdog. ",
 		"tags": "magic3",
 		"type":"core",
@@ -29,7 +29,7 @@
 		{ "id": "ew_display",
 		"name": "display driver",
 		"icon": "../icon.png",
-		"version":"2.74",
+		"version":"2.78",
 		"description": "lcd driver",
 		"tags": "magic3",
 		"type":"core",
@@ -44,7 +44,7 @@
 	{ "id": "ew_handler",
 		"name": "Handler",
 		"icon": "../icon.png",
-		"version":"3.03",
+		"version":"3.08",
 		"description": "handlers ",
 		"tags": "magic3",
 	    "needsFeatures":["magic3"],
@@ -59,7 +59,7 @@
 	{ "id": "ew_handler_extra",
 		"name": "Handler_extra",
 		"icon": "../icon.png",
-		"version":"3.12",
+		"version":"3.20",
 		"description": "handlers ",
 		"tags": "magic3",
 	    "needsFeatures":["magic3"],
@@ -68,7 +68,6 @@
 			{"name":"ew_handler_notify","url":"../handler/handler_notify.js"},
 			{"name":"ew_handler_btn","url":"../handler/handler_btn.js"},
 			{"name":"ew_handler_charge","url":"../handler/handler_charge.js"},
-			{"name":"ew_f_charge","url":"../handler/handler_f_charge.js"},
 			{"name":"ew_handler_touch","url":"../handler/handler_touch.js"},
 			{"name":"ew_handler_touch_716","url":"../handler/handler_touch_716.js"},
 			{"name":"ew_handler_touch_816","url":"../handler/handler_touch_816.js"},
@@ -80,7 +79,7 @@
 	{ "id": "ew_UI",
 		"name": "UI support",
 		"icon": "../icon.png",
-		"version":"2.90",
+		"version":"2.96",
 		"description": "UI",
 		"tags": "magic3",
 		"type":"core",
@@ -91,28 +90,42 @@
 			{"name":"C:ew_icons","url":"../UI/icons.js"}
 		]
 	},
-	{ "id": "ew_settings",
-		"name": "Settings",
+	{ "id": "ew_q.panel",
+		"name": "q.panel",
 		"icon": "../icon.png",
-		"version":"2.99",
-		"description": "Settings face",
+		"version":"3.07",
+		"description": "q-panel face",
 		"tags": "magic3",
 		"type":"clock",
 		"readme": "README.md",
 	    "needsFeatures":["magic3"],
 		"storage": [
-			{"name":"ew_f_settings","url":"../settings/settings.js"},
-			{"name":"ew_f_set_set","url":"../settings/set_set.js"},
-			{"name":"ew_f_set_apps","url":"../settings/set_apps.js"},
-			{"name":"ew_f_set_theme","url":"../settings/set_theme.js"},
-			{"name":"ew_f_set_dash","url":"../settings/set_dash.js"}
+			{"name":"ew_f_q.panel","url":"../q.panel/q.panel.js"},
+			{"name":"ew_f_q.panel_theme","url":"../q.panel/q.panel_theme.js"}
 		]
 	},
 	
+	{ "id": "ew_launcher",
+		"name": "launcher",
+		"icon": "../icon.png",
+		"version":"3.07",
+		"description": "launcher face",
+		"tags": "magic3",
+		"type":"clock",
+		"readme": "README.md",
+	    "needsFeatures":["magic3"],
+		"storage": [
+			{"name":"ew_a_launcher","url":"../launcher/launcher.js"},
+			{"name":"ew_f_launcher","url":"../launcher/f_launcher.js"},
+			{"name":"ew_f_launcher-set","url":"../launcher/f_launcher_set.js"}
+
+
+		]
+	},
 	{ "id": "ew_logger",
 		"name": "logger",
 		"icon": "../icon.png",
-		"version":"2.73",
+		"version":"2.78",
 		"description": "logger",
 		"tags": "magic3",
 	    "needsFeatures":["magic3"],
@@ -127,30 +140,31 @@
 	{ "id": "ew_clock",
 		"name": "clock",
 		"icon": "../icon.png",
-		"version":"2.89",
+		"version":"3:01",
 		"description": "clock",
 		"tags": "magic3",
 	    "needsFeatures":["magic3"],
 		"storage": [
-			{"name":"ew_f_main","url":"../clock/f_clock.js"},
-			{"name":"ew_f_main-set","url":"../clock/f_clock_set.js"}	
-	
+			{"name":"ew_a_clock","url":"../clock/clock.js"},
+			{"name":"ew_f_clock","url":"../clock/f_clock.js"},
+			{"name":"ew_f_clock-set","url":"../clock/f_clock_set.js"},
+			{"name":"ew_f_clock-set-time","url":"../clock/f_clock_set_time.js"}	
 		]
 	},
 	{ "id": "ew_itag",
 		"name": "itag",
 		"icon": "../icon.png",
-		"version":"3.07",
+		"version":"3.13",
 		"description": "itag",
 		"tags": "magic3",
 	    "needsFeatures":["magic3"],
 		"storage": [
 			{"name":"ew_a_itag","url":"../itag/itag.js"},
-			{"name":"ew_f_itag-scan","url":"../itag/f_itag_scan.js"},
+			{"name":"ew_f_itag","url":"../itag/f_itag_scan.js"},
 			{"name":"ew_f_itag-dev","url":"../itag/f_itag_dev.js"},
 			{"name":"ew_f_itag-connect","url":"../itag/f_itag_connect.js"},	
 			{"name":"ew_f_itag-connect-set","url":"../itag/f_itag_connect_set.js"},	
-			{"name":"ew_f_itag-scan-set","url":"../itag/f_itag_scan_set.js"},
+			{"name":"ew_f_itag-set","url":"../itag/f_itag_scan_set.js"},
 			{"name":"ew_f_itag-dev-set","url":"../itag/f_itag_dev_set.js"}	
 
 
@@ -159,7 +173,7 @@
 		{ "id": "ew_timer",
 		"name": "timer",
 		"icon": "../icon.png",
-		"version":"3.01",
+		"version":"3.09",
 		"description": "timer",
 		"tags": "magic3",
 	    "needsFeatures":["magic3"],
@@ -173,24 +187,166 @@
 		{ "id": "ew_torch",
 		"name": "torch",
 		"icon": "../icon.png",
-		"version":"2.59",
+		"version":"2.58",
 		"description": "torch",
 		"tags": "magic3",
 	    "needsFeatures":["magic3"],
 		"storage": [
-			{"name":"ew_f_torch","url":"../torch/f_torch.js"}
+			{"name":"ew_f_torch","url":"../torch/f_torch.js"},
+			{"name":"ew_a_torch","url":"../torch/torch.js"},
+			{"name":"ew_f_torch-set","url":"../torch/f_torch_set.js"}
+
 		]
 	},
 		{ "id": "ew_tag",
 		"name": "ewtag",
 		"icon": "../icon.png",
-		"version":"2.61",
+		"version":"2.65",
 		"description": "ewtag",
 		"tags": "nano",
 	    "needsFeatures":["nano"],
 		"storage": [
 			{"name":"ew_a_ewtag","url":"../ewtag/ewtag.js"}
 		]
+	},
+		{ "id": "ew_tpms",
+		"name": "tpms",
+		"icon": "../icon.png",
+		"version":"2.63",
+		"description": "tpms",
+		"tags": "magic3",
+	    "needsFeatures":["magic3"],
+		"storage": [
+			{"name":"ew_a_tpms","url":"../tpms/tpms.js"},
+			{"name":"ew_f_tpms","url":"../tpms/f_tpms.js"}
+			
+		]
+	},
+		{ "id": "ew_euc",
+		"name": "euc",
+		"icon": "../icon.png",
+		"version":"2.63",
+		"description": "euc",
+		"tags": "magic3",
+	    "needsFeatures":["magic3"],
+		"storage": [
+			{"name":"ew_a_euc","url":"../euc/euc.js"},
+			{"name":"ew_f_euc","url":"../euc/f_euc.js"},
+			{"name":"ew_f_euc_scan","url":"../euc/f_euc_scan.js"},
+			{"name":"ew_m_euc_KingSong","url":"../euc/m_euc_KingSong.js"}
+
+		]
+	},
+		{ "id": "ew_scan",
+		"name": "scan",
+		"icon": "../icon.png",
+		"version":"2.63",
+		"description": "scan",
+		"tags": "magic3",
+	    "needsFeatures":["magic3"],
+		"storage": [
+			{"name":"ew_a_scan","url":"../scan/scan.js"},
+			{"name":"ew_f_scan","url":"../scan/f_scan.js"}
+			
+		]
+	},
+		{ "id": "ew_HearRate",
+		"name": "heart Rate",
+		"icon": "../icon.png",
+		"version":"2.63",
+		"description": "Hear Rate",
+		"tags": "magic3",
+	    "needsFeatures":["magic3"],
+		"storage": [
+			{"name":"ew_a_hr","url":"../hr/hr.js"},
+			{"name":"ew_f_hr","url":"../hr/f_hr.js"},
+			{"name":"ew_f_hr-set","url":"../hr/f_hr_set.js"}
+			
+		]
+	},
+		{ "id": "ew_Steps",
+		"name": "Steps",
+		"icon": "../icon.png",
+		"version":"2.63",
+		"description": "Steps",
+		"tags": "magic3",
+	    "needsFeatures":["magic3"],
+		"storage": [
+			{"name":"ew_a_steps","url":"../steps/steps.js"},
+			{"name":"ew_f_steps","url":"../steps/f_steps.js"},
+			{"name":"ew_f_steps-set","url":"../steps/f_steps_set.js"}
+			
+		]
+	},
+		{ "id": "ew_Movement",
+		"name": "Move",
+		"icon": "../icon.png",
+		"version":"2.63",
+		"description": "Move",
+		"tags": "magic3",
+	    "needsFeatures":["magic3"],
+		"storage": [
+			{"name":"ew_a_move","url":"../move/move.js"},
+			{"name":"ew_f_move","url":"../move/f_move.js"},
+			{"name":"ew_f_move-set","url":"../move/f_move_set.js"}
+			
+		]
+	},	
+	{ "id": "ew_Temperature",
+		"name": "temp",
+		"icon": "../icon.png",
+		"version":"2.63",
+		"description": "temperature",
+		"tags": "magic3",
+	    "needsFeatures":["magic3"],
+		"storage": [
+			{"name":"ew_a_temp","url":"../temp/temp.js"},
+			{"name":"ew_f_temp","url":"../temp/f_temp.js"},
+			{"name":"ew_f_temp-set","url":"../temp/f_temp_set.js"}
+			
+		]
+	},
+		{ "id": "ew_Battery",
+		"name": "Battery",
+		"icon": "../icon.png",
+		"version":"2.63",
+		"description": "Battery",
+		"tags": "magic3",
+	    "needsFeatures":["magic3"],
+		"storage": [
+			{"name":"ew_a_battery","url":"../battery/battery.js"},
+			{"name":"ew_f_battery","url":"../battery/f_battery.js"},
+			{"name":"ew_f_battery-set","url":"../battery/f_battery_set.js"}
+			
+		]
+	},
+		
+		{ "id": "ew_toilet",
+		"name": "Toilet",
+		"icon": "../icon.png",
+		"version":"2.63",
+		"description": "Toilet",
+		"tags": "magic3",
+	    "needsFeatures":["magic3"],
+		"storage": [
+			{"name":"ew_a_kitty","url":"../toilet/kitty/kitty.js"},
+			{"name":"ew_f_kitty","url":"../toilet/kitty/f_kitty.js"},
+			{"name":"ew_f_kitty-set","url":"../toilet/kitty/f_kitty_set.js"},
+			{"name":"ew_a_scale","url":"../toilet/scale/scale.js"},
+			{"name":"ew_f_scale","url":"../toilet/scale/f_scale.js"},
+			{"name":"ew_f_scale-set","url":"../toilet/scale/f_scale_set.js"},
+			{"name":"ew_f_scale_calib","url":"../toilet/scale/f_scale_calib.js"},
+			{"name":"ew_a_Tof","url":"../toilet/ToF/ToF.js"},
+			{"name":"ew_f_ToF","url":"../toilet/ToF/f_ToF.js"},
+			{"name":"ew_f_ToF-set","url":"../toilet/ToF/f_ToF_set.js"},
+			{"name":"ew_logger_kitty","url":"../toilet/logger/logger_kitty.js"},
+			{"name":"ew_logger_battery","url":"../toilet/logger/logger_battery.js"},
+			{"name":"ew_f_view_activity","url":"../toilet/logger/f_view_activity.js"},
+			{"name":"ew_f_view_battery","url":"../toilet/logger/f_view_battery.js"},
+			{"name":"ew_f_view_cycles","url":"../toilet/logger/f_view_cycles.js"}				
+		]
 	}
+	
+	
 
 ]

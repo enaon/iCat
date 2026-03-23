@@ -1,0 +1,3219 @@
+θελω να μου φτιαξεις ενα appDrawer για το ρολογακι μου
+
+
+
+σου δινω μερικά ινφο: 
+
+- το ρολοι ειναι το Bangle js2, τρεχει espruino, αλλα οχι το defautbangle apps, εχω ενα δικό μου UI και λιγες εφαρμογές. 
+- το αππ drawer/ launcher app, θέλω να καλει και τις δικες μου εφαρμογες, αλλα και τις βανγλε εφαρμογες απο το ιδιο launcher. 
+
+εδω ειαι το αρχειο που χρησιμοποιώ σαν UI, για να καλω κουμπια κλπ
+
+
+
+// === font support ===
+
+
+Graphics.prototype.setFontLECO1976Regular42 = function(scale) {
+  // Actual height 42 (41 - 0)
+  return g.setFontCustom(atob("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAH/AAAAAAAAH/AAAAAAAAH/AAAAAAAAH/AAAAAAAAH/AAAAAAAAH/AAAAAAAAH/AAAAAAAAH/AAAAAAAAD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADAAAAAAAAA/AAAAAAAAH/AAAAAAAA//AAAAAAAP//AAAAAAB///AAAAAAP///AAAAAB////AAAAAf////AAAAD////4AAAAf////AAAAH////4AAAA////+AAAAA////wAAAAA///+AAAAAA///gAAAAAA//8AAAAAAA//gAAAAAAA/4AAAAAAAA/AAAAAAAAA4AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA///////AAA///////AAA///////AAA///////AAA///////AAA///////AAA///////AAA///////AAA///////AAA/4AAAH/AAA/4AAAH/AAA/4AAAH/AAA/4AAAH/AAA/4AAAH/AAA/4AAAH/AAA/4AAAH/AAA/4AAAH/AAA/4AAAH/AAA/4AAAH/AAA/4AAAH/AAA/4AAAH/AAA///////AAA///////AAA///////AAA///////AAA///////AAA///////AAA///////AAA///////AAA///////AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/4AAAH/AAA/4AAAH/AAA/4AAAH/AAA/4AAAH/AAA/4AAAH/AAA/4AAAH/AAA/4AAAH/AAA/4AAAH/AAA///////AAA///////AAA///////AAA///////AAA///////AAA///////AAA///////AAA///////AAA///////AAAAAAAAH/AAAAAAAAH/AAAAAAAAH/AAAAAAAAH/AAAAAAAAH/AAAAAAAAH/AAAAAAAAH/AAAAAAAAH/AAAAAAAAD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA//h////AAA//h////AAA//h////AAA//h////AAA//h////AAA//h////AAA//h////AAA//h////AAA//h////AAA/4B/wH/AAA/4B/wH/AAA/4B/wH/AAA/4B/wH/AAA/4B/wH/AAA/4B/wH/AAA/4B/wH/AAA/4B/wH/AAA/4B/wH/AAA/4B/wH/AAA/4B/wH/AAA/4B/wH/AAA////wH/AAA////wH/AAA////wH/AAA////wH/AAA////wH/AAA////wH/AAA////wH/AAA////wH/AAA////gD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/4AAAH/AAA/4AAAH/AAA/4AAAH/AAA/4AAAH/AAA/4B/gH/AAA/4B/wH/AAA/4B/wH/AAA/4B/wH/AAA/4B/wH/AAA/4B/wH/AAA/4B/wH/AAA/4B/wH/AAA/4B/wH/AAA/4B/wH/AAA/4B/wH/AAA/4B/wH/AAA/4B/wH/AAA/4B/wH/AAA/4B/wH/AAA/4B/wH/AAA/4B/wH/AAA///////AAA///////AAA///////AAA///////AAA///////AAA///////AAA///////AAA///////AAA///////AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA////wAAAAA////wAAAAA////wAAAAA////wAAAAA////wAAAAA////wAAAAA////wAAAAA////wAAAAA////wAAAAAAAB/wAAAAAAAB/wAAAAAAAB/wAAAAAAAB/wAAAAAAAB/wAAAAAAAB/wAAAAAAAB/wAAAAAAAB/wAAAAAAAB/wAAAAAAAB/wAAAAAAAB/wAAAAAAAB/wAAAAA///////AAA///////AAA///////AAA///////AAA///////AAA///////AAA///////AAA///////AAA///////AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA////x//AAA////x//AAA////x//AAA////x//AAA////x//AAA////x//AAA////x//AAA////x//AAA////x//AAA/4B/wH/AAA/4B/wH/AAA/4B/wH/AAA/4B/wH/AAA/4B/wH/AAA/4B/wH/AAA/4B/wH/AAA/4B/wH/AAA/4B/wH/AAA/4B/wH/AAA/4B/wH/AAA/4B/wH/AAA/4B////AAA/4B////AAA/4B////AAA/4B////AAA/4B////AAA/4B////AAA/4B////AAA/4B////AAA/wB////AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA///////AAA///////AAA///////AAA///////AAA///////AAA///////AAA///////AAA///////AAA///////AAA/4B/wH/AAA/4B/wH/AAA/4B/wH/AAA/4B/wH/AAA/4B/wH/AAA/4B/wH/AAA/4B/wH/AAA/4B/wH/AAA/4B/wH/AAA/4B/wH/AAA/4B/wH/AAA/4B/wH/AAA/4B////AAA/4B////AAA/4B////AAA/4B////AAA/4B////AAA/4B////AAA/4B////AAA/4B////AAA/wB////AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA//gAAAAAAA//gAAAAAAA//gAAAAAAA//gAAAAAAA//gAAAAAAA//gAAAAAAA//gAAAAAAA//gAAAAAAA//gAAAAAAA/4AAAAAAAA/4AAAAAAAA/4AAAAAAAA/4AAAAAAAA/4AAAAAAAA/4AAAAAAAA/4AAAAAAAA/4AAAAAAAA/4AAAAAAAA/4AAAAAAAA/4AAAAAAAA/4AAAAAAAA///////AAA///////AAA///////AAA///////AAA///////AAA///////AAA///////AAA///////AAA///////AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA///////AAA///////AAA///////AAA///////AAA///////AAA///////AAA///////AAA///////AAA///////AAA/4B/wH/AAA/4B/wH/AAA/4B/wH/AAA/4B/wH/AAA/4B/wH/AAA/4B/wH/AAA/4B/wH/AAA/4B/wH/AAA/4B/wH/AAA/4B/wH/AAA/4B/wH/AAA/4B/wH/AAA///////AAA///////AAA///////AAA///////AAA///////AAA///////AAA///////AAA///////AAA///////AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA////wH/AAA////wH/AAA////wH/AAA////wH/AAA////wH/AAA////wH/AAA////wH/AAA////wH/AAA////wH/AAA/4B/wH/AAA/4B/wH/AAA/4B/wH/AAA/4B/wH/AAA/4B/wH/AAA/4B/wH/AAA/4B/wH/AAA/4B/wH/AAA/4B/wH/AAA/4B/wH/AAA/4B/wH/AAA/4B/wH/AAA///////AAA///////AAA///////AAA///////AAA///////AAA///////AAA///////AAA///////AAA///////AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAP+AAH/AAAAP+AAH/AAAAP+AAH/AAAAP+AAH/AAAAP+AAH/AAAAP+AAH/AAAAP+AAH/AAAAP+AAH/AAAAH+AAD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"), 46, atob("ERkmHyYmJiYmJCYmEQ=="), 60+(scale<<8)+(1<<16));
+};
+
+Graphics.prototype.setFontLECO1976Regular22 = function(scale) {
+  // Actual height 22 (21 - 0)
+  return g.setFontCustom(atob("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAP/nA/+cD/5wP/nAAAAAAAAPwAA/gAD+AAPwAAAAAD+AAP4AA/gAAAAAAAAAAAAAcOAP//A//8D//wP//AHDgAcOAP//A//8D//wP//AHDgAAAAAAAAH/jgf+OB/44H/jj8OP/w4//Dj/8OPxw/4HD/gcP+Bw/4AAAAAAAP+AA/8AD/wQOHHA4c8D//wP/8A//gAD4AAfAAH/8A//wP//A84cDjhwIP/AA/8AB/wAAAAAAAD//wP//A//8D//wOHHA4ccDhxwOHHA4f8Dh/wOH/A4f8ABwAAAAAAAAD8AAP4AA/gAD8AAAAAAAAAAAEAAD+AB//A///v/D//gB/wABwAAAAAADgAA/wAf/4P8///wf/4AP8AAOAAAAAAAAAyAAHcAAPwAD/gAP/AA/8AA/AAH8AAMwAAAAAAAAAAAAADgAAOAAA4AAf8AD/wAP/AA/8AAOAAA4AADgAAAAAAAAAAD8AAfwAB/AAD8AAAAAAAADgAAOAAA4AADgAAOAAA4AADgAAAAAAAAAADgAAOAAA4AADgAAAAAAAAABwAB/AA/8A//gP/gA/wADwAAIAAAAAAD//wP//A//8D//wOAHA4AcDgBwOAHA//8D//wP//A//8AAAAAAAA4AcDgBwOAHA//8D//wP//A//8AABwAAHAAAcAAAAAAAA+f8D5/wPn/A+f8DhxwOHHA4ccDhxwP/HA/8cD/xwP/HAAAAAAAAOAHA4AcDhxwOHHA4ccDhxwOHHA4ccD//wP//A//8D//wAAAAAAAD/wAP/AA/8AD/wAAHAAAcAABwAAHAA//8D//wP//A//8AAAAAAAA/98D/3wP/fA/98DhxwOHHA4ccDhxwOH/A4f8Dh/wOH/AAAAAAAAP//A//8D//wP//A4ccDhxwOHHA4ccDh/wOH/A4f8Dh/wAAAAAAAD4AAPgAA+AADgAAOAAA4AADgAAP//A//8D//wP//AAAAAAAAP//A//8D//wP//A4ccDhxwOHHA4ccD//wP//A//8D//wAAAAAAAD/xwP/HA/8cD/xwOHHA4ccDhxwOHHA//8D//wP//A//8AAAAAAAAOA4A4DgDgOAOA4AAAAAAAAOA/A4H8DgfwOA/AAAAAAAAB4AAPwAA/AAD8AAf4ABzgAPPAA8cAHh4AAAAAAAAAAAAHHAAccABxwAHHAAccABxwAHHAAccABxwAHHAAAAAAAAAOHAA4cADzwAPPAAf4AB/gAD8AAPwAAeAAB4AAAAAAAAA+AAD4AAPgAA+ecDh9wOH3A4fcDhwAP/AA/8AD/wAP/AAAAAAAAAP//4///j//+P//44ADjn/OOf845/zjnHOP8c4//zj//OP/84AAAAAAAP//A//8D//wP//A4cADhwAOHAA4cAD//wP//A//8D//wAAAAAAAD//wP//A//8D//wOHHA4ccDhxwOHHA//8D//wP9/A/j8AAAAAAAA//8D//wP//A//8DgBwOAHA4AcDgBwOAHA4AcDgBwOAHAAAAAAAAP//A//8D//wP//A4AcDgBwOAHA8A8D//wH/+AP/wAf+AAAAAAAAD//wP//A//8D//wOHHA4ccDhxwOHHA4ccDhxwOAHA4AcAAAAAAAA//8D//wP//A//8DhwAOHAA4cADhwAOHAA4cADgAAOAAAAAAD//wP//A//8D//wOAHA4ccDhxwOHHA4f8Dh/wOH/A4f8AAAAAAAA//8D//wP//A//8ABwAAHAAAcAABwAP//A//8D//wP//AAAAAAAAP//A//8D//wP//AAAAAAAAOAHA4AcDgBwOAHA4AcDgBwOAHA//8D//wP//A//8AAAAAAAA//8D//wP//A//8AHwAA/AAP8AB/wAPn/A8f8DB/wIH/AAAAAAAAP//A//8D//wP//AAAcAABwAAHAAAcAABwAAHAAAAAAAAP//A//8D//wP//Af8AAP+AAH/AAD8AAHwAD/AB/wAf8AP+AA//8D//wP//AAAAAAAAP//A//8D//wP//AfwAAfwAAfwAAfwAAfwP//A//8D//wAAAAAAAAAAAP//A//8D//wP//A4AcDgBwOAHA4AcD//wP//A//8D//wAAAAAAAD//wP//A//8D//wOHAA4cADhwAOHAA/8AD/wAP/AA/8AAAAAP//A//8D//wP//A4AcDgBwOAHA4AcD//+P//4///j//+AAA4AADgAAAP//A//8D//wP//A4eADh+AOH8A4f4D/3wP/HA/8MD/wQAAAAAAAD/xwP/HA/8cD/xwOHHA4ccDhxwOHHA4f8Dh/wOH/A4f8AAAAAAAA4AADgAAOAAA//8D//wP//A//8DgAAOAAA4AADgAAAAAA//8D//wP//A//8AABwAAHAAAcAABwP//A//8D//wP//AAAADAAAPgAA/wAD/4AB/8AA/8AAfwAB/AA/8Af+AP/AA/wAD4AAMAAA4AAD+AAP/gA//8AH/wAB/AAf8Af/wP/4A/4AD/gAP/4AH/8AB/wAB/AB/8D//wP/gA/gADgAAIABA4AcDwDwPw/Afn4Af+AA/wAD/AA//AH5+A/D8DwDwOAHAgAEAAAAP/AA/8AD/wAP/AAAf8AB/wAH/AAf8D/wAP/AA/8AD/wAAAAAAAADh/wOH/A4f8Dh/wOHHA4ccDhxwOHHA/8cD/xwP/HA/8cAAAAAAAAf//9///3///f//9wAA3AADcAAMAAAOAAA/gAD/wAH/8AB/8AA/wAAPAAAEAAAAHAADcAANwAB3///f//9///wAA"), 32, atob("BwYLDg4UDwYJCQwMBgkGCQ4MDg4ODg4NDg4GBgwMDA4PDg4ODg4NDg4GDQ4MEg8ODQ8ODgwODhQODg4ICQg="), 22+(scale<<8)+(1<<16));
+};
+
+Graphics.prototype.setFontLECO1976Regular14 = function() {
+  // Actual height 14 (13 - 0)
+  return this.setFontCustom(
+    atob('AAAAAAAAAAAD+w/sAAAAA8APAAAA8APAAAAMwP/D/wMwDMD/w/8DMAAAAAD8w/M8z/M/zPM/DPwAAAAPwD8QzcP/D/AHgD/D/wzMI/APwAAAAD/w/8MzDMwzMM/DPwDAAADwA8AAAAAAD8H/74f4BwAAAA4B/z8/8D8AAAAAeAPwD8AeAHgAAAAAAAAYAGAH4B+AGABgAAAAAAHgB4AAAAAYAGABgAYAAAAAABgAYAAAAQA8D/D+A8AAAAAA/8P/DAwwMMDD/w/8AAAAAwMMDD/w/8ADAAwAAO/DvwzMMzDMw/MPzAAAAAMDDMwzMMzDMw/8P/AAAAAPwD8ADAAwAMA/8P/AAAAAP3D9wzMMzDMwz8M/AAAAAP/D/wzMMzDMwz8M/AAA4AOADAAwAMAD/w/8AAAAA/8P/DMwzMMzD/w/8AAAAA/MPzDMwzMMzD/w/8AAAAAYYGGAAAAAGHhh4AABwAcAPgDYB3AYwAAAAAZgGYBmAZgGYBmAAAAABjAdwDYA+AHABwAAA4AOADOwzsMwD8A/AAAAAA//P/zAM37N+zZs/7P+wAAAAP/D/wzAMwDMA/8P/AAAAAP/D/wzMMzDMw/8P/AAAAAP/D/wwMMDDAwwMMDAAAAAP/D/wwMMDDhw/8H+AAAAAP/D/wzMMzDMwzMMDAAAAAP/D/wzAMwDMAzAMAAAA/8P/DAwzMMzDPwz8AAAAA/8P/AMADAAwD/w/8AAAAA/8P/AAAwMMDDAwwMMDD/w/8AAAAA/8P/AcAPAPwDvwj8AAAAA/8P/AAwAMADAAwAAP/D/w/AB+AHwA8B+B+A/8P/AAA/8P/D/wfAB8AHw/8P/AAAAAP/D/wwMMDDAw/8P/AAAAAP/D/wzAMwDMA/APwAAA/8P/DAwwMMDD/8//AAwAA/8P/DOAzwM/D9w/EAAAAA/MPzDMwzMMzDPwz8AADAAwAMAD/w/8MADAAwAAAD/w/8ADAAwAMP/D/wAAPAD8AP4AfAHwP4PwDgAAAPgD/gH8AfB/w/AP4A/wA8D/D/A8AAADAw4cP/A/APwH+DzwwMAAAAA/APwAPwD8A/D8A/AAAAAAz8M/DMwzMMzD8w/MAAAAA/////ADwA4ADwA/wB/ADwAAMAPAD////8A'),
+    32,
+    atob("BAQHCQkNCQQGBggIBAYEBgkHCQkJCQkICQkEBAcIBwkKCQkJCQkICQkECAkHDAkJCAkJCQgJCQ0JCQkFBgU="),
+    14|65536
+  );
+}
+
+
+const font = E.toString(require('heatshrink').decompress(atob("ABH/5k/+YVRh/AgfwBBoAEhgNBmEP//D//wBBgaEnkwj+Oh1x4cMmH//k//4FB4eOuFx/EMngaE+Ewnkch8OgfHgEDwEB4EA8fAuHwnE8hkPGovwj/+h154eemF/5kPn8Ag4fB8EA/kAmZwJFwNwgH4EoK4TE4N/wE4uEch0OgPDgCCFUpEA4eAuFwnEOjkB/0AKgIAImEwCIXOLoShDgHMgFzHwUMFYIADgZpDIgIMBn/wh5XBBAYREHZUAjkAn0AWYoANFhAIDACQdEGJxLBhzrBC4LtBGoLvBcAM4HI8P4EH/EDw4VB8Hgjk4g8HD4Ph4Ef8ED+A4IJAPA4EwXghuEJ5E8jkfh0O4cHmHDxgCBhgCBzkwv0Mh50FFwLzBhkB4YiBC4cM+HDv1w/P4nk8JgvAgJZB9kAuZ9B4AbBh//4f/BoJUH/kwn41B4PDHYPMhkzgcM4HDnFw4/4mH8UIvwg/+gex4PMmHjKAYCBh1wgP4gBQFHoZ3BQwJlBwExKQK3Ba4IZHAwPwj/+h15QYgCEz1wv/4h4bFAoMfwBEBC4vHNwODxvAv/gMgLbIAAkMhkDZwoAON4Mchk+gcPChopBgPgYILXBwC1BjkOhz7DI5PAgYMB5kAmYIODxEAXINwuE4h0cgPOgE/gEHwDRCMo0AhxWCDoPMmPza4ScBvAqCAAk/a4ZiD5/MmYaB5nD2cwv/AXg0P/kH/8DxgbC8HAnEwg4vB8bnB/kD/4aE//8n//d4gCGz1wv/4h88KBvAC4MDR4z9BGpIRBDRQ1Cc4JQTAQIjDDRQvDHA7UBeIxrNhnDwcwuH8hj3BGo4mCFgJECF4YIBCIgAHJoiPICxAKCh0AgIvFHAlw//4n6hJC4UegEP4EHnEDw4kB8HgjihKMo5uIDRIJC8EAj8Ag/AgeADYSGIBAgPBnAYBD4ccGAQaIa5qhBwFwv/4h6GJCgodFzkAvyRBXYo1J5kwn8Mg+DwPgv/8h/zGp3AmH4hk3GoPgv0ch6hFnkwj+Oh1x4YdBAQ2OuFxEIM8DQjIIHwjaHKAvwn/+gEBeRVw//4n6hFAoM/c4N8SgIEDeoM+AYQpBn41NuEA/AYCBAY1I+E8n0fgPOFAUHwEB8BDCueA/F8njYF+ArFnAaB/kB/8ADgI9DUAp3BXoUMh3Dg62BxkxXgPg4dwboU8a4oADh//4ZyB4D4FVQIIDCwi0BhxQGBYJOBjjABVQJTBEQJQEFhY+EJhAWBFwIpBG4QyBHJIbIBIQZBLAIINABbFGDIIAJBYMegHP4EzmEM5kDmcA5nAncwcAMAcAIAD//8n4IB4HAmAaBhkDI4IIBnFwg7zBDgIADgfwgP+gHhDRIIGDSpHEDRHtNZiLBbZKwEn/8j//hz+DABBQF5kwmZQB4cDmHABAM3h//wf/HAKhIeJM4gC8IAAh9D5/8mYRCeZoADGQMH5//2ZHFABhdB4f/SgIXBvCLBgEc8EOjjXGGYvDI4LOFKBcP/kDQwZ9DgIIB8CGLDQyhTa4qhCa4JiCVQM4uEH/EADgKCIXgYaRGp4IBV4oAHaAM/+AXBgJpBQwJ0GGokMgPjIAPAmY1B5kDmcA5gIB+EMvATBeZKhDIgM/LIPBKATXJJIIRBJQS9INYLODDQgQBMAMfAgccaIINBwEH4ADBgYgBGpdwgCzBnwIEh/4ga8FWYWHgFzwEP4EBG4N4gE/HYPgh0cYoQ1J5kAToMM4EDOAIIBm7XBwbMBGowjB4fAmKzB9kDuZUB4E8fYoAIFoMeJYPwj8+h0B4YLB4EMmAaKAAf8/k/NIIAMEYbRB4eAuF8/DQBRAQLBJZTPBhzWBwC9CAwLEEnAeH/5HB/6TB4f/+AIMLJoARA=")));
+Graphics.prototype.setFontTeletext10x18Ascii = function() {
+	g.setFontCustom(font, 33, 12, 18);
+};
+
+
+
+const font1 = atob("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAP/nA/+cD/5wP/nAAAAAAAAPwAA/gAD+AAPwAAAAAD+AAP4AA/gAAAAAAAAAAAAAcOAP//A//8D//wP//AHDgAcOAP//A//8D//wP//AHDgAAAAAAAAH/jgf+OB/44H/jj8OP/w4//Dj/8OPxw/4HD/gcP+Bw/4AAAAAAAP+AA/8AD/wQOHHA4c8D//wP/8A//gAD4AAfAAH/8A//wP//A84cDjhwIP/AA/8AB/wAAAAAAAD//wP//A//8D//wOHHA4ccDhxwOHHA4f8Dh/wOH/A4f8ABwAAAAAAAAD8AAP4AA/gAD8AAAAAAAAAAAEAAD+AB//A///v/D//gB/wABwAAAAAADgAA/wAf/4P8///wf/4AP8AAOAAAAAAAAAyAAHcAAPwAD/gAP/AA/8AA/AAH8AAMwAAAAAAAAAAAAADgAAOAAA4AAf8AD/wAP/AA/8AAOAAA4AADgAAAAAAAAAAD8AAfwAB/AAD8AAAAAAAADgAAOAAA4AADgAAOAAA4AADgAAAAAAAAAADgAAOAAA4AADgAAAAAAAAABwAB/AA/8A//gP/gA/wADwAAIAAAAAAD//wP//A//8D//wOAHA4AcDgBwOAHA//8D//wP//A//8AAAAAAAA4AcDgBwOAHA//8D//wP//A//8AABwAAHAAAcAAAAAAAA+f8D5/wPn/A+f8DhxwOHHA4ccDhxwP/HA/8cD/xwP/HAAAAAAAAOAHA4AcDhxwOHHA4ccDhxwOHHA4ccD//wP//A//8D//wAAAAAAAD/wAP/AA/8AD/wAAHAAAcAABwAAHAA//8D//wP//A//8AAAAAAAA/98D/3wP/fA/98DhxwOHHA4ccDhxwOH/A4f8Dh/wOH/AAAAAAAAP//A//8D//wP//A4ccDhxwOHHA4ccDh/wOH/A4f8Dh/wAAAAAAAD4AAPgAA+AADgAAOAAA4AADgAAP//A//8D//wP//AAAAAAAAP//A//8D//wP//A4ccDhxwOHHA4ccD//wP//A//8D//wAAAAAAAD/xwP/HA/8cD/xwOHHA4ccDhxwOHHA//8D//wP//A//8AAAAAAAAOA4A4DgDgOAOA4AAAAAAAAOA/A4H8DgfwOA/AAAAAAAAB4AAPwAA/AAD8AAf4ABzgAPPAA8cAHh4AAAAAAAAAAAAHHAAccABxwAHHAAccABxwAHHAAccABxwAHHAAAAAAAAAOHAA4cADzwAPPAAf4AB/gAD8AAPwAAeAAB4AAAAAAAAA+AAD4AAPgAA+ecDh9wOH3A4fcDhwAP/AA/8AD/wAP/AAAAAAAAAP//4///j//+P//44ADjn/OOf845/zjnHOP8c4//zj//OP/84AAAAAAAP//A//8D//wP//A4cADhwAOHAA4cAD//wP//A//8D//wAAAAAAAD//wP//A//8D//wOHHA4ccDhxwOHHA//8D//wP9/A/j8AAAAAAAA//8D//wP//A//8DgBwOAHA4AcDgBwOAHA4AcDgBwOAHAAAAAAAAP//A//8D//wP//A4AcDgBwOAHA8A8D//wH/+AP/wAf+AAAAAAAAD//wP//A//8D//wOHHA4ccDhxwOHHA4ccDhxwOAHA4AcAAAAAAAA//8D//wP//A//8DhwAOHAA4cADhwAOHAA4cADgAAOAAAAAAD//wP//A//8D//wOAHA4ccDhxwOHHA4f8Dh/wOH/A4f8AAAAAAAA//8D//wP//A//8ABwAAHAAAcAABwAP//A//8D//wP//AAAAAAAAP//A//8D//wP//AAAAAAAAOAHA4AcDgBwOAHA4AcDgBwOAHA//8D//wP//A//8AAAAAAAA//8D//wP//A//8AHwAA/AAP8AB/wAPn/A8f8DB/wIH/AAAAAAAAP//A//8D//wP//AAAcAABwAAHAAAcAABwAAHAAAAAAAAP//A//8D//wP//Af8AAP+AAH/AAD8AAHwAD/AB/wAf8AP+AA//8D//wP//AAAAAAAAP//A//8D//wP//AfwAAfwAAfwAAfwAAfwP//A//8D//wAAAAAAAAAAAP//A//8D//wP//A4AcDgBwOAHA4AcD//wP//A//8D//wAAAAAAAD//wP//A//8D//wOHAA4cADhwAOHAA/8AD/wAP/AA/8AAAAAP//A//8D//wP//A4AcDgBwOAHA4AcD//+P//4///j//+AAA4AADgAAAP//A//8D//wP//A4eADh+AOH8A4f4D/3wP/HA/8MD/wQAAAAAAAD/xwP/HA/8cD/xwOHHA4ccDhxwOHHA4f8Dh/wOH/A4f8AAAAAAAA4AADgAAOAAA//8D//wP//A//8DgAAOAAA4AADgAAAAAA//8D//wP//A//8AABwAAHAAAcAABwP//A//8D//wP//AAAADAAAPgAA/wAD/4AB/8AA/8AAfwAB/AA/8Af+AP/AA/wAD4AAMAAA4AAD+AAP/gA//8AH/wAB/AAf8Af/wP/4A/4AD/gAP/4AH/8AB/wAB/AB/8D//wP/gA/gADgAAIABA4AcDwDwPw/Afn4Af+AA/wAD/AA//AH5+A/D8DwDwOAHAgAEAAAAP/AA/8AD/wAP/AAAf8AB/wAH/AAf8D/wAP/AA/8AD/wAAAAAAAADh/wOH/A4f8Dh/wOHHA4ccDhxwOHHA/8cD/xwP/HA/8cAAAAAAAAf//9///3///f//9wAA3AADcAAMAAAOAAA/gAD/wAH/8AB/8AA/wAAPAAAEAAAAHAADcAANwAB3///f//9///wAA");
+const width1 = atob("BwYLDg4UDwYJCQwMBgkGCQ4MDg4ODg4NDg4GBgwMDA4PDg4ODg4NDg4GDQ4MEg8ODQ8ODgwODhQODg4ICQg=");
+Graphics.prototype.setFontLECO1976Regular22 = function(scale) {
+	// Actual height 22 (21 - 0)
+	//g.setFontCustom(font1, 28, width1, 16+(scale<<8)+(1<<16));
+	g.setFontCustom(font1, 32, width1, 22 + (scale << 8) + (1 << 16));
+};
+
+const font2 = atob("AAAAAAAAAAfkAAwAAAwAAACQf8CQf8CQAAGIJEf+JEE4AAMMMQBgCMMMAAAYMkTEMkAYBkAAwAgAAAHwIIQEAAQEIIHwAABAFQDgBADgFQBABABAHwBABAAAACAMAABABABABABAAAAEAAAEAYAgDAEAYAAAP4QkRESEP4AAEEIEf8AEAAMMQUQUQkPEAAIIQEREREO4AABwCQEQIQf8AAeISESESER4AAH4KESESEB4AAYAQAQcTgcAAAO4REREREO4AAPAQkQkQoPwAACIAAACCMAABACgEQIIAACQCQCQCQCQAAIIEQCgBAAAMAQAQ0RAOAAAP4QETkUUUUP0AAP8RARARAP8AAf8REREREO4AAP4QEQEQEIIAAf8QEQEIIHwAAf8REREREQEAAf8RARARAQAAAP4QEQEREJ4AAf8BABABAf8AAQEf8QEAAAYAEQEf4QAAAf8BACgEQYMAAf8AEAEAEAEAAf8IAEACAEAIAf8AAf8EACABAf8AAP4QEQEQEP4AAf8RARARAOAAAP4QEQEQGP6AAf8RgRQRIOEAAOIREREREI4AAQAQAf8QAQAAAf4AEAEAEf4AAeABwAMBweAAAf8AIAQAgAQAIf8AAYMGwBAGwYMAAYAGAB8GAYAAAQMQ0REWEYEAAf8QEAAMACABgAQAMAAQEf8AAIAQAgAQAIAAAACACACACACAAgAwAAAAYCkCkCkB8AAf8CECECEB4AAB4CECECEBIAAB4CECECEf8AAB4CUCUCUBwAACAP8SAQAAAB4CFCFCFD+AAf8CACACAB8AACET8AEAAACABT+AAf8AgBQCIAEAAQEf8AEAAD8CACAD8CACAB8AAD8CACACAB8AAB4CECECEB4AAD/CECECEB4AAB4CECECED/AAD8BACACACAAABICkCkCkAYAACAP4CECEAAD4AEAEAED8AADAAwAMAwDAAAD4AEAEA4AEAED4AACMBQAgBQCMAAD4AFAFAFD+AACMCUCkDECEAABAO4QEQEAAf8AAQEQEO4BAAAYAgAQAQAIAwAAAAAAAAAAAAA");
+const widths2 = atob("BQIEBgYGBwMEBAcGAwYCBwYFBgYGBgYGBgYCAwUGBQYHBgYGBgYGBgYEBgYGCAYGBgYGBgYGBggGBgYDBgMGBgMGBgYGBgUGBgQEBgQIBgYGBgYGBQYGCAYGBgUCBQcF");
+Graphics.prototype.setFont8x12 = function() {
+	g.setFontCustom(font2, 32, widths2, 12);
+};
+
+const font3 = atob("AAAAAAAAA/QAAcAAAHAAAAJAf4CQH+AkAAAMQJIP+CSBGAAAQAUIEYAwBiBCgAgAAG4EiCRA0gBgDIAAOAAAAfAwYgCAAIAjBgfAAACgAgB8AIAKAAABAAgB8AIAEAAAACAOAAAIAEACABAAgAAADAAAAYAwBgDAGAAAAfgQIJkECB+AAAIQIIP8ACABAAAQwQoIkEiBhAAAQgQIJEEiBuAAADACgCQCID/ACAAAeQJEEiCRBHAAAHwFEEiCRAHAAAQAIMEYCwBgAAANwJEEiCRA3AAAOAIkESCKA+AAAGYAAAAgzgAACACgCICCAAAKAFACgBQAoAAAggIgCgAgAABABAAjQSAGAAAA8AhAmQUoL0CKA4AAABwHAMgGQA4ADgAAf4JEEiCRA4gDgAADwCECBBAggQIQAAH+CBBAggQIQDwAAD/BIgkQSIJEECAAB/gkASAJAEAAAAeAQgQIIkESBOAAA/wCABAAgAQB/gAAQIP8ECAAABAAQQIIEH8AAB/gEADACQCECBAAA/wAIAEACABAAA/wMABgAwBgB/gAAf4MABgAMABg/wAADwCECBBAgQgHgAAH+CIBEAiAOAAAB4BCBAggQIQD2AAD/BEAiARgHIACAAAxAkQSIIkESBGAAAgAQAIAH+CABAAgAAAP4ACABAAgAQfwAAHAAcABgAwDgOAAAD4ADgGAMABgAOD4AAAwwEgBgAwAkBhgAAYACAAgAPAIAIAYAAAEGCFBEgkQUIMEAAH/yAJAEAAYADAAYADAAYAAQBIAn/wAAGAMAYADAAYAAAAIAEACABAAgAQAIAAQAEAAAADAKQFICkA+AAD/gIQEICEA8AAAPAIQEICEAkAAAPAIQEICEP+AAAPAKQFICkA0AAAQA/wkASAIAAAAPAISEJCEh/gAD/gIAEACAA+AAAQBPwAAABAAggSfwAA/4AQAYASAQgAAgAf8AAA/AQAIAD4CABAAfAAAPwEACABAAfAAAHgEICEBCAeAAAP+EICEBCAeAAAHgEICEBCA/4AAPwCACABAAQAAAEQFICkBKAiAAAIAfwCEBCABAAAPgAIAEACA/AAAMABgAMAYAwAAAPAAYAYAwAGABgPAAACEAkAMAJAIQAAD5ACQBIAkP8AACEBGAlAUgMQAAAgAQD3iAJAEAAf/AAEASAI94BAAgAAAIAIAEADAAgAQAQAAAFAHwFUCqBBARAAAACAOAAAAQQI/4kASAAAADgAAA4AAAEAAABAAAAQAAEACAH/AgAQAAAFACgH/AoAUAAAEAEAEABAAQAAAGMAYAwBjAAAAwAADEKRDIiiQRIEYAAAIAKAIgAAH4ECCBA/AkQSIIEAACDFChiRSIKEGCAADAAQAAAEAMAAADAAQAwAEAAABADAAQAwAAAAQAcAfAHABAAAAQAIAEACABAAAAQAIAEACABAAgAQAAAgAgAIAIAAACAB4AgAAAPAGADwAAAEQlIKkJKAiAAAIgCgAgAAAeAQgIQDwCkBSAaAAAIQkYKUJSAxAAAYACAQgAOEIAIAYAAAL8AAAeAQgf4EIBIAAATA+gkQSIAEAABBAfAIgEQCIB8BBAAAwAEgBQAeAUASAwAAAffAADCCYhKQjIIYAAEAAABAAAAH4ECCZBSgpQQIH4AAAQBUAqAPAAAAQAUAVAFAEQAAAQAIAEADwAAH4ECC9BUglQQIH4AAIAEACABAAgAQAIAAAAwAkASAGAAAAIgEQPoBEAiAACIBMAqAJAAAEQCoBUAUAAAEAEAAAAAEH8AIACABAfAAQAAGAHgD/hAA/4QAAAA4AcAOAAAAFADAACQD4AEAAAOAIgEQBwAAAEQBQBUAUAEAAA8YAwBkDGGHgAgAAeMAYAwBpjFQBIAAIgFTB2AMgYww8AEAAADACQWIAEAEAAADgOBJAUgBwAHAAABwHAUgSQA4ADgAAA4TgSQJICcABwAAAcJwJICkCOAA4AAAOE4AkASAnAAcAAAHDcCSBJAbgAOAAADgGANAIgH+CRBAgAAHgEIECSBxAgQgAAH8SSFJAkgQQAAH8CSFJEkgQQAAH8KSJJCkgQQAAH8KSBJCkgQQAAEET+FBAAAQQv4kEAAFBE/hQQAAUED+FBAAACAP4EkCSBBARAHAAAH8KAIwCGCAwP4AAA4AiEghQQEQBwAAAcARBQRIICIA4AAAOBIhIIkEJEAcAAAHAkQkEKCIiAOAAADgSICCBBCRAHAAACIAoAIAKAIgAAD0CECNBYgQgXgAAD8ABEAhAQAIH4AAB+AAhARAIAED8AAA/BARAIgEICB+AAAfggIAEACEBA/AAAMABAAQEHEEAEAMAAAH+AkASAJADAAAABD/CQhIQkINEAcAAADAKQlIKkA+AAADAKQVISkA+AAADAqQlIKkA+AAADAqQlIKkI+AAADAqQFIKkA+AAADBKRVISkA+AAADAKQFIB8BSApANAAADwCEhDghAJAAADwSkFSApANAAADwKkJSApANAAADwKkJSCpANAAADwKkBSCpANAAAkAL8AACgCfgAAUAT8EAAACQAPwgAAAAcERCogkQvwAAF+EgBQBIAD4AAA8EhBQgIQDwAAA8AhBQhIQDwAAA8ChCQgoQDwAAA8ChCQgoQjwAAA8ChAQgoQDwAAAQAIAVACABAAAA9AjAWgMQLwAAB8EBBAgAQH4AAB8CBCAgAQH4AAB8CBCAggQH4AAB8CBAAggQH4AAB8ABJAlASH+AAH/ghAQgIQDwAAB8CBIAkgSH+AAA");
+const widths3 = atob("AwIEBgYIBwIEBAYGAwYCBgYGBgYHBgYGBgYCAwUGBQYIBwcHBwcGBwcEBgcGBwcHBgcHBwgHBwgHCAcEBgQGCAMGBgYGBgYGBgMFBgMIBgYGBgYGBgYGCAYGBgYCBggABwADBgQGBgYGBwcECAAHAAADAwUFBgYIBQgGBAgABggAAgYGCAgCBgQIBQYFAAgIBQYFBQMIBwQDBAUGBwcIBgcHBwcHBwgHBgYGBgQEBAQIBwcHBwcHBgcHBwcHCAYIBgYGBgYGCAYGBgYGAwMEBAYGBgYGBgYGBgYGBgYGBgY=");
+Graphics.prototype.setFontDylex7x13 = function() {
+	g.setFontCustom(font3, 32, widths3, 13);
+};
+
+
+// === UI ===
+
+ew.UI = {
+	//size: { _2x2: 20, _2x1: 25, _txt: 26, _sideSmall: 20, sideBig: 45, underSmall: 20, txt: 0.85, len: 1, sca: 1 },
+	size: { _2x2: 20, _2x1: 25, _txt: 26, t1: 10, t2: 35, t3: 42, txt: 0.85, len: 1, sca: 1 },
+	font: { def: "LECO1976Regular22" },
+	pos: { //raw X colomn
+		_fold: [20, [79, 161], //middle pos x
+			[65], //middle pos y
+			[158, 158], //size x
+			[74] //size y
+		],
+		_2x1: [28, [120],
+			[80, 200],
+			[240],
+			[120, 120]
+		],
+		_2x2: [27, [60, 180],
+			[80, 200],
+			[120, 120],
+			[120, 120]
+		],
+		_2x3: [
+			28, [38, 120, 202],
+			[65, 144],
+			[77, 77, 77],
+			[74, 74]
+		],
+		_3x1: [25, [120],
+			[63, 145, 225],
+			[220],
+			[72, 72, 75]
+		],
+		_4x1: [27, [120],
+			[50, 110, 170, 230],
+			[240],
+			[60, 60, 60, 60]
+		],
+		_ind: [27, [120],
+			[260],
+			[240],
+			[40]
+		],
+		_kp4x4: [28, [30, 90, 150, 210],
+			[50, 110, 170, 230]
+		],
+		_kp4x3: [35, [40, 120, 200],
+			[50, 110, 170, 230],
+			[80, 80, 80],
+			[60, 60, 60, 60]
+		],
+		_ele: { "0": 25, title: [0, 260, 239, 279, 19], titleTop: [0, 0, 239, 19, 18], ind: [80, 0, 160, 4, 0, 240]  },
+
+		_bar: [23, [40, 120, 200, 60, 180, 120],
+			[240],
+			[80, 80, 80, 114, 114, 240],
+			[80]
+		],
+		_1x2: [25, [120],
+			[80, 200],
+			[240],
+			[120, 120]
+		],
+		_header: [23, [40, 120, 200, 60, 180, 120],
+			[25],
+			[80, 80, 80, 120, 120, 240],
+			[54]
+		],
+		_headerL: [23, [40, 120, 200, 70, 190, 120],
+			[30],
+			[80, 80, 80, 140, 100, 240],
+			[60]
+		],
+		_headerS: [23, [40, 120, 200, 70, 190, 120],
+			[30],
+			[80, 80, 80, 140, 100, 240],
+			[48]
+		],
+		_main: [25, [60, 180, 120], //5x3
+			[45, 120, 102, 140, 140],
+			[120, 120, 240],
+			[50, 130, 195, 240, 280]
+		],
+		_lcd: [110, [120],
+			[135, 110, 140],
+			[240],
+			[130, 180, 240]
+		],
+		_log: [50, [80, 120, 200],
+			[36, 105, 170],
+			[160, 240, 80],
+			[50, 90, 40]
+		],
+		_top: 20,
+		_head: 2,
+		_foot: [225, 210, 240]
+	},
+	loc: function(no, po) {
+		let m = {};
+		const p = (ew.UI.pos[no]);
+		let ln = p[1].length;
+		m.x = p[1][(po - 1) % ln];
+		m.y = p[2][((po - 1) / ln) | 0];
+		m.szX = p[3][(po - 1) % ln] / 2;
+		m.szY = p[4][((po - 1) / ln) | 0] / 2;
+		return m;
+	},
+	btn: {
+		size: { _xs: 28, _s: 22, _m: 28, _l: 35, _xl: 45, txt: 1, len: 1 },
+
+		cInd: function(loc, no, po, val, txt, fclr, bclr, size) {
+			const p = (ew.UI.pos[no]);
+			const ln = p[1].length;
+			const x = p[1][(po - 1) % ln];
+			const y = p[2][((po - 1) / ln) | 0];
+			const szX = p[3][(po - 1) % ln] / 2;
+			const szY = p[4][((po - 1) / ln) | 0] / 2;
+			g.setCol(0, bclr);
+			g.fillRect({ x: x - szX, y: y - szY, x2: x + szX, y2: y + szY, r: 10 });
+			g.setCol(1, fclr);
+			if (txt && ew.def.face.txt) {
+				if (process.env.BOARD == "BANGLEJS2") g.setFont("Teletext10x18Ascii");
+				else g.setFont("LECO1976Regular22");
+				g.drawString(txt, x - (g.stringWidth(txt) / 2), y + 2 + ((szY * 2) * (2 - ew.UI.size.txt) / 6));
+				let szXn = (val / 10) * (szX - 10);
+				g.fillRect({ x: x - szXn, y: y - szY + 8, x2: x + szXn, y2: y - 4, r: 10 });
+			}
+			else {
+				g.drawCircle(x, y, p[0] * ew.UI.size.txt * (size ? size : 1));
+				g.fillCircle(x, y, (p[0] * ew.UI.size.txt * (size ? size : 1) - 3) * (val / 10));
+			}
+			if (!ew.def.face.bpp) 
+			g.flip();
+			//coordinates
+			if (ew.UI.c.get[loc])
+				ew.UI.c.raw[loc] = ew.UI.c.raw[loc] + `${ew.UI.c.raw[loc]==" "?'':'else '}if (${x}-${szX}<x&&x<${x}+${szX}&&${y}-${szY}<y&&y<${y}+${szY}) ew.UI.c.${loc}.${no}(${po},l);`;
+		},
+
+		i2l: function(loc, no, po, txt1, txt2, fclr, bclr, size) {
+
+			const p = (ew.UI.pos[no]);
+			const ln = p[1].length;
+			const x = p[1][(po - 1) % ln];
+			const y = p[2][((po - 1) / ln) | 0];
+			const szX = p[3][(po - 1) % ln] / 2;
+			const szY = p[4][((po - 1) / ln) | 0] / 2;
+			g.setCol(0, bclr);
+			g.fillRect({ x: x - szX, y: y - szY, x2: x + szX, y2: y + szY, r: 10 });
+			g.setCol(1, fclr);
+
+			if (txt1) {
+				g.setFont("LECO1976Regular22", size ? size : 2);
+				if (txt1 != "fill") g.drawString(txt1, x - (g.stringWidth(txt1) / 2), y - (g.stringMetrics(txt1).height / 2));
+			}
+			if (txt2) {
+				if (process.env.BOARD == "BANGLEJS2") g.setFont("Vector", p[0] * ew.UI.size.txt); //g.setFont("Dylex7x13",2);
+				else g.setFont("Teletext10x18Ascii");
+				if (txt2 != "fill") g.drawString(txt2, x - (g.stringWidth(txt2) / 2), y + szY - 10 - (g.stringMetrics(txt2).height / 2));
+			}
+			if (!ew.def.face.bpp) g.flip();
+			//coordinates
+			if (ew.UI.c.get[loc])
+				ew.UI.c.raw[loc] = ew.UI.c.raw[loc] + `${ew.UI.c.raw[loc]==" "?'':'else '}if (${x}-${szX}<x&&x<${x}+${szX}&&${y}-${szY}<y&&y<${y}+${szY}) ew.UI.c.${loc}.${no}(${po},l);`;
+		},
+
+		c1l: function(loc, no, po, txt1, txt2, fclr, bclr, size) { //type:main|bar,
+			//"ram";
+			//draw
+			const p = (ew.UI.pos[no]);
+			let len = p[1].length;
+			let x = p[1][(po - 1) % len];
+			let y = p[2][((po - 1) / len) | 0];
+			let szX = p[3][(po - 1) % len] / 2;
+			let szY = p[4][((po - 1) / len) | 0] / 2;
+			//g.setFont("LECO1976Regular22", size?size:1);
+			g.setFont("Vector", p[0] * ew.UI.size.txt * (size ? size : 1));
+			if (this.x0) {
+				g.setCol(0, bclr);
+				g.fillRect(this.x0, this.y0, this.x1, this.y1);
+			}
+			this.x0 = x - (g.stringWidth(txt1) / 2);
+			this.x1 = x + (g.stringWidth(txt1) / 2);
+			this.y0 = y + 4 - (g.stringMetrics(txt1).height / 2);
+			this.y1 = y + (g.stringMetrics(txt1).height / 2);
+			g.setCol(1, fclr);
+			g.drawString(txt1, x - (g.stringWidth(txt1) / 2), y + 5 - (g.stringMetrics(txt1).height / 2));
+			g.flip();
+		},
+		c2l: function(loc, no, po, txt1, txt2, fclr, bclr, size, offset, font) { //type:main|bar,
+			//"ram";
+			//draw
+			const p = (ew.UI.pos[no]);
+			let len = p[1].length;
+			let x = p[1][(po - 1) % len];
+			let y = p[2][((po - 1) / len) | 0];
+			let szX = p[3][(po - 1) % len] / 2;
+			let szY = p[4][((po - 1) / len) | 0] / 2;
+
+			g.setCol(0, bclr);
+
+			g.fillRect({ x: x - szX, y: y - szY, x2: x + szX, y2: y + szY, r: 10 });
+
+			g.setCol(1, fclr);
+			if (txt2 && txt2 != "") {
+				g.setFont("Vector", p[0] * 0.70 * ew.UI.size.txt * (size ? size : 1));
+				g.drawString(txt1, x - (g.stringWidth(txt1) / 2), y - 6 - g.stringMetrics(txt1).height);
+				g.setFont("Vector", p[0] * 1 * ew.UI.size.txt * (size ? size : 1));
+				g.drawString(txt2, x - (g.stringWidth(txt2) / 2), y + (1.00 - ew.UI.size.txt));
+			}
+			else {
+				if (offset) y =y+offset;
+				if (font) g.setFont(font, size ? size : 1)
+				else g.setFont("Vector", p[0] * ew.UI.size.txt * (size ? size : 1));
+				g.setFontAlign(0, 0);
+				//g.drawString(txt1, x - (g.stringWidth(txt1) / 2), y + 2 - (g.stringMetrics(txt1).height / 2));
+				//g.drawString(txt1, x, y + 2 - (g.stringMetrics(txt1).height / 2));
+				g.drawString(txt1, x, y);
+				g.setFontAlign(-1, -1);
+
+			}
+			if (!ew.def.face.bpp) g.flip();
+			//coordinates
+			if (ew.UI.c.get[loc])
+				ew.UI.c.raw[loc] = ew.UI.c.raw[loc] + `${ew.UI.c.raw[loc]==" "?'':'else '}if (${x}-${szX}<x&&x<${x}+${szX}&&${y}-${szY}<y&&y<${y}+${szY}) ew.UI.c.${loc}.${no}(${po},l);`;
+
+			else g.flip();
+		},
+		img: function(loc, no, po, img, txt, fclr, bclr, size, side, tran) {
+			if (process.env.BOARD == "P8" || process.env.BOARD == "P22" || process.env.BOARD == "PINETIME") img = 0;
+			else img = require("heatshrink").decompress(atob(ew_icon[img]));
+
+			const p = (ew.UI.pos[no]);
+			let len = p[1].length;
+			let x = p[1][(po - 1) % len];
+			let y = p[2][((po - 1) / len) | 0];
+			let szX = p[3][(po - 1) % len] / 2;
+			let szY = p[4][((po - 1) / len) | 0] / 2;
+			if (!tran) {
+				g.setCol(0, bclr);
+				g.fillRect({ x: x - szX, y: y - szY, x2: x + szX, y2: y + szY, r: 10 });
+			}
+			g.setCol(1, fclr);
+			let imgW = g.imageMetrics(img).width;
+			let imgH = g.imageMetrics(img).height;
+			if (txt && side) {
+				g.setFont("Vector", p[0] * 1.5 * ew.UI.size.txt * size);
+				let xa = x - ((imgW + g.stringWidth(txt)) / 2);
+				g.setCol(1, 11);
+				g.drawImage(img, xa, y - (imgH / 2), { scale: ew.UI.size.sca });
+				g.setCol(1, fclr);
+				g.drawString(txt, xa + 8 + imgW, y - (p[0] * 1.7 * ew.UI.size.txt) / 2 + 2);
+			}
+			else if (ew.def.face.txt && txt) {
+				g.drawImage(img, x - (imgW * ew.UI.size.sca * 0.65 / 2), (y - szY) + ((szY * 2) * (2 - ew.UI.size.txt) / 15), { scale: 0.75 * ew.UI.size.sca });
+				g.setCol(1, fclr);
+				if (process.env.BOARD == "BANGLEJS2") g.setFont("Teletext10x18Ascii");
+				else g.setFont("LECO1976Regular22");
+				g.drawString(txt, x - (g.stringWidth(txt) / 2), y + 2 + ((szY * 2) * (2 - ew.UI.size.txt) / 6));
+			}
+			else g.drawImage(img, x - (imgW * ew.UI.size.sca / 2), y - (imgH * ew.UI.size.sca / 2), { scale: ew.UI.size.sca });
+			img = 0;
+			if (!ew.def.face.bpp) g.flip();
+			//coordinates
+			if (ew.UI.c.get[loc])
+				ew.UI.c.raw[loc] = ew.UI.c.raw[loc] + `${ew.UI.c.raw[loc]==" "?'':'else '}if (${x}-${szX}<x&&x<${x}+${szX}&&${y}-${szY}<y&&y<${y}+${szY}) ew.UI.c.${loc}.${no}(${po},l);`;
+			else g.flip();
+		},
+		ntfy: function(rst, tmot, ignr, no, po, txt1, txt2, fclr, bclr, sel, img, pri) {
+			//"ram";
+
+			if (ew.is.UIpri && !pri) return;
+			if (pri) ew.is.UIpri = 1;
+			if (ew.UI.ntid) {
+				clearTimeout(ew.UI.ntid);
+				ew.UI.ntid = 0;
+			}
+			if (rst && !sel) {
+				//ew.UI.c.xy.replaceWith(new Function("x", "y", "l", 'setTimeout(()=>{' + ew.UI.c.raw.main + '},0);'));
+				ew.UI.c.xy.replaceWith(new Function("x", "y", "l", '' + ew.UI.c.raw.main + ''));
+
+				ew.is.slide = 0;
+			}
+			if (!ignr) {
+				ew.face.off();
+				const p = (ew.UI.pos[no]);
+				let len = p[1].length;
+				let x = p[1][(po - 1) % len];
+				let y = p[2][((po - 1) / len) | 0];
+				let szX = p[3][(po - 1) % len] / 2;
+				let szY = p[4][((po - 1) / len) | 0] / 2;
+				g.setCol(0, bclr);
+				g.fillRect({ x: x - szX, y: y - szY, x2: x + szX, y2: y + szY, r: 10 });
+				g.setCol(1, fclr);
+				g.setFont("LECO1976Regular22");
+				if (txt1)
+					g.drawString(txt1, x - (g.stringWidth(txt1) / 2), (txt2) ? ew.UI.pos._foot[1] : ew.UI.pos._foot[0]);
+
+				if (txt2)
+					g.drawString(txt2, x - (g.stringWidth(txt2) / 2), ew.UI.pos._foot[2]);
+
+				if (sel && rst) {
+					//g.flip
+					ew.is.bar = 1;
+					ew.is.slide = 0;
+					ew.UI.c.raw.bar = `if (x<120&&${y}-${szY}<y&&y<${y}+${szY}) ew.UI.c.bar._ntfy(1); else if (120<x&&${y}-${szY}<y&&y<${y}+${szY}) ew.UI.c.bar._ntfy(2);`;
+					ew.UI.c.xy.replaceWith(new Function("x", "y", "l", '' + ew.UI.c.raw.main + ew.UI.c.raw.bar + ''));
+					//ew.UI.c.xy.replaceWith(new Function("x", "y", "l", 'setTimeout(()=>{' + ew.UI.c.raw.main + ew.UI.c.raw.bar + '},0);'));
+				}
+				else ew.UI.c.bar._ntfy = function() {};
+				g.flip();
+			}
+			if (txt1) ew.face[0].ntfy = txt1;
+			//if (!sel) g.flip();
+			ew.UI.ntid = setTimeout(function(t) {
+				ew.face[0].ntfy = false;
+				ew.UI.rtb();
+			}, tmot ? tmot * 1000 : 1000);
+
+		}
+	},
+	ele: {
+		title: function(txt, fclr, bclr, top) {
+			//"ram";
+			let p = (top ? ew.UI.pos._ele.titleTop : ew.UI.pos._ele.title);
+			let x = 4 + p[2] - ((p[2] - p[0]) / 2);
+			let y = p[3] - ((p[3] - p[1]) / 1.5);
+			g.setCol(0, bclr);
+			g.fillRect(p[0], p[1], p[2], p[3]);
+			g.setCol(1, fclr);
+			g.setFont("Vector", p[4] * ew.UI.size.txt);
+			g.drawString(txt, x - (g.stringWidth(txt) / 2), top ? y - 2 : y);
+			if (!ew.def.face.bpp) g.flip();
+		},
+
+		ind: (process.env.BOARD != "BANGLEJS2")? 
+		
+		function(c, t, clrB, clrF) {
+			//"ram";
+			let p = ew.UI.pos._ele.ind; 
+
+			g.setCol(0,clrB !== undefined ? clrB : 0);
+			g.fillRect(p[4], p[1], p[5], p[3]);
+			if (!c) return;
+			
+			g.setCol(0, clrB ? 0 : 6);
+			g.fillRect(p[0], p[1], p[2], p[3]);
+			let pa = (p[2] - p[0]) / t;
+			g.setCol(1, clrF ? clrF : 3);
+			g.fillRect(p[0] + (pa * (c - 1)), p[1], p[0] + (pa * c), p[3]);
+			if (!ew.def.face.bpp) g.flip();
+	
+		}:
+			function(c, t, clrB, clrF) {
+
+			let p = ew.UI.pos._ele.ind; // [50, 118, 126, 124, 0, 176]
+
+			g.setCol(0,clrB !== undefined ? clrB : 0);
+			g.fillRect(p[4], p[1], p[5], p[3]);
+
+			if (!c) return; 
+
+			let startX = p[0]; // αριστερή άκρη
+			let startY = p[1]; // πάνω άκρη
+			let endX = p[2]; // δεξιά άκρη
+			let height = p[3] - p[1]; // ύψος περιοχής
+
+			// Υπολογισμός διαστάσεων για τους κύκλους
+			let availableWidth = endX - startX;
+			let circleDiameter = Math.min(10, Math.floor(availableWidth / t) - 2);
+			let circleRadius = Math.floor(circleDiameter / 3);
+
+			// Κεντρική ευθυγράμμιση
+			let totalDotsWidth = circleDiameter * t + 2 * (t - 1);
+			let startDrawingX = startX + Math.floor((availableWidth - totalDotsWidth) / 2);
+			let centerY = startY + Math.floor(height / 2)-1;
+
+			// Σχεδίαση όλων των κύκλων (background)
+			g.setCol(0,4); // χρώμα μη-ενεργών
+			for (let i = 0; i < t; i++) {
+				let x = startDrawingX + i * (circleDiameter + 2) + circleRadius;
+				g.fillCircle(x, centerY, circleRadius);
+			}
+
+			// Σχεδίαση ενεργού κύκλου
+			if (c > 0 && c <= t) {
+				g.setCol(0,clrF !== undefined ? clrF : 15);
+				let activeX = startDrawingX + (c - 1) * (circleDiameter + 2) + circleRadius;
+				g.fillCircle(activeX, centerY, circleRadius);
+			}
+
+			if (!ew.def.face.bpp) g.flip();
+		},
+
+		/*
+		ind: function(current, total, bgColor, fgColor) {
+			let p = ew.UI.pos._ele.ind;
+
+			// Καθαρισμός
+			g.setCol(0,bgColor !== undefined ? bgColor : 0);
+			g.fillRect(p[4], p[1], p[5], p[3]);
+
+			if (!current) return;
+
+			let startX = p[0];
+			let width = p[2] - p[0];
+			let centerY = p[1] + Math.floor((p[3] - p[1]) / 2);
+
+			// Fast calculation - χωρίς κύκλους, μόνο τετράγωνα με στρογγυλεμένες άκρες
+			let btnWidth = 8;
+			let spacing = 4;
+			let totalWidth = total * btnWidth + (total - 1) * spacing;
+			let startDrawingX = startX + Math.floor((width - totalWidth) / 2);
+
+			// Background dots (fast)
+			g.setCol(0,4);
+			for (let i = 0; i < total; i++) {
+				let x = startDrawingX + i * (btnWidth + spacing);
+				g.fillRect(x, centerY - 3, x + btnWidth, centerY + 3);
+			}
+
+			// Active dot (filled)
+			if (current > 0 && current <= total) {
+				g.setCol(0,fgColor !== undefined ? fgColor : 15);
+				let x = startDrawingX + (current - 1) * (btnWidth + spacing);
+				g.fillRect(x, centerY - 3, x + btnWidth, centerY + 3);
+				// Κάνουμε το active πιο στρογγυλό με μικρές γραμμές
+				g.drawLine(x + 1, centerY - 4, x + btnWidth - 1, centerY - 4);
+				g.drawLine(x + 1, centerY + 4, x + btnWidth - 1, centerY + 4);
+			}
+
+			if (!ew.def.face.bpp) g.flip();
+		},
+		*/
+		/*ind: function(current, total, bgColor, fgColor) {
+		    let p = ew.UI.pos._ele.ind;
+		    
+		    // Καθαρισμός
+		    g.setCol(0,bgColor !== undefined ? bgColor : 0);
+		    g.fillRect(p[4], p[1], p[5], p[3]);
+		    
+		    if (!current) return;
+		    
+		    // Χρησιμοποιούμε fixed size για ταχύτητα
+		    let charWidth = 8;
+		    let centerY = p[1] -5 ; // σταθερό offset
+		    
+		    // Fast positioning με bit operations
+		    let availableWidth = p[2] - p[0];
+		    let dotsWidth = total * charWidth;
+		    let margin = (availableWidth - dotsWidth) >> 1;
+		    let startX = p[0] + (margin > 0 ? margin : 0);
+		    
+		    g.setFont("Dylex7x13"); // Το πιο γρήγορο font
+		    
+		    // Σχεδίαση όλων των τελειών (background)
+		    g.setCol(1,4);
+		    for (let i = 0; i < total; i++) {
+		        g.drawString("o", startX + i * charWidth, centerY);
+		    }
+
+		    // Ενεργός κύκλος
+		    if (current > 0 && current <= total) {
+		        g.setCol(1,fgColor !== undefined ? fgColor : 3);
+		        
+		        // Δοκιμή διαφορετικών χαρακτήρων:
+		        // 'o' μικρό o, 'O' κεφαλαίο O, '●' filled circle αν υπάρχει
+		        let activeChar = "o"; // ή "O" για πιο μεγάλο
+		        
+		        g.drawString(activeChar, startX + (current - 1) * charWidth, centerY);
+		    }
+		    
+		    if (!ew.def.face.bpp) g.flip();
+		},
+		*/
+		fill: function(no, po, clr) {
+			//"ram";
+			let m = ew.UI.loc(no, po);
+			g.setCol(0, clr);
+			g.fillRect(m.x - m.szX, m.y - m.szY, m.x + m.szX, m.y + m.szY);
+			if (!ew.def.face.bpp) g.flip();
+		},
+		keypad: function(no, po, clr) {
+			let m = ew.UI.loc(no, po);
+			g.setCol(0, clr);
+			g.fillRect(m.x - m.szX, m.y - m.szY, m.x + m.szX, m.y + m.szY);
+			if (!ew.def.face.bpp) g.flip();
+		},
+		coord: function(loc, no, po) {
+			//"ram";
+			let m = ew.UI.loc(no, po);
+			ew.UI.c.raw[loc] = ew.UI.c.raw[loc] + `${ew.UI.c.raw[loc]==" "?'':'else '}if (${m.x}-${m.szX}<x&&x<${m.x}+${m.szX}&&${m.y}-${m.szY}<y&&y<${m.y}+${m.szY}) ew.UI.c.${loc}.${no}(${po},l);`;
+		},
+		txt: function(loc, no, po, txt, bclr, fclr, size) {
+			let m = ew.UI.loc(no, po);
+			print("m", m);
+			g.setCol(0, bclr);
+			g.fillRect(m.x - m.szX, m.y - m.szY, m.x + m.szX, m.y + m.szY);
+			g.setCol(1, fclr);
+			if (process.env.BOARD == "BANGLEJS2") g.setFont("Dylex7x13");
+			else
+				//g.setFont("Teletext10x18Ascii",1);
+				g.setFont("Vector", ew.UI.size._txt * ew.UI.size.txt * (size ? size : 1));
+
+			//txt=g.wrapString(txt||"",220);
+			//g.drawString(txt.join("\n"), m.x - (g.stringWidth(txt) / 2), m.y - m.szY + (m.szY / 10));
+			g.drawString(txt, m.x - (g.stringWidth(txt) / 2), m.y - m.szY + (m.szY / 10));
+			//if (!ew.def.face.bpp) 
+			g.flip();
+		}
+	},
+	txt: {
+		wrap: function(str, len) {
+			//"ram";
+			str = str.split(' ');
+			var line = "";
+			let i = 0;
+			var prev = 0;
+			for (i == 0; i < str.length; i++) {
+				if (str[i].length < (len + 1)) {
+					if (str[i].length + (line.length - line.lastIndexOf('\n')) < (len + 1)) {
+						if (line != "") line = line + " " + str[i];
+						else line = str[i];
+					}
+					else line = line + "\n" + str[i];
+				}
+				else {
+					var o = 0;
+					var l;
+					while (o < str[i].length) {
+						l = line.length - (line.lastIndexOf('\n') + 1) > 0 ? len - (line.length - line.lastIndexOf('\n')) : len;
+						if (l <= 0) l = len;
+						if (l < len) line = line + " " + str[i].substr(o, l);
+						else {
+							if (line != "") line = line + "\n" + str[i].substr(o, l);
+							else line = str[i].substr(o, l);
+						}
+						o = o + l;
+					}
+				}
+			}
+			return line;
+		},
+		block: function(no, po, txt, len, fclr, bclr, tran) {
+			//"ram";
+			const p = (ew.UI.pos[no]);
+			let ln = p[1].length;
+			let x = p[1][(po - 1) % ln];
+			let y = p[2][((po - 1) / ln) | 0];
+			let szX = p[3][(po - 1) % ln] / 2;
+			let szY = p[4][((po - 1) / ln) | 0] / 2;
+			g.setCol(0, bclr);
+			txt = this.wrap(txt, len * ew.UI.size.len);
+			if (!tran) g.fillRect(x - szX, y - szY, x + szX, y + szY);
+			g.setCol(1, fclr);
+			if (process.env.BOARD == "BANGLEJS2") g.setFont("Dylex7x13");
+			else
+				g.setFont("Teletext10x18Ascii", 1);
+			//g.setFont("Vector", ew.UI.size._txt * ew.UI.size.txt);
+			g.drawString(txt, x - (g.stringWidth(txt) / 2), y - szY + (szY / 10));
+			//g.drawString(txt,x-(g.stringWidth(txt)/2),y-szY); 
+
+			if (!ew.def.face.bpp) g.flip();
+		}
+	},
+	rtb: function() {
+		if (ew.UI.ntid) {
+			clearTimeout(ew.UI.ntid);
+			ew.UI.ntid = 0;
+		}
+		ew.is.UIpri = 0;
+		if (ew.sys.TC.tid && ew.def.dev.touchtype === "816") {
+			clearTimeout(ew.sys.TC.tid);
+			ew.sys.TC.tid = 0;
+		}
+		ew.is.bar = 0;
+		ew.is.slide = 0;
+		if (ew.face[0].exe) {
+			ew.face[0].exe();
+			ew.face[0].exe = 0;
+		}
+		if (ew.face[0].bar) ew.face[0].bar();
+	},
+	bar: function(i) {
+		"ram"
+		ew.is.UIpri = 0;
+		ew.is.bar = 1;
+		ew.is.slide = 0;
+		ew.UI.btn.ntfy(0, 1.3, 1);
+		ew.UI.ele.fill("_bar", 6, 3);
+		ew.UI.c.start(0, 1);
+		if (ew.face.appCurr != "settings") ew.UI.btn.img("bar", "_bar", 1, "settings", "", 0, 3, 0, 1);
+		ew.UI.btn.img("bar", "_bar", 2, "apps", "", 0, 3, 0, 1);
+		if (require('Storage').read('ew_f_' + ew.face.appCurr + "-set")) ew.UI.btn.img("bar", "_bar", 3, "dash", "", 0, 3, 0, 1);
+		ew.UI.c.end();
+		ew.UI.c.bar._bar = (i) => {
+			ew.sys.buzz.nav(ew.sys.buzz.type.ok);
+			if (i === 3) ew.face.go(ew.face.appCurr + "-set", 0);
+			else if (i === 1) ew.face.go("settings", 0, i);
+			else setTimeout(() => {
+				ew.sys.updt();
+				Bangle.showLauncher()
+			}, 100); //ew.face.go("launcher", 0, i);
+		};
+	}
+};
+//g.col=Uint16Array([  0,31,2016,2016,31,2047,2047,63488,63519,63519,   31,63519,63519,65504,65535,65535]);
+//icon
+
+// === icons ===
+
+eval(require('Storage').read('ew_icons'));
+
+// === UI control ==
+
+ew.UI.c = {
+	get: { bar: 0, main: 0 },
+	raw: { main: " ", bar: " ", up: " ", down: " ", back: " ", next: " " },
+	xy: function() {},
+	main: {},
+	bar: {},
+	start: function(m, b) {
+		//"ram";
+		if (m) {
+			ew.UI.c.raw.main = " ";
+			ew.UI.c.get.main = 1;
+		}
+		if (b) {
+			ew.UI.c.raw.bar = " ";
+			ew.UI.c.get.bar = 1;
+		}
+	},
+	end: function() {
+		//"ram";
+		g.flip();
+		ew.UI.c.get.main = 0;
+		ew.UI.c.get.bar = 0;
+		ew.UI.c.xy.replaceWith(new Function("x", "y", "l", '' + ew.UI.c.raw.main + ew.UI.c.raw.bar + ''));
+		//ew.UI.c.xy.replaceWith(new Function("x", "y", "l", 'setTimeout(()=>{' + ew.UI.c.raw.main + ew.UI.c.raw.bar + '},0);'));
+	},
+	clear: function() {
+		this.raw = { main: " ", bar: " ", up: " ", down: " ", back: " ", next: " " };
+	}
+};
+
+//  === themes ===
+ew.UI.theme = {};
+ew.UI.theme.dark = {
+	btn: { onT: 15, onB: 4, offT: 11, offB: 2 },
+	menu: { onT: 15, onB: 4, offT: 15, offB: 2 },
+	slide: { onT: 15, onB: 4, offT: 15, offB: 2 },
+	ntfy: { text: 0, back: 15 },
+	clock: { minF: 15, minB: 1, hrF: 11, hrB: 1, secF: 15, secB: 1, dateF: 11, dateB: 0, batF: 11, batB: 0, back: 0, top: 0 }
+};
+ew.UI.theme.white = {
+	btn: { onT: 15, onB: 4, offT: 11, offB: 2 },
+	menu: { onT: 15, onB: 4, offT: 15, offB: 2 },
+	slide: { onT: 15, onB: 4, offT: 15, offB: 2 },
+	ntfy: { text: 0, back: 15 },
+	clock: { minF: 0, minB: 15, hrF: 10, hrB: 15, secF: 10, secB: 15, dateF: 11, dateB: 0, batF: 11, batB: 0, back: 0, top: 0 }
+};
+ew.UI.theme.current = ew.UI.theme.dark;
+
+
+// === UI navigation ===
+
+ew.UI.nav = {
+	dn: function(x, y) {
+		"ram";
+		ew.sys.buzz.nav(ew.sys.buzz.type.ok);
+		if (ew.UI.ntid && !ew.is.UIpri) {
+	      clearTimeout(ew.UI.ntid);
+	       ew.UI.ntid = 0;
+	    }
+		if (ew.face.appCurr == "clock" && ew.face.pageCurr != -1)
+			ew.face.go(ew.def.face.main, -1);
+		else if (ew.face.appCurr.endsWith("-set"))
+			ew.face.go(ew.face.appCurr.substring(0,ew.face.appCurr.length -4) , 0);
+		else
+			ew.face.go(ew.def.face.main, 0);
+	},
+	up: function(x, y) {
+		"ram";
+	/*	if (x < 50 && g.getHeight() - (process.env.BOARD == "BANGLEJS2" ? 25 : 50) < y) {
+			ew.sys.buzz.nav(ew.sys.buzz.type.ok);
+			if (ew.def.face.bri !== ((process.env.BOARD == "BANGLEJS2") ? 10 : 7)) {
+				ew.is.bri = ew.def.face.bri;
+				g.bri.set((process.env.BOARD == "BANGLEJS2") ? 10 : 7);
+			}
+			else
+				g.bri.set(ew.is.bri);
+			if (ew.face[0].bar) {
+				ew.UI.btn.ntfy(1, 1, 0, "_bar", 6, "BRIGHTNESS", "GESTURE", 0, 15, 0);
+				g.flip();
+				if (ew.face.appCurr == "settings" && ew.face[0].page == "set")
+					ew.UI.btn.cInd("main", "_2x3", 3, ew.def.face.bri == (process.env.BOARD == "BANGLEJS2" ? 10 : 7) ? process.env.BOARD == "BANGLEJS2" ? 10 : 7 : ew.is.bri, "BRI", 15, 6, 0.9);
+			
+			}
+		}
+	*/	
+	//	else {
+			ew.sys.buzz.nav(ew.sys.buzz.type.ok);
+			ew.UI.bar(2);
+	//	}
+	},
+	back: function() {
+		ew.sys.buzz.nav(ew.sys.buzz.type.ok);
+		ew.face.go(ew.face.appRoot[0], ew.face.appRoot[1]);
+	},
+	next: function() {
+		ew.sys.buzz.nav(ew.sys.buzz.type.na);
+	},
+	bar: function(a, b, r) { ew.UI.c.tcBar(a, b, r); },
+};
+
+
+if (process.env.BOARD == "BANGLEJS2") {
+	ew.UI.size = { _2x2: 20, _2x1: 25, _txt: 19, t1: 8, t2: 28, t3: 34, txt: 0.8, len: 1, sca: 0.75 };
+
+	ew.UI.pos = {
+
+		_fold: [12, [58, 120], //middle pos x
+			[36], //middle pos y
+			[120, 120], //size x
+			[57] //size y
+		],
+		_2x1: [25, [89],
+			[45, 122],
+			[176],
+			[78, 78]
+		],
+		_2x2: [22, [45, 135],
+			[40, 120],
+			[88, 88],
+			[78, 78]
+		],
+		_2x3: [23, [28, 87, 146],
+			[27, 86],
+			[56, 56, 56],
+			[56, 56]
+		],
+		_3x1: [25, [90],
+			[40, 120, 200]
+		],
+		_ind: [12, [88],
+			[3],
+			[176],
+			[6]
+		],
+		_4x1: [22, [89],
+			[25, 65, 105, 145],
+			[176],
+			[40, 40, 40, 40]
+		],
+		_kp4x3: [25, [30, 89, 145],
+			[20, 58, 100, 140],
+			[58, 58, 58],
+			[40, 40, 40, 40]
+		],
+		_ele: { "0": 25, title: [0, 160, 176, 176, 16], titleTop: [0, 0, 176, 5, 14], ind: [50, 116, 126, 124, 0, 176] },
+		_bar: [16, [30, 88, 145, 43, 133, 88],
+			[150],
+			[58, 58, 58, 84, 84, 176],
+			[50]
+		],
+		_1x2: [25, [90],
+			[78, 135],
+			[176],
+			[78, 78]
+		],
+		_header: [19, [30, 89, 145, 45, 133, 88],
+			[15],
+			[58, 58, 58, 100, 77, 176],
+			[30]
+		],
+		_headerL: [19, [30, 89, 145, 45, 133, 88],
+			[25],
+			[58, 58, 58, 100, 77, 176],
+			[40]
+		],
+		_headerS: [19, [30, 89, 145, 45, 133, 88],
+			[15],
+			[58, 58, 58, 100, 77, 176],
+			[30]
+		],
+		_main: [20, [44, 132, 88],
+			[25, 72, 58, 70, 92],
+			[88, 88, 176],
+			[40, 84, 115, 130, 174]
+		],
+
+		_lcd: [75, [89],
+			[83, 65, 90],
+			[176],
+			[78, 120, 176]
+		],
+		_log: [40, [58, 88, 146],
+			[20, 65, 105],
+			[116, 176, 60],
+			[30, 70, 30]
+		],
+		_top: 20,
+		_head: 2,
+		_foot: [142, 132, 155]
+	};
+}
+
+
+εδω ειναι ενα αππ, το τιμερ, απλα για να δεις ενα παραδειγμα. 
+
+το αππ χωριζεται σε δυο αρχεία, το service και το face (μπορει να εχει πολαλ faceε). To service toy app brisktai panta sthn diadromh
+ew.apps.xxx οπου χχχ ειανι το ονομα του αππ. Στο ew.apps.xxx.state={} σωζει μεταβλητες λειτυργείας, 
+και στο ew.apps.xxx.state.def={} σωζει εκεινες τις μεταβλητές που πρεπει να διατηρηθει η κατασταση τους, το συστημα τις αποθηκευει αυτοματα. 
+
+το σερβισε λοιπον του τιμερ:
+
+ew.apps.timer = {
+  state: {
+    def: {
+      1: { min: 5, active: 0, buzz: 1, buzzRep: 5, buzzDelay: 2000, snooze: 5, wake: 0, rep: 0, repLeft: 0, remaining: 0, paused: 0, name: "Timer 1" },
+      2: { min: 10, active: 0, buzz: 1, buzzRep: 5, buzzDelay: 2000, snooze: 5, wake: 0, rep: 0, repLeft: 0, remaining: 0, paused: 0, name: "Timer 2" },
+      3: { min: 15, active: 0, buzz: 1, buzzRep: 5, buzzDelay: 2000, snooze: 5, wake: 0, rep: 0, repLeft: 0, remaining: 0, paused: 0, name: "Timer 3" },
+      4: { min: 20, active: 0, buzz: 1, buzzRep: 5, buzzDelay: 2000, snooze: 5, wake: 0, rep: 0, repLeft: 0, remaining: 0, paused: 0, name: "Timer 4" },
+      5: { min: 25, active: 0, buzz: 1, buzzRep: 5, buzzDelay: 2000, snooze: 5, wake: 0, rep: 0, repLeft: 0, remaining: 0, paused: 0, name: "Timer 5" }
+    },
+    tid: {
+      1: { timer: 0, interval: 0, buzz: 0 },
+      2: { timer: 0, interval: 0, buzz: 0 },
+      3: { timer: 0, interval: 0, buzz: 0 },
+      4: { timer: 0, interval: 0, buzz: 0 },
+      5: { timer: 0, interval: 0, buzz: 0 }
+    },
+    page: 1
+  },
+
+
+  // Αρχικοποίηση
+  init: function() {
+    for (var i = 1; i <= 5; i++) {
+      var timer = this.state.def[i];
+
+      // Αν δεν υπάρχει repLeft, το δημιουργούμε από το rep
+      if (timer.repLeft === undefined) {
+        timer.repLeft = timer.rep > 0 ? timer.rep : 0;
+      }
+
+      if (timer.active === 1 && timer.paused === 0) {
+        this._startTimer(i, timer.remaining);
+      }
+    }
+  },
+
+  // Ορισμός νέου timer (ΧΩΡΙΣ auto start)
+  setTimer: function(timerId, minutes, buzz, buzzRep, buzzDelay, repetitions) {
+    if (timerId < 1 || timerId > 5) return false;
+
+    var timer = this.state.def[timerId];
+
+    // Clear existing timer if any
+    this._stopTimerResources(timerId);
+
+    // Set new values (χωρίς να ξεκινάει)
+    timer.min = minutes;
+    timer.buzz = buzz ? 1 : 0;
+    timer.buzzRep = buzzRep || 1;
+    timer.buzzDelay = buzzDelay || 2000;
+    timer.rep = repetitions || 0; // Αυτό παραμένει η ρύθμιση
+    timer.repLeft = repetitions > 0 ? repetitions - 1 : 0; // Επαναλήψεις που απομένουν
+    timer.remaining = minutes * 60000;
+    timer.active = 0; // Δεν είναι active ακόμα
+    timer.paused = 0;
+
+
+    return true;
+  },
+
+  // Εκκίνηση timer (ξεκινάει την μέτρηση)
+  startTimer: function(timerId) {
+    if (timerId < 1 || timerId > 5) return false;
+
+    var timer = this.state.def[timerId];
+    // Έλεγχος αν ο timer έχει ρυθμιστεί
+    if (timer.min === 0) return false;
+
+    // Έλεγχος αν είναι ήδη active
+    if (timer.active === 1 && timer.paused === 0) return false;
+
+    // Clear existing resources
+    this._stopTimerResources(timerId);
+
+    timer.remaining = timer.min * 60000;
+
+    // Αρχικοποίηση repLeft - repLeft = rep - 1 (επαναλήψεις που απομένουν)
+    timer.repLeft = timer.rep > 0 ? timer.rep : 0;
+
+    // Ξεκινάει τον timer
+    timer.active = 1;
+    timer.paused = 0;
+    this._startTimer(timerId, timer.remaining);
+
+    return true;
+  },
+  // Εσωτερική συνάρτηση εκκίνησης timer
+  _startTimer: function(timerId, ms) {
+    var self = this;
+    var timer = this.state.def[timerId];
+    var tid = this.state.tid[timerId];
+
+    var startTime = Date.now();
+
+    // Set the main timeout
+    tid.timer = setTimeout(function() {
+      self._timerComplete(timerId);
+    }, ms);
+
+    // Update remaining time every second
+    tid.interval = setInterval(function() {
+      if (!timer.active || timer.paused || !tid.timer) {
+        clearInterval(tid.interval);
+        tid.interval = 0;
+        return;
+      }
+
+      var elapsed = Date.now() - startTime;
+      timer.remaining = Math.max(0, ms - elapsed);
+
+      if (timer.remaining === 0) {
+        clearInterval(tid.interval);
+        tid.interval = 0;
+      }
+    }, 1000);
+  },
+  // Pause timer
+  pauseTimer: function(timerId) {
+    if (timerId < 1 || timerId > 5) return false;
+
+    var timer = this.state.def[timerId];
+    if (!timer.active || timer.paused) return false;
+
+    // Stop the countdown but keep remaining time
+    this._stopTimerResources(timerId);
+    timer.paused = 1;
+
+    return true;
+  },
+
+  // Resume timer
+  resumeTimer: function(timerId) {
+    if (timerId < 1 || timerId > 5) return false;
+
+    var timer = this.state.def[timerId];
+    if (!timer.active || !timer.paused || timer.remaining <= 0) return false;
+
+    // Continue from remaining time
+    timer.paused = 0;
+    this._startTimer(timerId, timer.remaining);
+
+    return true;
+  },
+  /*
+    // Εσωτερική συνάρτηση ολοκλήρωσης timer
+    _timerComplete: function(timerId) {
+      var timer = this.state.def[timerId];
+      var tid = this.state.tid[timerId];
+      // Clean up intervals
+      if (tid.interval) {
+        clearInterval(tid.interval);
+        tid.interval = 0;
+      }
+
+      tid.timer = 0;
+      timer.active = 0;
+      timer.paused = 0;
+      timer.remaining = 0;
+
+      // Trigger buzzer if enabled
+      if (timer.buzz) {
+        this._triggerBuzzer(timerId, timer.buzzRep, timer.buzzDelay);
+      }
+
+      // Handle repetitions
+      if (timer.repLeft > 0) {
+        timer.repLeft--; // Μείωση των επαναλήψεων που απομένουν
+        if (timer.repLeft >= 0) {
+          // Επαναφορά και εκκίνηση timer
+          timer.remaining = timer.min * 60000;
+          timer.active = 1;
+          this._startTimer(timerId, timer.remaining);
+        }
+      }
+    },
+  */
+  // Also modify the _timerComplete function to restore original time after snooze
+  _timerComplete: function(timerId) {
+    var timer = this.state.def[timerId];
+    var tid = this.state.tid[timerId];
+
+    // Clean up intervals
+    if (tid.interval) {
+      clearInterval(tid.interval);
+      tid.interval = 0;
+    }
+
+    tid.timer = 0;
+    timer.active = 0;
+    timer.paused = 0;
+
+    // RESTORE ORIGINAL TIME - This is important!
+    timer.remaining = timer.min * 60000;
+
+    // Trigger buzzer if enabled
+    if (timer.buzz) {
+      this._triggerBuzzer(timerId, timer.buzzRep, timer.buzzDelay);
+    }
+
+    // Handle repetitions
+    if (timer.repLeft > 0) {
+      timer.repLeft--; // Μείωση των επαναλήψεων που απομένουν
+      if (timer.repLeft >= 0) {
+        // Επαναφορά και εκκίνηση timer με τον αρχικό χρόνο
+        timer.remaining = timer.min * 60000;
+        timer.active = 1;
+        this._startTimer(timerId, timer.remaining);
+      }
+    }
+  },
+
+
+
+  // Εσωτερική συνάρτηση για buzzer με repetitions
+  _triggerBuzzer: function(timerId, repetitions, delay) {
+    var timer = this.state.def[timerId];
+    var tid = this.state.tid[timerId];
+
+    var count = 0;
+
+    // Clear any existing buzz
+    if (tid.buzz) {
+      clearTimeout(tid.buzz);
+      tid.buzz = 0;
+    }
+
+    function buzz(timer) {
+      if (count < repetitions && tid.buzz) {
+        ew.sys.buzz.alrm([100, 200, 200]);
+        count++;
+        tid.buzz = setTimeout(() => { buzz(timer); }, delay, timer);
+        ew.apps.timer._alert(timerId, timer.name);
+      }
+    }
+    //if (ew.face.appCurr === "timer") ew.face[0].init();
+    // Start the buzz
+    tid.buzz = 1; // Mark as active
+    buzz(timer);
+  },
+  _alert: function(timerId, name) {
+    if (ew.apps.timer.state.def[timerId].wake && !g.isOn)
+      ew.face.go(ew.face.appCurr, 0)
+
+    ew.UI.btn.ntfy(1, 2, 0, "_bar", 6, name.toUpperCase(), "", 15, 13, true, false, false);
+    ew.UI.c.bar._ntfy = function() {
+      ew.UI.btn.ntfy(1, 3, 0, "_bar", 6, "", "", 15, 0, false, false, true);
+      ew.UI.c.start(0, 1);
+      if (!ew.apps.timer.state.def[timerId].rep) {
+        ew.UI.btn.img("bar", "_bar", 4, "snooze", "SNOOZE", 15, 4);
+        ew.UI.btn.img("bar", "_bar", 5, "confirm", "MUTE", 0, 14);
+      }
+      else
+        ew.UI.btn.img("bar", "_bar", 6, "confirm", "MUTE", 0, 14);
+      ew.UI.c.end();
+      ew.UI.c.bar._bar = function(i, l) {
+        ew.is.UIpri = 0;
+        ew.sys.buzz.nav(ew.sys.buzz.type.ok);
+        if (i == 4) {
+          ew.apps.timer.snoozeTimer(timerId);
+          if (ew.def.face.info) ew.UI.btn.ntfy(1, 1.5, 0, "_bar", 6, name.toUpperCase(), "SNOOZE", 0, 15);
+
+        }
+        else {
+          ew.apps.timer.stopBuzz(timerId);
+          if (ew.def.face.info) ew.UI.btn.ntfy(1, 1.5, 0, "_bar", 6, "MUTED", "", 0, 15);
+
+        }
+      };
+    };
+
+  },
+
+  // Σταμάτημα buzz για συγκεκριμένο timer
+  stopBuzz: function(timerId) {
+    if (timerId < 1 || timerId > 5) return false;
+
+    var timer = this.state.def[timerId];
+    var tid = this.state.tid[timerId];
+
+    if (tid.buzz) {
+      if (typeof tid.buzz === 'number' && tid.buzz > 1) {
+        clearTimeout(tid.buzz);
+      }
+      tid.buzz = 0;
+      return true;
+    }
+    return false;
+  },
+
+  // Σταμάτημα όλων των buzz
+  stopAllBuzz: function() {
+    var stopped = false;
+    for (var i = 1; i <= 5; i++) {
+      if (this.stopBuzz(i)) {
+        stopped = true;
+      }
+    }
+    return stopped;
+  },
+
+  // Εσωτερική συνάρτηση καθαρισμού πόρων timer
+  _stopTimerResources: function(timerId) {
+    var timer = this.state.def[timerId];
+    var tid = this.state.tid[timerId];
+
+    if (tid.timer) {
+      clearTimeout(tid.timer);
+      tid.timer = 0;
+    }
+
+    if (tid.interval) {
+      clearInterval(tid.interval);
+      tid.interval = 0;
+    }
+
+    // Stop buzz when clearing timer
+    this.stopBuzz(timerId);
+  },
+
+  // Καθαρισμός timer (stop)
+  stopTimer: function(timerId) {
+    if (timerId < 1 || timerId > 5) return false;
+
+    this._stopTimerResources(timerId);
+
+    var timer = this.state.def[timerId];
+    timer.active = 0;
+    timer.paused = 0;
+    timer.remaining = timer.min * 60000; // Επαναφορά στο αρχικό χρόνο
+    timer.repLeft = timer.rep > 0 ? timer.rep : 0; // Επαναφορά και των επαναλήψεων
+    if (ew.face.appCurr === "timer") ew.face[0].init();
+
+    return true;
+  },
+
+  // Πάυση όλων των timers
+  stopAll: function() {
+    for (var i = 1; i <= 5; i++) {
+      this.stopTimer(i);
+    }
+  },
+
+  // Λήψη κατάστασης timer
+  getTimerStatus: function(timerId) {
+    if (timerId < 1 || timerId > 5) return null;
+
+    var timer = this.state.def[timerId];
+    var tid = this.state.tid[timerId];
+
+    var totalSeconds = Math.ceil(timer.remaining / 1000);
+    var minutes = Math.floor(totalSeconds / 60);
+    var seconds = totalSeconds % 60;
+
+    return {
+      active: timer.active === 1,
+      paused: timer.paused === 1,
+      minutes: timer.min,
+      remainingSeconds: seconds,
+      remainingMinutes: minutes,
+      buzz: timer.buzz === 1,
+      buzzActive: tid.buzz !== 0,
+      buzzRep: timer.buzzRep,
+      buzzDelay: timer.buzzDelay,
+      repetitions: timer.rep, // Η ρύθμιση των επαναλήψεων
+      repetitionsLeft: timer.repLeft, // Οι υπόλοιπες επαναλήψεις
+      name: timer.name
+    };
+  },
+
+
+  // Λήψη όλων των timers
+  getAllStatus: function() {
+    return {
+      1: this.getTimerStatus(1),
+      2: this.getTimerStatus(2),
+      3: this.getTimerStatus(3),
+      4: this.getTimerStatus(4),
+      5: this.getTimerStatus(5)
+    };
+  },
+
+  /*  // Snooze function
+    snoozeTimer: function(timerId) {
+      if (timerId < 1 || timerId > 5) return false;
+
+      var timer = this.state.def[timerId];
+      if (timer.active) return false;
+
+      this.stopTimer(timerId);
+      this.setTimer(timerId, timer.snooze, timer.buzz, timer.buzzRep, timer.buzzDelay, timer.rep, timer.name);
+      this.startTimer(timerId);
+      return true;
+    },
+
+    // Vibration function
+    vibrate: function(pattern) {
+      ew.sys.buzz.alrm(pattern || [100, 100, 100]);
+    },
+    
+  */
+
+  snoozeTimer: function(timerId) {
+    print(timerId);
+    if (timerId < 1 || timerId > 5) return false;
+
+    var timer = this.state.def[timerId];
+    if (timer.active) return false;
+
+    // Stop any current buzzing
+    this.stopBuzz(timerId);
+
+    // Instead of changing the default settings, just start a new timer
+    // with the snooze duration WITHOUT modifying the permanent settings
+    timer.remaining = timer.snooze * 60000; // Set remaining time to snooze duration
+    timer.active = 1;
+    timer.paused = 0;
+
+    // Start the timer with snooze duration
+    this._startTimer(timerId, timer.remaining);
+
+    return true;
+  },
+
+
+  // Επανεκκίνηση timer
+  restartTimer: function(timerId) {
+    if (timerId < 1 || timerId > 5) return false;
+
+    var timer = this.state.def[timerId];
+    if (timer.min === 0) return false;
+
+    this.setTimer(timerId, timer.min, timer.buzz, timer.buzzRep, timer.buzzDelay, timer.rep, timer.name);
+    this.startTimer(timerId);
+    return true;
+  },
+
+  getRemainingMinutes: function(timerId) {
+    if (timerId < 1 || timerId > 5) return 0;
+    var timer = this.state.def[timerId];
+    return Math.floor(timer.remaining / 60000);
+  },
+
+  getRemainingSeconds: function(timerId) {
+    if (timerId < 1 || timerId > 5) return 0;
+    var timer = this.state.def[timerId];
+    return Math.floor((timer.remaining % 60000) / 1000);
+  },
+
+  getFormattedTime: function(timerId) {
+    var min = this.getRemainingMinutes(timerId);
+    var sec = this.getRemainingSeconds(timerId);
+    return min + ":" + (sec < 10 ? "0" + sec : sec);
+  },
+
+};
+
+if (require('Storage').readJSON('ew.json', 1).timer)
+  ew.apps.timer.state.def = require('Storage').readJSON('ew.json', 1).timer;
+
+// Αρχικοποίηση κατά την φόρτωση
+ew.apps.timer.init();
+
+
+και το face του
+
+//timer face
+
+ew.UI.nav.next.replaceWith(() => {
+    ew.sys.buzz.nav(ew.sys.buzz.type.ok);
+
+    if (ew.UI.ntid && !ew.is.UIpri) {
+        clearTimeout(ew.UI.ntid);
+        ew.UI.ntid = 0;
+    }
+    if (ew.face[0].page === 5)
+        ew.face[0].page = 1;
+    else
+        ew.face[0].page++;
+    ew.face[0].init(ew.face[0].page);
+
+});
+ew.UI.nav.back.replaceWith(() => {
+    ew.sys.buzz.nav(ew.sys.buzz.type.ok);
+    if (ew.UI.ntid && !ew.is.UIpri) {
+        clearTimeout(ew.UI.ntid);
+        ew.UI.ntid = 0;
+    }
+    if (ew.face[0].page === 1)
+        ew.face[0].page = 5;
+    else
+        ew.face[0].page--;
+    ew.face[0].init(ew.face[0].page);
+
+});
+
+ew.face[0] = {
+    run: false,
+    //page: 1,
+    val:0,
+    offms: (ew.def.face.off[ew.face.appCurr]) ? ew.def.face.off[ew.face.appCurr] : 60000,
+    coord: (process.env.BOARD == "BANGLEJS2") ? { "txt":[40],"main": [0, 30, 176, 115], "clear": [3, 30, 170, 113], "rep": [88,96], "time": [55, 55, 87, 92, 40, 46, 50] } : 
+    { "txt":[55],"main": [0, 55, 240, 185], "clear": [5, 55, 235, 160], "rep": [120, 167], "time": [77, 87, 140, 124, 82, 87, 85] },
+    init: function(o) {
+        ew.def.face.off[ew.face.appCurr] = this.offms;
+        this.rep = 0;
+       
+        if (o ) this.page = o;
+        else {
+             let earliest = this.active();
+            if (earliest !== null) {
+              this.page = earliest;
+            }else this.page=ew.apps.timer.state.pos||1;      
+        }
+        ew.apps.timer.state.pos = this.page;
+
+        ew.UI.c.start(1, 1);
+        ew.UI.ele.ind(this.page, 5, 0, 15);
+        ew.UI.ele.coord("main", "_main", 9);
+        ew.UI.c.end();
+
+        // button hander
+        ew.UI.c.main._main = (i, l) => {
+            if (ew.apps.timer.getTimerStatus(this.page).active) return;
+            ew.sys.buzz.nav(ew.sys.buzz.type.ok);
+            if (ew.UI.ntid && this.ntfy==="<  SET TIME  >") {
+                clearTimeout(ew.UI.ntid);
+                ew.UI.ntid = 0;
+                this.bar();
+                return;
+            }
+            ew.UI.btn.ntfy(1, 3, 0, "_bar", 6, "<  SET TIME  >", "", 15, 6, 1);
+            ew.sys.TC.val = { cur: ew.apps.timer.state.def[ew.face[0].page].min, dn: 1, up: 1440, tmp: 0, fire: 1, reverce: 0, loop: 1 };
+            ew.UI.c.tcBar = (a, b, r) => {
+                if (11 < r && 29 < b && b < 1440) b = b + (a * (20 < r ? 10 : 5));
+                ew.sys.TC.val.cur = b;
+                ew.apps.timer.state.def[ew.face[0].page].min = b;
+                this.info(b);
+                ew.UI.btn.ntfy(0, 3, 1);
+
+            };
+            ew.is.slide = 1;
+        };
+        g.setCol(0, 0);
+        g.fillRect({ x: this.coord.main[0], y: this.coord.main[1], x2: this.coord.main[2], y2: this.coord.main[3], r: 0 });
+
+        //draw repeat 
+        if (!ew.apps.timer.getTimerStatus(ew.face[0].page).active) {
+            let rep = ew.apps.timer.getTimerStatus(this.page).repetitions;
+            if (rep) {
+                g.setCol(1, 15);
+                //g.setFont("Teletext10x18Ascii");
+                g.setFont("Vector",18);
+                g.drawString("Repeat: " + rep, this.coord.rep[0] - g.stringWidth("Repeat: " + rep) / 2, this.coord.rep[1]);
+            }
+
+        }
+        // info
+        this.info(ew.apps.timer.getTimerStatus(this.page).minutes);
+        // header
+        ew.UI.btn.c2l("main", "_header", 6, ew.apps.timer.getTimerStatus(this.page).name, "", 15, 0, 1.5);
+
+        this.bar();
+        this.run = 1;
+
+    },
+    show: function(s) {
+        if (!this.run) return;
+
+        this.info();
+        if (this.tid) clearTimeout(this.tid);
+        this.tid = setTimeout(function(t) {
+            t.tid = 0;
+            t.show();
+        }, 1000, this);
+    },
+
+    active: function() {
+        let earliestTimer = null;
+        let minRemaining = Infinity;
+        
+        for (let i = 1; i <= 5; i++) {
+            let status = ew.apps.timer.getTimerStatus(i);
+            if (status.active && !status.paused) {
+                let remaining = status.remainingMinutes * 60 + status.remainingSeconds;
+                if (remaining < minRemaining) {
+                    minRemaining = remaining;
+                    earliestTimer = i;
+                }
+            }
+        }
+        
+        return earliestTimer;
+    },
+    
+    info: function(min) {
+
+        // values
+        if (ew.apps.timer.getTimerStatus(ew.face[0].page).active) {
+            let totalMinutes = ew.apps.timer.getTimerStatus(this.page).remainingMinutes;
+            let sec = ew.apps.timer.getTimerStatus(this.page).remainingSeconds;
+
+            let hours = ((totalMinutes / 60) | 0); // Bitwise OR για γρήγορο floor
+            let mins = (totalMinutes % 60 );
+            let timeStr;
+            if (hours) timeStr = ("0" + hours).substr(-2) + ":" + ("0" + mins).substr(-2) + ":" + ("0" + sec).substr(-2);
+            //else timeStr = ("0" + mins).substr(-2) + ":" + ("0" + sec).substr(-2);
+            else timeStr = ("0" + mins).substr(-2);
+
+            g.setCol(0, 4);
+            g.fillRect({ x: this.coord.clear[0], y: this.coord.clear[1], x2: this.coord.clear[2], y2: this.coord.clear[3], r: 10 });
+            //g.fillRect(0, 60, 235, 170);
+            g.setCol(1, 15);
+
+            if (hours) {
+                g.setFont("Vector", this.coord.txt[0] * ew.def.face.size);
+                //g.setFont("LECO1976Regular22", 2);
+                let l = g.stringWidth(timeStr) / 2;
+                g.drawString(timeStr, this.coord.time[3] - l, this.coord.time[6]);
+
+            }
+            else if (mins) {
+                //g.setFont("LECO1976Regular22", 3);
+                g.setFont("Vector", 60 * ew.def.face.size);
+                let l = g.stringWidth(timeStr) / 2;
+                g.drawString(timeStr, this.coord.time[1] - l, this.coord.time[4]);
+                g.setFont("Vector", 50 * ew.def.face.size);
+                //g.setFont("LECO1976Regular22", 2);
+                g.drawString(":" + ("0" + sec).substr(-2), this.coord.time[3] + l - g.stringWidth(":" + ("0" + sec).substr(-2)) / 2, this.coord.time[5]);
+
+            }
+            else {
+                g.setFont("Vector", 60 * ew.def.face.size);
+                //g.setFont("LECO1976Regular22", 3);
+                g.drawString(("0" + sec).substr(-2), this.coord.time[3] - g.stringWidth(("0" + sec).substr(-2)) / 2, this.coord.time[4]);
+
+            }
+
+
+            //repeat
+            let repL = ew.apps.timer.getTimerStatus(this.page).repetitionsLeft;
+            let rep = ew.apps.timer.getTimerStatus(this.page).repetitions;
+
+            if (rep) {
+                //g.setFont("Teletext10x18Ascii");
+                g.setFont("Vector",18);
+                g.drawString("Rep.Left: " + repL + "/" + rep, this.coord.rep[0] - g.stringWidth("Rep.Left: " + repL + "/" + rep) / 2, this.coord.rep[1]);
+            }
+
+        }
+        else {
+            let totalMinutes = ew.apps.timer.getTimerStatus(this.page).minutes;
+
+            let hours = (totalMinutes / 60) | 0;
+            let mins = totalMinutes % 60;
+            let timeStr;
+
+
+            if (hours) timeStr = ("0" + hours).substr(-2) + ":" + ("0" + mins).substr(-2);
+            else timeStr = ("0" + mins).substr(-2);
+            g.setCol(0, 1);
+            g.fillRect({ x: this.coord.clear[0], y: this.coord.clear[1], x2: this.coord.clear[2], y2: this.coord.clear[3], r: 10 });
+            g.setCol(1, 15);
+            g.setFont("Vector", 60 * ew.def.face.size);
+            //g.setFont("LECO1976Regular22", hours?2:3);
+            let l = g.stringWidth(timeStr) / 2;
+            g.drawString(timeStr, this.coord.time[3] - l, this.coord.time[4]);
+
+        }
+        g.flip();
+
+    },
+    bar: function(timer) {
+        if (ew.UI.ntid) return; 
+        if (ew.is.UIpri) { if (ew.notify.log.error[0]) ew.notify.alert("error", ew.notify.log.error[0], 1, 1); return; }
+        //"ram";
+        ew.UI.ele.fill("_bar", 6, 0);
+
+        // timer active
+        if (ew.apps.timer.getTimerStatus(this.page).active) {
+            ew.is.slide = 0;
+            ew.UI.c.start(0, 1);
+            ew.UI.btn.img("bar", "_bar", 4, "pause", "PAUSE", 15, ew.apps.timer.getTimerStatus(this.page).paused ? 4 : 1);
+            ew.UI.btn.img("bar", "_bar", 5, "stop", "STOP", 13, 15);
+            ew.UI.c.end();
+
+            // bar buttons
+            ew.UI.c.bar._bar = (i, l) => {
+                ew.sys.buzz.nav(ew.sys.buzz.type.ok);
+
+                if (i == 4 && l) {
+                    //if (l) {
+                    if (ew.apps.timer.getTimerStatus(this.page).paused)
+                        ew.apps.timer.resumeTimer(this.page);
+                    else
+                        ew.apps.timer.pauseTimer(this.page);
+
+
+                    ew.UI.btn.img("bar", "_bar", 4, "pause", ew.apps.timer.getTimerStatus(this.page).paused ? "RESUME" : "PAUSE", 15, ew.apps.timer.getTimerStatus(this.page).paused ? 13 : 0);
+                    if (ew.def.face.info) ew.UI.btn.ntfy(1, 1.5, 0, "_bar", 6, ew.apps.timer.state.def[this.page].name.toUpperCase(), ew.apps.timer.getTimerStatus(this.page).paused ? "PAUSED" : "RESUMED", 0, 15);
+                    //}
+                    //else
+                    //if (ew.def.face.info) ew.UI.btn.ntfy(1, 1.5, 0, "_bar", 6, "LONG HOLD", "PAUSE/RESUME", 0, 15);
+
+                }
+                else if (i == 5 && l) {
+                    //if (l) //{
+                       // if (ew.def.face.info) ew.UI.btn.ntfy(1, 1.5, 0, "_bar", 6, ew.apps.timer.state.def[this.page].name.toUpperCase(), "RESTARTED", 0, 15, 0, 0, 0);
+                       // ew.apps.timer.restartTimer(this.page);
+                   // }
+                    //else {
+                        if (ew.def.face.info) ew.UI.btn.ntfy(1, 1.5, 0, "_bar", 6, ew.apps.timer.state.def[this.page].name.toUpperCase(), "STOPPED", 0, 15, 0, 0, 0);
+                        ew.apps.timer.stopTimer(ew.face[0].page);
+                   // }
+
+                }
+                 else  ew.UI.btn.ntfy(1, 1.5, 0, "_bar", 6, "USE", "LONG PRESS", 0, 15,0,0,0);
+                    
+                g.flip();
+            };
+        }
+        // timer inactive
+        else {
+            ew.is.slide = 0;
+            ew.UI.c.start(0, 1);
+            //ew.UI.btn.img("bar", "_bar", 4, "time", "TIME", 15, 4);
+            ew.UI.btn.img("bar", "_bar", 6, "play", "START",0,14);
+            ew.UI.c.end();
+
+            // bar buttons
+            ew.UI.c.bar._bar = (i, l) => {
+                ew.sys.buzz.nav(ew.sys.buzz.type.ok);
+                //start timer
+                if (l){ 
+                    if (ew.def.face.info) ew.UI.btn.ntfy(1, 1.5, 0, "_bar", 6, ew.apps.timer.state.def[this.page].name.toUpperCase(), "STARTED", 0, 15,0,0,0);
+                    ew.apps.timer.startTimer(ew.face[0].page);
+                    ew.face[0].init();
+                
+                }else  ew.UI.btn.ntfy(1, 1.5, 0, "_bar", 6, "USE", "LONG PRESS", 0, 15,0,0,0);
+
+            };
+        }
+    },
+    clear: function(o) {
+        ew.is.slide = 0;
+        if ( ew.face.appCurr=="timer" && ew.apps.timer.getTimerStatus(this.page).active ) return true;
+        if (this.tid) clearTimeout(this.tid);
+        this.tid = 0;
+        return true;
+    },
+    off: function(o) {
+        g.off();
+    }
+};
+
+
+και ενα ακομα αππ σου βαζω, για να εχεις πιο καλη εικονα, ειναι ενας finder για γατες.
+
+service 
+
+//itag viewer
+
+ew.apps.itag = {
+    tid: { con: 0, rssi: 0, checker: 0, alarm: 0, auto: 0 },
+    state: {
+        lost: 0,
+        move: -1,
+        focus: 0,
+        alert: 0,
+        ble: { scan: 0, next: 0, gatt: {} },
+        def: { store: {}, storeOrder: [], hiddenOrder: [], pos: 0, set: { phy: 0, autoPhy: 1, minInterval: 50, maxInterval: 100, slaveLatency: 4, persist: 0, rssi: 1, pos: 0, keepFor: 5, storeLock: 0, scanAll: 0, checker: 1, show: 0, rssiHandler: 0, auto: 0 } },
+        dev: {},
+        devA: [],
+        scanAll: {},
+        scanAllA: []
+    },
+    scan(phyR) {
+        this.auto();
+        if (ew.apps.itag.state.ble.scan) return;
+        ew.apps.itag.state.ble.scan = true;
+
+        let dev = ew.apps.itag.state.dev;
+        let devA = ew.apps.itag.state.devA;
+        const phy = ["1mbps", "coded", "both", "2mbps"];
+        const all = ew.apps.itag.state.def.set.scanAll;
+
+        NRF.setTxPower(ew.def.bt.rfTX);
+        phyR = phyR || ew.apps.itag.state.def.set.phy;
+        
+        // ---- start checker ----
+        ew.apps.itag.checker();
+        
+        // ---- start scan ----
+        NRF.setScan(function(device) {
+            let ewD = false;
+            if (!all && device.manufacturer === 1424) {
+                if (device.manufacturerData[0] & 4) ewD = device.manufacturerData;
+                else return;
+            }
+
+            const id = device.id;
+            const devE = dev[id];
+
+            if (devE !== undefined) {
+                devE.rfrs = true;
+                devE.rssi = device.rssi;
+
+                return;
+            }
+
+            // --- new device ---
+            setTimeout(() => { ew.apps.itag.newD(device, ewD) }, 10);
+
+        }, {
+            filters: [
+                ew.apps.itag.state.def.set.scanAll ? {} : // no filter
+                { manufacturerData: { 0x0105: {} } }, // itag
+                { manufacturerData: { 0x0590: {} } }, //espruino
+                { serviceData: { "feaa": {} } }, // google tags
+                //{ serviceData: { uuid: 0xfe2c } }, // google
+            ],
+            phy: phy[phyR],
+            interval: (ew.apps.itag.state.def.set.phy == 2) ? 900 : 600,
+            window: (ew.apps.itag.state.def.set.phy == 2) ? 300 : 300,
+            active: false
+        });
+
+    },
+    newD(device, ewD) {
+        let id = device.id;
+        // --- new device ---
+        let newD = {
+            //id: id,
+            rssi: device.rssi,
+            live: true,
+            oflc: 0,
+            rfrs: true
+        };
+        let Google = (device.serviceData && device.serviceData.feaa) ? 1 : 0;
+        if (Google) newD.name = "Google tag";
+        this.state.dev[id] = newD;
+        this.state.devA.push(id);
+
+        if (!this.state.def.set.scanAll && !Google) {
+            let stor = this.state.def.store[id];
+            if (!this.state.def.set.lock && !stor) {
+                newD = {
+                    id: id,
+                    name: device.name || "No Name",
+                    batt: 100,
+                    silent: 1,
+                    alert: 0
+                };
+                if (ewD) {
+                    newD.phy = (ewD[1] >> 2) & 0x07;
+                    //newD.rfTX = (device.manufacturerData[1] >> 5) & 0x07;
+                    newD.batt = ewD[2];
+                    newD.volt = ewD[3];
+                    newD.board = (ewD[4]) & 0x0F;
+                    newD.name = newD.name.substr(3);
+                }
+                if (device.serviceData && device.serviceData.feaa) newD.name = "Google tag";
+                this.state.def.store[id] = newD;
+                this.state.def.storeOrder.push(id);
+
+            }
+            else if (stor && ewD) {
+                stor.phy = (ewD[1] >> 2) & 0x07;
+                stor.batt = ewD[2];
+                stor.volt = ewD[3];
+                if (ewD[4] & 16) stor.name = device.name.substr(3); ///if (ewD[4] & (1 << 4))
+            }
+            return;
+        }
+        if (!this.state.scanAll[id]) {
+            newD = {
+                id: id,
+                //rssi: device.rssi,
+                name: device.name || "No Name",
+                live: true,
+                fixed: 100,
+                oflc: 0
+            };
+            this.state.scanAll[id] = newD;
+            this.state.scanAllA.push(id);
+        }
+    },
+    alert() {
+
+    },
+
+    checker() {
+        if (this.tid.checker) clearTimeout(this.tid.checker);
+
+        const maxOfflineTime = 5; // 5 δευτερόλεπτα offline
+        let store = ew.apps.itag.state.def.store;
+        let storeA = ew.apps.itag.state.def.storeOrder;
+        let dev = ew.apps.itag.state.dev;
+        let devA = ew.apps.itag.state.devA;
+        let tid = ew.apps.itag.tid;
+
+        const focus = ew.apps.itag.state.focus;
+        const all = ew.apps.itag.state.def.set.scanAll;
+
+        ew.apps.itag.tid.checker = setTimeout(function() {
+            ew.apps.itag.tid.checker = false;
+
+            let counter = 0;
+            let now = Date.now() / 1000 | 0;
+            let devicesToDelete = [];
+
+            const deviceIds = Object.keys(dev);
+
+            for (let i = 0; i < deviceIds.length; i++) {
+                const id = deviceIds[i];
+                counter++;
+                let device = dev[id];
+
+                if (device.rfrs) {
+                    if (ew.apps.itag.dbg) console.log("checker id online:", id);
+
+                    device.rfrs = false;
+                    device.live = true;
+                    device.oflc = 0; // reset            
+                    device.lastseen = now;
+                    if (!all && store[id])
+                        store[id].lastseen = now;
+                        
+                    if (!tid.alarm && id === focus) {
+                        tid.alarm = setTimeout(function() {
+                            ew.sys.buzz.nav([100, 50, 100, 50, 100]);
+                            if (!ew.face.appCurr.startsWith("itag")) ew.UI.btn.ntfy(1, 3, 0, "_bar", 6, store[id].name.toUpperCase(), "FOUND", 15, 4);
+                            tid.alarm = 0;
+                        }, 50);
+                    }   
+                        
+                        
+                        
+                        
+                }
+                else if (maxOfflineTime < now - device.lastseen) {
+                    if (ew.apps.itag.dbg) console.log("checker id offline:", id);
+
+                    device.live = false;
+                    device.oflc = (device.oflc || 0) + 1;
+
+                    if (device.oflc > 50) {
+                        if (ew.apps.itag.dbg) console.log("checker id to delete:", id);
+                        devicesToDelete.push(id);
+                    }
+                }
+                else if (ew.apps.itag.dbg) console.log("checker id idle:", id);
+            }
+
+            if (devicesToDelete.length > 0) {
+                for (let i = 0; i < devicesToDelete.length; i++) {
+                    const id = devicesToDelete[i];
+                    delete dev[id];
+                    const index = devA.indexOf(id);
+                    if (index !== -1) {
+                        devA.splice(index, 1);
+                    }
+                }
+            }
+
+            if (ew.face.appCurr === "itag") ew.face[0].update();
+
+            if (ew.apps.itag.dbg) console.log("checker counter:", counter);
+            if (!counter && !ew.apps.itag.state.ble.scan) {
+                if (ew.apps.itag.dbg) console.log("stop checker");
+            }
+            else {
+                ew.apps.itag.checker();
+            }
+        }, 1000);
+    },
+    auto(min) {
+        if (this.tid.auto) clearTimeout(this.tid.auto);
+        this.tid.auto = false;
+        if (!min) return;
+        if (ew.apps.itag.dbg) console.log("itag: auto scan start");
+        this.tid.auto = setTimeout(() => {
+            this.scan(2);
+            this.tid.auto = setTimeout(() => {
+                this.tid.auto = false;
+                this.stopScan();
+            }, 25000);
+        }, min * 60000);
+
+    },
+    stopScan() {
+        if (ew.apps.itag.dbg) console.log("itag: stop scan");
+        NRF.setScan();
+        if (ew.apps.itag.tid.checker && !ew.apps.itag.state.def.set.checker) {
+            clearTimeout(ew.apps.itag.tid.checker);
+            ew.apps.itag.tid.checker = 0;
+        }
+        ew.apps.itag.state.ble.scan = false;
+        this.auto(this.state.def.set.auto);
+    },
+    conn(id, phyR) {
+
+        if (ew.face.appCurr === "itag") ew.face.go("itag-connect", 0);
+        if (ew.apps.itag.tid.con) {
+            clearTimeout(ew.apps.itag.tid.con);
+            ew.apps.itag.tid.con = false;
+        }
+        ew.apps.itag.tid.con = setTimeout(() => {
+            ew.apps.itag.tid.con = false;
+            ew.UI.btn.ntfy(1, 2, 0, "_bar", 6, "NOT FOUND", "", 15, 13);
+            setTimeout(() => { if (ew.face.appCurr === "itag-connect") ew.face.go("itag", 0); }, 1500);
+        }, 10000);
+        var phy = ["1mbps", "coded", "both", "2mbps"];
+        phyR = phyR || ew.apps.itag.state.def.set.phy;
+
+        NRF.connect(id, {
+            minInterval: ew.apps.itag.state.def.set.minInterval,
+            maxInterval: ew.apps.itag.state.def.set.maxInterval,
+            phy: phy[phyR],
+            slaveLatency: ew.apps.itag.state.def.set.slaveLatency
+        }).then(function(ga) {
+            ew.apps.itag.state.ble.gatt = ga;
+            if (ew.apps.itag.dbg) console.log("getting service...");
+
+            // Ρύθμιση handler για RSSI
+            if (ew.apps.itag.tid.rssi) clearTimeout(ew.apps.itag.tid.rssi)
+            ew.apps.itag.tid.rssi = 0;
+            ew.apps.itag.state.ble.gatt.setRSSIHandler(function(rssi) {
+                if (!ew.face.pageCurr && ew.face.appCurr === "itag-connect" && !ew.apps.itag.tid.rssi) {
+                    ew.apps.itag.tid.rssi = setTimeout(() => {
+                        if (ew.face.appCurr === "itag-connect") ew.UI.btn.c1l("main", "_main", 9, rssi + " ", "", 15, 1, 4);
+                        ew.apps.itag.tid.rssi = 0;
+                    }, 330);
+                }
+            });
+
+            // Χειρισμός αποσύνδεσης
+            ga.device.on('gattserverdisconnected', function(reason) {
+                ew.apps.itag.state.connected = 0;
+
+                if (ew.apps.itag.tid.rssi) { clearTimeout(ew.apps.itag.tid.rssi);
+                    ew.apps.itag.tid.rssi = 0; }
+                //ew.apps.itag.state.ble.gatt.setRSSIHandler();
+
+                if (ew.apps.itag.state.focus) { ew.apps.itag.stopScan();
+                    ew.apps.itag.scan(); }
+
+                if (ew.apps.itag.dbg) console.log("disconnected: " + reason);
+
+                if (reason === 62 && ew.face.appCurr === "itag-connect") {
+                    ew.UI.btn.ntfy(1, 2, 0, "_bar", 6, "TOO FAR", "", 15, 13);
+                }
+                else if (reason === 8 && ew.face.appCurr === "itag-connect") {
+                    ew.UI.btn.ntfy(1, 2, 0, "_bar", 6, "LOST", "", 15, 13);
+                }
+                else if (ew.face.appCurr === "itag-connect") {
+                    ew.UI.btn.ntfy(1, 2, 0, "_bar", 6, "DISCONNECTED", "", 0, 15);
+                }
+
+                if (ew.apps.itag.state.ble.next) {
+                    ew.apps.itag.conn(ew.apps.itag.state.ble.next);
+                    if (ew.face.appCurr === "itag-connect") ew.UI.btn.ntfy(1, 1.5, 0, "_bar", 6, "CONNECTING", "", 0, 15);
+                    ew.apps.itag.state.ble.next = 0;
+                }
+                else {
+                    setTimeout(() => {
+                        if (ew.face.appCurr === "itag-connect") ew.face.go("itag", 0);
+                    }, 1500);
+                }
+            });
+
+            return ga.getPrimaryService(0xffe0);
+        }).then(function(service) {
+            if (ew.apps.itag.tid.con) {
+                clearTimeout(ew.apps.itag.tid.con);
+                ew.apps.itag.tid.con = 0;
+            }
+            if (ew.face.appCurr === "itag-connect") ew.UI.btn.ntfy(1, 10, 0, "_bar", 6, "PRIMARY", "SERVICE", 0, 15);
+            if (ew.apps.itag.dbg) console.log("getting characteristic...");
+            ew.apps.itag.state.ble.ser_sil = service;
+
+            // Προσπάθεια λήψης του χαρακτηριστικού 0xffe1
+            return service.getCharacteristic(0xffe1).catch(function(e) {
+                if (ew.apps.itag.dbg) console.log("Characteristic 0xffe1 not available:", e);
+                return null; // Επιστροφή null αντί να απορριφθεί η Promise
+            });
+        }).then(function(characteristic) {
+            if (characteristic) {
+                if (ew.face.appCurr === "itag-connect") ew.UI.btn.ntfy(1, 10, 0, "_bar", 6, "BUTTON", "CHARACTERISTIC", 0, 15);
+                ew.apps.itag.state.ble.ffe1 = characteristic;
+
+                // incomming
+                characteristic.on('characteristicvaluechanged', function(evt) { ew.apps.itag.receive(evt.target.value.buffer) });
+
+                if (ew.apps.itag.dbg) console.log("starting notifications...");
+                return characteristic.startNotifications().then(function() {
+                    if (ew.face.appCurr === "itag-connect") ew.UI.btn.ntfy(1, 10, 0, "_bar", 6, "START", "NOTIFICATIONS", 0, 15);
+                    if (ew.apps.itag.dbg) console.log("waiting for notifications");
+                    return characteristic;
+                }).catch(function(e) {
+                    if (ew.apps.itag.dbg) console.log("Notifications not supported:", e);
+                    return characteristic;
+                });
+            }
+            else {
+                if (ew.apps.itag.dbg) console.log("Skipping notifications - characteristic not available");
+                return null;
+            }
+        }).then(function() {
+            // Προσπάθεια λήψης του χαρακτηριστικού 0xffe2
+            if (ew.apps.itag.state.ble.ser_sil) {
+                return ew.apps.itag.state.ble.ser_sil.getCharacteristic(0xffe2).then(function(characteristic) {
+                    if (ew.face.appCurr === "itag-connect") ew.UI.btn.ntfy(1, 10, 0, "_bar", 6, "SILENCE", "CHARACTERISTIC", 0, 15);
+                    if (ew.apps.itag.dbg) console.log("got silence characteristic");
+                    ew.apps.itag.state.ble.silence = characteristic;
+                    return characteristic;
+                }).catch(function(e) {
+                    if (ew.apps.itag.dbg) console.log("Characteristic 0xffe2 not available:", e);
+                    ew.apps.itag.state.ble.silence = null;
+                    return null;
+                });
+            }
+            return null;
+        }).then(function() {
+            // Προσπάθεια λήψης της υπηρεσίας ειδοποιήσεων (0x1802)
+            return ew.apps.itag.state.ble.gatt.getPrimaryService(0x1802).then(function(service) {
+                if (ew.face.appCurr === "itag-connect") ew.UI.btn.ntfy(1, 10, 0, "_bar", 6, "ALERT", "SERVICE", 0, 15);
+                if (ew.apps.itag.dbg) console.log("got alert service");
+                return service.getCharacteristic(0x2A06);
+            }).then(function(characteristic) {
+                if (ew.face.appCurr === "itag-connect") ew.UI.btn.ntfy(1, 10, 0, "_bar", 6, "ALERT", "CHARACTERISTIC", 0, 15);
+                if (ew.apps.itag.dbg) console.log("got alert characteristic");
+                ew.apps.itag.state.ble.alert = characteristic;
+                return characteristic;
+            }).catch(function(e) {
+                if (ew.apps.itag.dbg) console.log("Alert service not available:", e);
+                ew.apps.itag.state.ble.alert = null;
+                return null;
+            });
+        }).then(function() {
+            // Προσπάθεια λήψης της υπηρεσίας μπαταρίας (0x180F)
+            return ew.apps.itag.state.ble.gatt.getPrimaryService(0x180F).then(function(service) {
+                if (ew.face.appCurr === "itag-connect") ew.UI.btn.ntfy(1, 10, 0, "_bar", 6, "BATTERY", "SERVICE", 0, 15);
+                if (ew.apps.itag.dbg) console.log("got battery service");
+                return service.getCharacteristic(0x2A19);
+            }).then(function(characteristic) {
+                if (ew.face.appCurr === "itag-connect") ew.UI.btn.ntfy(1, 10, 0, "_bar", 6, "BATTERY", "CHARACTERISTIC", 0, 15);
+                if (ew.apps.itag.dbg) console.log("got battery characteristic");
+                ew.apps.itag.state.ble.battery = characteristic;
+                return characteristic.readValue();
+            }).then(function(d) {
+                if (ew.apps.itag.dbg) console.log("Got battery value:", JSON.stringify(d.buffer));
+                ew.apps.itag.state.def.store[ew.apps.itag.state.ble.id].batt = d.buffer[0];
+                return d;
+            }).catch(function(e) {
+                if (ew.apps.itag.dbg) console.log("Battery service not available:", e);
+                ew.apps.itag.state.ble.battery = null;
+                return null;
+            });
+        }).then(function() {
+            // Τελική ρύθμιση σιγήματος (αν υπάρχει το χαρακτηριστικό)
+            if (ew.apps.itag.state.ble.silence) {
+                ew.apps.itag.state.ble.silence.writeValue(
+                    (ew.apps.itag.state.def.store[ew.apps.itag.state.ble.id].silent) ? 0 : 1
+                );
+            }
+
+            ew.apps.itag.state.connected = 1;
+            if (ew.face.appCurr === "itag-connect") ew.face[0].bar(); //ew.face.go("itag-connect", 0);
+        }).catch(function(e) {
+            if (ew.apps.itag.dbg) console.log("itag: catch Error: " + e);
+            if (e === "ERR 0x12 (CONN_COUNT)") {
+                if (ew.face.appCurr === "itag-connect") ew.UI.btn.ntfy(1, 1.5, 0, "_bar", 6, "MAX 2", "CONNECTIONS", 13, 15);
+            }
+            else {
+                if (ew.apps.itag.dbg) console.log("itag: disconnected");
+            }
+        });
+
+    },
+    receive(data) {
+        if (ew.apps.itag.dbg) console.log("notification incoming data : ", data);
+        if (ew.apps.itag.dbg) console.log("notification incoming data string: ", E.toString(data));
+        if (ew.apps.itag.dbg) console.log("notification incoming data length: ", data.length);
+        if (data.length === 1) {
+            ew.sys.buzz.alrm(ew.sys.buzz.type.alert);
+            if (ew.face.appCurr === "itag-connect") ew.UI.btn.ntfy(1, 1, 0, "_bar", 6, "BUTTON", "PRESSED", 15, 4);
+        }
+        else {
+            data = JSON.parse(E.toString(data));
+            if (ew.face.appCurr === "itag-connect") ew.UI.btn.ntfy(1, 1, 0, "_bar", 6, data.s.toUpperCase(), "", 0, 15);
+        }
+    }
+
+};
+if (require('Storage').readJSON('ew.json', 1).itag) {
+    ew.apps.itag.state.def = require('Storage').readJSON('ew.json', 1).itag;
+    if (!ew.apps.itag.state.def) ew.apps.itag.state.def = { store: {}, storeOrder: [], hiddenOrder: [], pos: 0, set: { phy: 0, autoPhy: 1, minInterval: 50, maxInterval: 100, slaveLatency: 4, persist: 0, rssi: 1, pos: 0, keepFor: 5, storeLock: 0, scanAll: 0, checker: 1, show: 0, rssiHandler: 0, auto: 0 } };
+    //ew.apps.itag.state.def.storeOrder=  Object.values(ew.apps.itag.state.def.store).map(item => item.id);
+}
+ew.apps.itag.stopScan();
+
+
+και faces
+
+//itag scan viewer
+
+ew.UI.nav.next.replaceWith(() => {
+    ew.sys.buzz.nav(ew.sys.buzz.type.ok);
+    ew.face.go("itag-dev", 0);
+});
+ew.UI.nav.back.replaceWith(() => {
+    ew.sys.buzz.nav(ew.sys.buzz.type.ok);
+    ew.face.go("itag-dev", 0);
+});
+
+ew.face[0] = {
+    data: { source: 0, name: 0, key: 0, key_1: 0, key_2: 0, key_3: 0, lowLimit: 0, hiLimit: 0, fields: 0, totLowField: 0, ref: 0, style: 0, posL: 0 },
+    gatt: {},
+    run: false,
+    offms: (ew.def.face.off[ew.face.appCurr]) ? ew.def.face.off[ew.face.appCurr] : 60000,
+    init: function() {
+        if (!ew.def.face.off[ew.face.appCurr])  ew.def.face.off[ew.face.appCurr] = this.offms;
+        if (ew.apps.itag.state.ble.gatt.connected|| (ew.comm.mstr.connection  && ew.comm.mstr.connection.connected)) {
+            ew.face.go("itag-connect", 0);
+            return;
+        }
+        ew.is.bar = 0;
+        if (ew.face.appPrev === "itag-dev") this.started = 1
+        ew.UI.ele.ind(1, 2, 0, 15);
+
+        this.data.key = "rssi";
+        // UI control Start
+        ew.UI.c.start(1, 1);
+        ew.UI.ele.coord("main", "_main", 9);
+        ew.UI.c.end();
+
+        // button hander
+        ew.UI.c.main._main = (i, l) => {
+            if (ew.face[0].dbg) console.log("button: ", i);
+            if (l) {
+                ew.sys.buzz.nav(ew.sys.buzz.type.ok);
+                if (ew.apps.itag.state.def.set.scanAll) {
+                    ew.UI.btn.ntfy(1, 1.5, 0, "_bar", 6, "SCAN ALL", "IS ACTIVE", 15, 13);
+                    return;
+                }
+                ew.apps.itag.state.ble.id = ew.apps.itag.state.devA[this.data.posL];
+                ew.face.go("itag-connect", 0, ew.apps.itag.state.ble.id);
+            } else if (ew.def.face.info) ew.UI.btn.ntfy(1, 0.4, 0, "_bar", 6,"HOLD TO", "CONNECT", 0, 15);
+
+        };
+        if (!ew.apps.itag.state.def.set.scanAll) {
+            //this.data.array =  ew.apps.itag.state.def.storeOrder;
+            this.data.source = ew.apps.itag.state.def.store;;
+        }
+        else {
+            //this.data.array = ew.apps.itag.state.scanAllA;
+            this.data.source = ew.apps.itag.state.scanAll;;
+        }
+
+        if (ew.apps.itag.state.focus)
+            ew.apps.itag.state.lastId = ew.apps.itag.state.focus;
+
+        if (!ew.apps.itag.state.ble.scan) {
+            if (!ew.apps.itag.state.def.set.persist) {
+                let timePassed = ((getTime() | 0) - ew.apps.itag.state.time);
+                if (ew.apps.itag.state.def.set.keepFor * 60 <= timePassed) {
+                    ew.apps.itag.state.dev = {};
+                    ew.apps.itag.state.devA = [];
+                }
+            }
+            ew.apps.itag.stopScan();
+            ew.apps.itag.scan();
+        }
+        this.bar();
+
+ 
+        //if (ew.apps.itag.state.lastId && (ew.apps.itag.state.dev[ew.apps.itag.state.lastId]))
+        //        this.data.posL = ew.apps.itag.state.devA.indexOf(ew.apps.itag.state.lastId);
+        //else this.data.posL = 0;
+
+        //this.info(this.data.source[ew.apps.itag.state.devA[this.data.posL] ].rssi   , ew.apps.itag.state.devA[this.data.posL] , this.data.source[ew.apps.itag.state.devA[this.data.posL] ].name , this.data.source[ew.apps.itag.state.devA[this.data.posL] ].oflc);
+        //this.bar();
+
+
+        //this.run=1
+
+    },
+    show: function() {
+        if (!this.run) return;
+
+        this.bar();
+        if (this.tid) clearTimeout(this.tid);
+        this.tid = setTimeout(function(t) {
+            t.tid = 0;
+            t.show();
+        }, 1000, this);
+    },
+
+    info: function(rssi, id, name, oflc) {
+
+        name = this.data.source[id] ? this.data.source[id].name : name;
+        let brd =(this.data.source[id] &&this.data.source[id].board )?this.data.source[id].board:0;
+        let boCo=[0,0,0,6,1]
+        ew.UI.btn.i2l("main", "_main", 9, oflc ? oflc : rssi + " ", oflc ? "OFFLINE" : (ew.apps.itag.state.def.set.scanAll) ? id.split(" ")[0].toUpperCase() : "dBm", oflc ? 13 : 4, 15, process.env.BOARD === "BANGLEJS2" ? 3 : 4);
+        //name
+        ew.UI.btn.c2l("main", "_header", 6, name, "", 15, boCo[brd], 1.5);
+
+    },
+    bar: function() {
+        if (ew.is.UIpri) { ew.notify.alert("error", ew.notify.log.error[0], 1, 1); return; }
+
+        if (ew.is.bar) return;
+        
+        // set the bar control
+        ew.UI.c.tcBar = (a, b) => {
+            let v = this.graph(ew.apps.itag.state.devA, b, 1, this.data.key);
+            if (!v) { return; }
+            this.info(v[0], v[1], v[2], v[3]);
+        };
+        ew.is.slide = 1;
+
+        // reset UI control, bar only
+        ew.UI.c.start(0, 1);
+        ew.UI.c.end();
+
+        if (!ew.apps.itag.state.devA.length) {
+            ew.UI.ele.fill("_bar", 6, 0);
+            ew.UI.btn.img("main", "_main", 9, "scan", "WAIT", 4, 15, 3);
+            ew.UI.btn.c2l("main", "_header", 6, "SCANNING", "", 15, 0, 1.2);
+
+            if (!this.started && ew.def.face.info) {
+                ew.UI.btn.ntfy(1, 1.5, 0, "_bar", 6, "ITAG", "SCANNER", 15, 1);
+                setTimeout(() => { ew.face[0].started = 1; }, 1000);
+            }
+            return;
+        }
+        g.flip();
+        this.update();
+    },
+
+    update: function(listReniew) {
+        if (ew.is.bar) return;
+      
+        ew.UI.ele.fill("_bar", 6, 0);
+
+        ew.sys.TC.val = { cur: this.data.posL, dn: 0, up: ew.apps.itag.state.devA.length - 1, tmp: 0, reverce: 0, loop: 1 };
+        // graph the bar
+
+        if (ew.apps.itag.state.devA.length) {
+            if (ew.apps.itag.state.lastId && (ew.apps.itag.state.dev[ew.apps.itag.state.lastId]))
+                this.data.posL = ew.apps.itag.state.devA.indexOf(ew.apps.itag.state.lastId);
+            else this.data.posL = 0;
+
+            let v = this.graph(ew.apps.itag.state.devA, this.data.posL, 0, this.data.key);
+            if (!ew.apps.itag.state.def.set.persist&&!g.isOn)
+            ew.UI.btn.img("main", "_main", 9, "pause", "Paused", 4, 15, 2);
+            else this.info(v[0], v[1], v[2], v[3]);
+
+        }
+        else {
+            ew.UI.btn.img("main", "_bar", 6, "scan", "WAIT", 14, 0, 3);
+            //ew.UI.ele.fill("_bar", 6, 0);
+            g.flip();
+        }
+    },
+    graph: function(data, pos, update, focus) {
+
+        // vars
+        const width = g.getWidth() - (process.env.BOARD == "BANGLEJS2" ? 0 : 30);
+        const bottom = g.getHeight() - (process.env.BOARD == "BANGLEJS2" ? 0 : 15);
+        const height = bottom / (process.env.BOARD == "BANGLEJS2" ? 3.65 : 3.65) | 0;
+        const value = this.data.key;
+        const source = ew.apps.itag.state.dev;
+        const fields = data.length;
+        const margin = process.env.BOARD == "BANGLEJS2" ? 0 : 15;
+        const bw = width / fields;
+        if (!data[pos]) return;
+
+        // get scale
+        let scale = (process.env.BOARD == "BANGLEJS2" ? 0.9 : 1.1);
+        //for (let i in data)
+        //   if (scale < 100 - Math.abs(data[i][value]) - 0) scale = 100 - Math.abs(data[i][value]);
+        //scale = 1 // (height - (bottom / 10)) / ((scale) ? scale : 1);
+        let rssi = ew.apps.itag.state.def.set.rssi;
+        let limits = source[data[pos]].live
+        let abs_pos = (source[data[pos]][value] ^ (source[data[pos]][value] >> 31)) - (source[data[pos]][value] >> 31);
+        let abs_posL = (source[data[this.data.posL]][value] ^ (source[data[this.data.posL]][value] >> 31)) - (source[data[this.data.posL]][value] >> 31);
+        if (update) {
+
+            // top dot - erase last
+            g.setCol(1, 0);
+            g.fillRect(margin + 2 + (this.data.posL * bw) + bw - 2, bottom - height + 0, margin + 2 + (this.data.posL * bw), bottom - height + 5);
+            // top dot - create current
+            g.setCol(1, 14);
+
+            if (fields) g.fillRect(margin + 2 + (pos * bw) + bw - 2, bottom - height + 0, margin + 2 + (pos * bw), bottom - height + 5);
+            limits = source[data[this.data.posL]].live;
+
+            // style 1
+            if (!rssi) {
+                // bar - clear previus 
+                g.setCol(1, limits ? 4 : 13);
+                g.fillRect(margin + 2 + (this.data.posL * bw) + bw - 2, bottom - (limits ? 50 : 50 - source[data[this.data.posL]].oflc), margin + 2 + (this.data.posL * bw), bottom);
+                // bar - highlight current
+                g.setCol(1, 14);
+                limits = source[data[pos]].live;
+                g.drawRect(margin + 2 + (pos * bw) + bw - 2, bottom - (limits ? 50 : 50 - source[data[pos]].oflc), margin + 2 + (pos * bw), bottom);
+            }
+            // style 0
+            else {
+                //limits color coding
+                g.setCol(1, limits ? 4 : 13);
+                // bar - clear previus
+                g.drawRect(margin + 2 + (this.data.posL * bw) + bw - 2, bottom - (limits ? ((100 - abs_posL) * scale) : 50 - source[data[this.data.posL]].oflc), margin + 2 + (this.data.posL * bw), bottom);
+                // bar - highlight current 
+                g.setCol(1, 14);
+                limits = source[data[pos]].live;
+                g.drawRect(margin + 2 + (pos * bw) + bw - 2, bottom - (limits ? ((100 - abs_pos) * scale) : 50 - source[data[pos]].oflc), margin + 2 + (pos * bw), bottom);
+            }
+            this.data.posL = pos;
+            ew.apps.itag.state.lastId = data[pos];
+        }
+
+        // first draw
+        else {
+
+            // dot highlight current
+            g.setCol(1, 14);
+            if (1 < fields) g.fillRect(margin + 2 + (pos * bw) + bw - 2, bottom - height + 0, margin + 2 + (pos * bw), bottom - height + 5);
+
+            // bar - draw bars
+            for (let i in data) {
+                if (fields < i) break;
+                limits = source[data[i]].live;
+                g.setCol(1, limits ? 4 : 13);
+                if (rssi) {
+                    let abs_i = (source[data[i]][value] ^ (source[data[i]][value] >> 31)) - (source[data[i]][value] >> 31);
+                    g.fillRect(margin + 2 + (i * bw) + bw - 2, bottom - (limits ? ((100 - abs_i) * scale) : 50 - source[data[i]].oflc), margin + 2 + (i * bw), bottom);
+                }
+                else
+                    g.fillRect(margin + 2 + (i * bw) + bw - 2, bottom - (limits ? 50 : 50 - source[data[i]].oflc), margin + 2 + (i * bw), bottom);
+            }
+            // bar - highlight curent
+            g.setCol(1, 14);
+            limits = source[data[pos]].live;
+            if (rssi)
+                g.drawRect(margin + 2 + (pos * bw) + bw - 2, bottom - (limits ? ((100 - abs_pos) * scale) : 50 - source[data[pos]].oflc), margin + 2 + (pos * bw), bottom);
+            else
+                g.drawRect(margin + 2 + (pos * bw) + bw - 2, bottom - (limits ? 50 : 50 - source[data[pos]].oflc), margin + 2 + (pos * bw), bottom);
+        }
+
+        return [source[data[pos]].rssi, data[pos], source[data[pos]].name, source[data[pos]].oflc];
+    },
+    clear: function(o) {
+        ew.is.slide = 0; /*TC.removeAllListeners();*/
+        if (this.tid) clearTimeout(this.tid);
+        this.tid = 0;
+        if (ew.apps.itag.state.focus || (ew.apps.itag.state.def.set.persist && ew.face.appCurr === "itag") /*|| (ew.face.appCurr.startsWith("itag") && !ew.face.pageCurr)*/ )
+            return;
+
+        else {
+            if (ew.face.appCurr === "itag") ew.UI.btn.img("main", "_main", 9, "pause", "Paused", 4, 15, 2);
+            ew.apps.itag.state.time = (getTime() | 0);
+            ew.apps.itag.stopScan();
+        }
+        return true;
+    },
+    off: function(o) {
+        g.off();
+        this.clear(o);
+    }
+};
+
+
+//itag store viewer
+
+ew.UI.nav.next.replaceWith(() => {
+    ew.sys.buzz.nav(ew.sys.buzz.type.ok);
+    ew.face.go("itag", 0);
+
+});
+ew.UI.nav.back.replaceWith(() => {
+    ew.sys.buzz.nav(ew.sys.buzz.type.ok);
+    ew.face.go("itag", 0);
+
+});
+
+ew.face[0] = {
+    data: { source: 0, name: 0, key: 0, key_1: 0, key_2: 0, key_3: 0, lowLimit: 0, hiLimit: 0, fields: 0, totLowField: 0, ref: 0, style: 1, posL: 0 },
+    gatt: {},
+    run: false,
+    coord: (process.env.BOARD == "BANGLEJS2") ? { "main": [0, 29, 176, 115], "id": [88, 97], "batt": [88, 65], "unit": [45, 70], "last": [88, 35] } : { "main": [0, 55, 240, 185], "id": [120, 160], "batt": [120, 120], "unit": [70, 122], "last": [120, 70] },
+    offms: (ew.def.face.off[ew.face.appCurr]) ? ew.def.face.off[ew.face.appCurr] : 60000,
+    init: function(o) {
+        if (!ew.def.face.off[ew.face.appCurr])  ew.def.face.off[ew.face.appCurr] = this.offms;
+        ew.UI.ele.ind(2, 2, 0, 15);
+        this.moveDo = 0;
+            
+        // ---- scan mode setup ----
+        if (!ew.apps.itag.state.def.set.scanAll) {
+            if (o === "move") this.moveMode = 1;
+            this.data.array = ew.apps.itag.state.def.set.show ? ew.apps.itag.state.def.hiddenOrder : ew.apps.itag.state.def.storeOrder;
+            this.data.source = ew.apps.itag.state.def.store;;
+            this.data.key = "batt";
+            if (ew.apps.itag.state.focus)
+                this.data.posL = this.data.array.indexOf(ew.apps.itag.state.focus);
+            else
+                this.data.posL = this.data.array[ew.apps.itag.state.def.set.pos] ? ew.apps.itag.state.def.set.pos : 0;
+        }
+        else {
+            this.data.array = ew.apps.itag.state.scanAllA;
+            this.data.source = ew.apps.itag.state.scanAll;;
+            this.data.key = "fixed";
+            this.data.posL = this.data.array[ew.apps.itag.state.def.set.pos] ? ew.apps.itag.state.def.set.pos : 0;
+        }
+
+        let dev=this.data.array[this.data.posL];
+        this.info(this.data.source[dev].batt, dev, this.data.source[dev].name, this.data.source[dev].lastseen);
+        ew.UI.btn.img("main", "_bar", 6, "scan", "WAIT", 14, 0, 3);
+
+        this.bar();
+
+        // ---- UI control Start ----
+        ew.UI.c.start(1, 1);
+        ew.UI.ele.coord("main", "_main", 9);
+        ew.UI.c.end();
+
+        // ---- button hander ----
+        ew.UI.c.main._main = (i, l) => {
+            if (l) {
+                ew.sys.buzz.nav(ew.sys.buzz.type.ok);
+
+                if (this.moveMode) {
+                    this.moveDo = 1 - this.moveDo;
+                    if (this.moveDo) ew.apps.itag.state.move = this.data.posL
+                    let v = this.graph(this.data.array, this.data.posL, 1, this.data.key);
+                    this.info(v[0], v[1], v[2], v[3]);
+                    if (ew.def.face.info) ew.UI.btn.ntfy(1, 0.4, 0, "_bar", 6, this.moveDo ? "DRAG TO MOVE" : "MOVED", "", 0, 15);
+                }
+                else {
+                    if (ew.apps.itag.state.focus == this.data.array[this.data.posL]) {
+                        ew.apps.itag.state.focus = 0;
+                        ew.apps.itag.stopScan();
+                        if (ew.apps.itag.state.def.set.persist) ew.apps.itag.scan();
+                    }
+                    else {
+                        ew.apps.itag.state.focus = this.data.array[this.data.posL];
+                        ew.apps.itag.stopScan();
+                        ew.apps.itag.scan((this.data.source[ew.apps.itag.state.focus].phy===2?2:"0"));
+
+                    }
+                    let v = this.graph(ew.face[0].data.array, this.data.posL, 1, this.data.key);
+                    this.info(v[0], v[1], v[2], v[3]);
+                    if (ew.def.face.info)   ew.UI.btn.ntfy(1, 1.5, 0, "_bar", 6, (!ew.apps.itag.state.focus) ? "UNFOCUS FROM" : "FOCUS AT", this.data.source[this.data.array[this.data.posL]].name.toUpperCase(), 0, 15);
+                }
+            }else if (ew.def.face.info) ew.UI.btn.ntfy(1, 0.4, 0, "_bar", 6,"HOLD TO", this.moveMode ? this.moveDo?"RELEASE":"SELECT": "FOCUS", 0, 15);
+                
+        };
+    },
+    show: function(s) {
+        if (!this.run) return;
+
+    },
+    info: function(batt, id, name, last) {
+        g.setCol(0, (ew.apps.itag.state.focus && id === ew.apps.itag.state.focus) ? 13 : this.moveDo ? 4 : ew.apps.itag.state.def.set.scanAll ? 6 : 1);
+        g.fillRect({ x: this.coord.main[0], y: this.coord.main[1], x2: this.coord.main[2], y2: this.coord.main[3], r: 10 });
+
+
+        // devInfo
+        g.setCol(1, 15);
+        g.setFont("LECO1976Regular22", 1);
+        //g.setFont("Teletext10x18Ascii");
+        let volt = this.data.source[id].volt;
+        let devInfo = (volt) ? batt + "% " + volt / 100 * 2 +"V "+ (this.data.source[id].phy? "CD":"1M") : batt + "%";
+        let l = g.stringWidth(devInfo) / 2;
+        g.drawString(devInfo, this.coord.batt[0] - l, this.coord.batt[1]);
+
+
+        // last seen
+        const now = (Date.now() / 1000 | 0);
+        const diffMins = (now - last) / 60 | 0;
+        g.setCol(1, 14);
+        g.setFont("Teletext10x18Ascii");
+        g.drawString(this.formatTimeDiff(diffMins), this.coord.last[0] - g.stringWidth(this.formatTimeDiff(diffMins)) / 2, this.coord.last[1]); //
+
+
+        // id
+        g.setCol(1, 14);
+        if (process.env.BOARD == "BANGLEJS2") g.setFont("Vector", 20 * ew.UI.size.txt);
+        else g.setFont("Teletext10x18Ascii");
+        g.drawString(id.split(" ")[0].toUpperCase(), this.coord.id[0] - g.stringWidth(id.split(" ")[0].toUpperCase()) / 2, this.coord.id[1]); //
+
+        // name
+        ew.UI.btn.c2l("main", "_header", 6, name, "", 15, 0, 1.5);
+
+    },
+    formatTimeDiff: function(mins) {
+        if (mins < 1) return 'Now';
+        if (mins < 60) return `${mins} Minutes ago`;
+        const hours = Math.floor(mins / 60);
+        if (hours < 24) return `${hours} Hours ago`;
+        const days = Math.floor(hours / 24);
+        return `${days} Days ago`;
+    },
+    move: function(from, to) {
+        ew.face[0].data.array.splice(to, 0, ew.face[0].data.array.splice(from, 1)[0]);
+    },
+    bar: function() {
+        if (ew.is.UIpri) { ew.notify.alert("error", ew.notify.log.error[0], 1, 1); return; }
+        //"ram";
+
+        if (this.data.array.length === 0) {
+            ew.UI.btn.c2l("main", "_main", 15, "EMPTY", "", 15, 0, 2);
+            //return;
+        }
+        ew.UI.ele.fill("_bar", 6, 0);
+
+        // graph the bar
+        if (this.data.array.length) {
+            let v = this.graph(ew.face[0].data.array, this.data.posL, 0, this.data.key);
+            //this.info(v[0], v[1], v[2], v[3]);
+        }
+        else {
+            ew.UI.btn.c2l("main", "_main", 15, "EMPTY", "", 15, 0, 2);
+        }
+
+        // set the bar control
+        ew.sys.TC.val = { cur: this.data.posL, dn: 0, up: ew.face[0].data.array.length - 1, tmp: 0, reverce: 0, loop: 1 };
+        ew.UI.c.tcBar = (a, b, r, m) => {
+            "ram";
+            if (ew.apps.itag.state.move != -1 && this.moveDo) {
+                this.move(this.data.posL, b);
+                ew.apps.itag.state.move = b;
+
+            }
+            let v = this.graph(ew.face[0].data.array, b, 1, this.data.key);
+            if (!v) { return; }
+            g.flip();
+            // call info
+            if (ew.tid.barDo) clearTimeout(ew.tid.barDo);
+            ew.tid.barDo = setTimeout(() => {
+                ew.tid.barDo = 0;
+                this.info(v[0], v[1], v[2], v[3])
+            }, 20);
+
+        };
+        ew.is.slide = 1;
+
+        // reset UI control, bar only
+        ew.UI.c.start(0, 1);
+        ew.UI.c.end();
+
+        // bar buttons
+        ew.UI.c.bar._bar = (i) => {
+            if (i == 1) {}
+        };
+    },
+    graph: function(data, pos, update, focus) {
+        //"ram";
+        // vars
+        const width = g.getWidth() - (process.env.BOARD == "BANGLEJS2" ? 0 : 30);
+        const bottom = g.getHeight() - (process.env.BOARD == "BANGLEJS2" ? 0 : 15);
+        const height = bottom / (process.env.BOARD == "BANGLEJS2" ? 3.65 : 3.5) | 0;
+        const value = this.data.key;
+        const fields = this.data.array.length;
+        const source = this.data.source;
+        const margin = process.env.BOARD == "BANGLEJS2" ? 0 : 15;
+        const bw = width / fields;
+        if (!data[pos]) return;
+
+        // get scale
+        let scale = 0;
+        for (let i in data)
+            if (scale < source[data[i]][value] - 0) scale = source[data[i]][value];
+        scale = (height - (bottom / 10)) / ((scale) ? scale : 1);
+
+
+        const limitsP = (ew.apps.itag.state.focus == data[pos]) ? 1 : 0;
+        const limitsLp = (ew.apps.itag.state.focus == data[this.data.posL]) ? 1 : 0;
+
+        const moveP = (ew.apps.itag.state.move === pos && this.moveDo ? 1 : 0);
+        const moveLp = ew.apps.itag.state.move === this.data.posL && this.moveDo ? 1 : 0;
+        if (update) {
+
+            // top dot - erase last
+            g.setCol(1, 0);
+            g.fillRect(margin + 2 + (this.data.posL * bw) + bw - 2, bottom - height + 0, margin + 2 + (this.data.posL * bw), bottom - height + 5);
+            // top dot - create current
+            g.setCol(1, 14);
+
+            if (fields) g.fillRect(margin + 2 + (pos * bw) + bw - 2, bottom - height + 0, margin + 2 + (pos * bw), bottom - height + 5);
+
+            // bar - clear previus 
+            g.setCol(1, limitsLp ? 13 : moveLp ? 15 : ew.apps.itag.state.def.set.scanAll ? 6 : ew.apps.itag.state.def.set.show ? 9 : 14);
+            //g.setCol(1,  1);
+            g.fillRect(margin + 2 + (this.data.posL * bw) + bw - 2, bottom - (source[data[this.data.posL]][value] * scale), margin + 2 + (this.data.posL * bw), bottom);
+            limits = (ew.apps.itag.state.focus == data[pos]) ? 1 : 0; //data[pos].live
+            // bar - highlight current
+            g.setCol(1, limitsP ? 13 : moveP ? 15 : 4);
+            //g.setCol(1, 4);
+            g.fillRect(margin + 2 + (pos * bw) + bw - 2, bottom - (source[data[pos]][value] * scale), margin + 2 + (pos * bw), bottom);
+            this.data.posL = pos;
+
+        }
+
+        // first draw
+        else {
+            // dot highlight current
+            g.setCol(1, 14);
+            if (1 < fields) g.fillRect(margin + 2 + (pos * bw) + bw - 2, bottom - height + 0, margin + 2 + (pos * bw), bottom - height + 5);
+
+            // bar - draw bars
+            for (let i in data) {
+                if (fields < i) break;
+                let limits = (ew.apps.itag.state.focus === data[i]) ? 1 : 0;
+                let move = (ew.apps.itag.state.move === i) ? 1 : 0;
+                g.setCol(1, limits ? 13 : move ? 15 : ew.apps.itag.state.def.set.scanAll ? 6 : ew.apps.itag.state.def.set.show ? 9 : 14);
+                //g.setCol(1,  1);
+                g.fillRect(margin + 2 + (i * bw) + bw - 2, bottom - (source[data[i]][value] * scale), margin + 2 + (i * bw), bottom);
+                //g.flip();
+                
+            }
+            // bar - highlight curent
+            g.setCol(1, limitsP ? 13 : moveP ? 15 : 4);
+            g.fillRect(margin + 2 + (pos * bw) + bw - 2, bottom - (source[data[pos]][value] * scale), margin + 2 + (pos * bw), bottom);
+
+        }
+        return [source[data[pos]][value], data[pos], source[data[pos]].name, source[data[pos]].lastseen];
+
+    },
+    clear: function(o) {
+        ew.is.slide = 0; /*TC.removeAllListeners();*/
+        if (this.tid) clearTimeout(this.tid);
+        if (ew.face.appCurr != "itag-dev-set") ew.apps.itag.state.move = -1;
+        ew.apps.itag.state.def.set.pos = this.data.posL;
+        this.tid = 0;
+        if (ew.apps.itag.state.focus || (ew.apps.itag.state.def.set.persist && ew.face.appCurr === "itag") || (ew.face.appCurr.startsWith("itag") && !ew.face.pageCurr)) return;
+        else ew.apps.itag.stopScan();
+        return true;
+    },
+    off: function(o) {
+        g.off();
+        this.clear(o);
+    }
+};
+
+
+ayto to face exei kai setings. τα σεττινγσ μπαινουν σε ενα αρχειο με ονομα ιδιο με του face  ( f_appName_faceName) σε αυτη την μορφή f_appName_faceName_set
+
+settings gia to scan
+
+//itag scan settings
+
+ew.UI.nav.next.replaceWith(() => {
+    if (ew.UI.ntid && !ew.is.UIpri) {
+        clearTimeout(ew.UI.ntid);
+        ew.UI.ntid = 0;
+    }
+    ew.sys.buzz.nav(ew.sys.buzz.type.ok);
+    ew.face[0].page2();
+});
+ew.UI.nav.back.replaceWith(() => {
+    if (ew.UI.ntid && !ew.is.UIpri) {
+        clearTimeout(ew.UI.ntid);
+        ew.UI.ntid = 0;
+    }
+    ew.sys.buzz.nav(ew.sys.buzz.type.ok);
+    if (ew.face[0].page===1) ew.face.go("itag",0);
+    else ew.face[0].page1();
+
+});
+
+ew.face[0] = {
+    run: false,
+    offms: (ew.def.face.off[ew.face.appCurr]) ? ew.def.face.off[ew.face.appCurr] : 60000,
+    init: function() {
+        if (!ew.def.face.off[ew.face.appCurr])  ew.def.face.off[ew.face.appCurr] = this.offms;
+
+        if (ew.apps.itag.state.focus) {
+            ew.face.go("itag", 0);
+            ew.UI.btn.ntfy(0, 1, 0, "_bar", 6, "FOCUS IS", "ENABLED", 15, 13);
+            return;
+        }
+
+        this.page=1;
+        this.page1();
+        this.bar();
+    },
+    show: function(o) {},
+    page1: function() {
+        this.page=1;
+        // header
+        ew.UI.ele.ind(1, 2, 0, 15);
+
+        this.phyMode = ["1MBPS", "CODED", "1MBPS + CODED", "2MBPS"];
+        ew.UI.c.start(1, 1);
+        ew.UI.ele.fill("_main", 12, 0);
+        ew.UI.btn.c2l("main", "_2x3", 1, "PHY", ew.apps.itag.state.def.set.phy.toString(), 15, 6);
+        ew.UI.btn.c2l("main", "_2x3", 2, "RSSI", ew.apps.itag.state.def.set.rssi ? "ON" : "OFF", 15, ew.apps.itag.state.def.set.rssi ? 4 : 1);
+        ew.UI.btn.c2l("main", "_2x3", 3, "PER", ew.apps.itag.state.def.set.persist ? "ON" : "OFF", 15, ew.apps.itag.state.def.set.persist ? 13 : 1);
+        ew.UI.btn.c2l("main", "_2x3", 4, "CLEAR", ew.apps.itag.state.def.set.keepFor, 15, 6);
+        ew.UI.btn.c2l("main", "_2x3", 5, "TMR", ew.apps.itag.state.def.set.checker ? "ON" : "OFF", 15, ew.apps.itag.state.def.set.checker ? 4 : 1);
+        ew.UI.btn.c2l("main", "_2x3", 6, "ALL", ew.apps.itag.state.def.set.scanAll ? "ON" : "OFF", 15, ew.apps.itag.state.def.set.scanAll ? 13 : 1);
+
+        ew.UI.c.end();
+
+        ew.UI.c.main._2x3 = (i) => {
+            if (i == 1) {
+                ew.sys.buzz.nav(ew.sys.buzz.type.ok);
+                if (ew.apps.itag.state.def.set.phy === undefined) ew.apps.itag.state.def.set.phy = 0;
+                ew.apps.itag.state.def.set.phy++;
+                if (2 < ew.apps.itag.state.def.set.phy) ew.apps.itag.state.def.set.phy = 0;
+                if (ew.def.face.info) ew.UI.btn.ntfy(1, 1.5, 0, "_bar", 6, "PHY MODE", ew.face[0].phyMode[ew.apps.itag.state.def.set.phy], 0, 15);
+                ew.UI.btn.c2l("main", "_2x3", 1, "PHY", ew.apps.itag.state.def.set.phy.toString(), 15, 6);
+                ew.apps.itag.stopScan();
+                ew.apps.itag.state.dev = {};
+                ew.apps.itag.state.devA = [];
+                //ew.apps.itag.scan();
+            }
+            if (i == 2) {
+                ew.sys.buzz.nav(ew.sys.buzz.type.ok);
+                if (ew.apps.itag.state.def.set.rssi == undefined) ew.apps.itag.state.def.set.rssi = 0;
+                ew.apps.itag.state.def.set.rssi = 1 - ew.apps.itag.state.def.set.rssi;
+                if (ew.def.face.info) ew.UI.btn.ntfy(1, 1.5, 0, "_bar", 6, "RSSI ON BAR", ew.apps.itag.state.def.set.rssi ? "ENABLED" : "DISABLED", 0, 15);
+                ew.UI.btn.c2l("main", "_2x3", 2, "RSSI", ew.apps.itag.state.def.set.rssi ? "ON" : "OFF", 15, ew.apps.itag.state.def.set.rssi ? 4 : 1);
+            }
+            if (i == 3) {
+                ew.sys.buzz.nav(ew.sys.buzz.type.ok);
+                if (ew.apps.itag.state.def.set.persist == undefined) ew.apps.itag.state.def.set.persist = 0;
+                ew.apps.itag.state.def.set.persist = 1 - ew.apps.itag.state.def.set.persist;
+
+                if (ew.def.face.info) ew.UI.btn.ntfy(1, 1.5, 0, "_bar", 6, "PERSIST MODE", ew.apps.itag.state.def.set.persist ? "ENABLED" : "DISABLED", 0, 15);
+                ew.UI.btn.c2l("main", "_2x3", 3, "PER", ew.apps.itag.state.def.set.persist ? "ON" : "OFF", 15, ew.apps.itag.state.def.set.persist ? 13 : 1);
+            }
+            else if (i == 4) {
+                ew.sys.buzz.nav(ew.sys.buzz.type.ok);
+                if (ew.apps.itag.state.def.set.keepFor == undefined) ew.apps.itag.state.def.set.keepFor = 5;
+                ew.UI.btn.ntfy(1, 3, 0, "_bar", 6, "CLEAR LIST", "(MINUTES)", 15, 6, 1);
+                ew.is.slide = 1;
+                ew.sys.TC.val = { cur: ew.apps.itag.state.def.set.keepFor, dn: 1, up: 120, tmp: 0, fire: 1 };
+                ew.UI.c.tcBar = (a, b, r) => {
+                    let val = ew.apps.itag.state.def.set.keepFor;
+                    ew.UI.btn.ntfy(0, 2, 1);
+                    if (11 < r && ew.sys.TC.val.dn < val && val < ew.sys.TC.val.up) val = val + (a * (20 < r ? 10 : 5));
+                    else val = b;
+                    ew.sys.TC.val.cur = val;
+                    ew.apps.itag.state.def.set.keepFor = val;
+                    ew.UI.btn.c2l("main", "_2x3", 4, "CLEAR", ew.apps.itag.state.def.set.keepFor, 15, 6);
+
+                };
+            }
+            if (i == 5) {
+                ew.sys.buzz.nav(ew.sys.buzz.type.ok);
+                if (ew.apps.itag.state.def.set.checker === undefined) ew.apps.itag.state.def.set.checker = 0;
+                ew.apps.itag.state.def.set.checker = 1 - ew.apps.itag.state.def.set.checker;
+                if (ew.def.face.info) ew.UI.btn.ntfy(1, 1.5, 0, "_bar", 6, "COUNTDOWN", ew.apps.itag.state.def.set.checker ? "REALTIME" : "WHEN UP", 0, 15);
+                ew.UI.btn.c2l("main", "_2x3", 5, "TMR", ew.apps.itag.state.def.set.checker ? "ON" : "OFF", 15, ew.apps.itag.state.def.set.checker ? 4 : 1);
+            }
+            if (i == 6) {
+                ew.sys.buzz.nav(ew.sys.buzz.type.ok);
+                if (ew.apps.itag.state.def.set.scanAll == undefined) ew.apps.itag.state.def.set.scanAll = 0;
+                ew.apps.itag.state.def.set.scanAll = 1 - ew.apps.itag.state.def.set.scanAll;
+                if (!ew.apps.itag.state.def.set.scanAll) {
+
+                    ew.apps.itag.state.scanAll = {};
+                    ew.apps.itag.state.scanAllA = [];
+                }
+                ew.apps.itag.state.dev = {};
+                ew.apps.itag.state.devA = [];
+                if (ew.def.face.info) ew.UI.btn.ntfy(1, 1.5, 0, "_bar", 6, "ITAG FILTERS", ew.apps.itag.state.def.set.scanAll ? "DISABLED" : "ENABLED", 0, 15);
+                ew.UI.btn.c2l("main", "_2x3", 6, "ALL", ew.apps.itag.state.def.set.scanAll ? "ON" : "OFF", 15, ew.apps.itag.state.def.set.scanAll ? 13 : 1);
+            }
+
+        };
+    },
+    page2: function() {
+        this.page=2;
+        // header
+        ew.UI.ele.ind(2, 2, 0, 0);
+
+        ew.UI.c.start(1, 1);
+        ew.UI.ele.fill("_main", 12, 0);
+        ew.UI.btn.c2l("main", "_2x3", 1, "AUTO", ew.apps.itag.state.def.set.auto ? "ON" : "OFF", 15, ew.apps.itag.state.def.set.auto ? 4 : 1);
+        ew.UI.btn.c2l("main", "_2x3", 3, "RSSI", ew.apps.itag.state.def.set.rssiHandler ? "ON" : "OFF", 15, ew.apps.itag.state.def.set.rssiHandler ? 4 : 1);
+        ew.UI.btn.c2l("main", "_2x3", 4, "MIN", ew.apps.itag.state.def.set.minInterval, 15, 1);
+        ew.UI.btn.c2l("main", "_2x3", 5, "MAX", ew.apps.itag.state.def.set.maxInterval, 15, 1);
+        ew.UI.btn.c2l("main", "_2x3", 6, "LAT", ew.apps.itag.state.def.set.slaveLatency, 15, 1);
+        ew.UI.c.end();
+
+        ew.UI.c.main._2x3 = (i) => {
+            if (i == 1) {
+                ew.sys.buzz.nav(ew.sys.buzz.type.ok);
+                ew.apps.itag.state.def.set.auto = !ew.apps.itag.state.def.set.auto? 15:0;
+                if (ew.def.face.info) ew.UI.btn.ntfy(1, 1.5, 0, "_bar", 6, "AUTO SCAN", ew.apps.itag.state.def.set.auto ? "ENABLED" : "DISABLED", 0, 15);
+                ew.UI.btn.c2l("main", "_2x3", 1, "AUTO", ew.apps.itag.state.def.set.auto ? "ON" : "OFF", 15, ew.apps.itag.state.def.set.auto ? 4 : 1);
+                ew.apps.itag.auto(ew.apps.itag.state.def.set.auto);
+            }
+            if (i == 3) {
+                ew.sys.buzz.nav(ew.sys.buzz.type.ok);
+                if (ew.apps.itag.state.def.set.rssiHandler == undefined) ew.apps.itag.state.def.set.rssiHandler = 0;
+                ew.apps.itag.state.def.set.rssiHandler = 1 - ew.apps.itag.state.def.set.rssiHandler;
+                if (ew.def.face.info) ew.UI.btn.ntfy(1, 1.5, 0, "_bar", 6, "RSSI ON CONNECTION", ew.apps.itag.state.def.set.rssiHandler ? "ENABLED" : "DISABLED", 0, 15);
+                ew.UI.btn.c2l("main", "_2x3", 3, "RSSI", ew.apps.itag.state.def.set.rssiHandler ? "ON" : "OFF", 15, ew.apps.itag.state.def.set.rssiHandler ? 4 : 1);
+            }
+            if (i == 4) {
+                ew.sys.buzz.nav(ew.sys.buzz.type.ok);
+                ew.UI.btn.ntfy(1, 3, 0, "_bar", 6, "MAX INTERVAL", "-MS-", 15, 6, 1);
+                ew.is.slide = 1;
+                ew.sys.TC.val = { cur: ew.apps.itag.state.def.set.minInterval, dn: 15, up: ew.apps.itag.state.def.set.maxInterval, tmp: 0 };
+                ew.UI.c.tcBar = (a, b, r) => {
+                    let val = ew.apps.itag.state.def.set.minInterval;
+                    ew.UI.btn.ntfy(0, 2, 1);
+                    if (11 < r && ew.sys.TC.val.dn < val && val < ew.sys.TC.val.up) val = val + (a * (20 < r ? 10 : 5));
+                    else val = b;
+                    ew.sys.TC.val.cur = val;
+                    //
+                    ew.UI.btn.c2l("main", "_2x3", 4, "MIN", val, 15, 1);
+                    ew.apps.itag.state.def.set.minInterval = val;
+                };
+            }
+            else if (i == 5) {
+                ew.sys.buzz.nav(ew.sys.buzz.type.ok);
+                ew.UI.btn.ntfy(1, 3, 0, "_bar", 6, "MAX INTERVAL", "-MS-", 15, 6, 1);
+                ew.is.slide = 1;
+                ew.sys.TC.val = { cur: ew.apps.itag.state.def.set.maxInterval, dn: ew.apps.itag.state.def.set.minInterval, up: 500, tmp: 0 };
+                ew.UI.c.tcBar = (a, b, r) => {
+                    let val = ew.apps.itag.state.def.set.maxInterval;
+                    ew.UI.btn.ntfy(0, 2, 1);
+                    if (11 < r && ew.sys.TC.val.dn < val && val < ew.sys.TC.val.up) val = val + (a * (20 < r ? 10 : 5));
+                    else val = b;
+                    ew.sys.TC.val.cur = val;
+                    //
+                    ew.UI.btn.c2l("main", "_2x3", 5, "MAX", val, 15, 1);
+                    ew.apps.itag.state.def.set.maxInterval = val;
+                };
+            }
+            else if (i == 6) {
+                ew.sys.buzz.nav(ew.sys.buzz.type.ok);
+                ew.UI.btn.ntfy(1, 3, 0, "_bar", 6, "SLAVE LATENCY", "", 15, 6, 1);
+                ew.is.slide = 1;
+                ew.sys.TC.val = { cur: ew.apps.itag.state.def.set.slaveLatency, dn: 2, up: 8, tmp: 0 };
+                ew.UI.c.tcBar = (a, b) => {
+                    let val = ew.apps.itag.state.def.set.slaveLatency;
+                    ew.UI.btn.ntfy(0, 2, 1);
+                    val = b;
+                    ew.sys.TC.val.cur = val;
+                    ew.UI.btn.c2l("main", "_2x3", 6, "LAT", val, 15, 1);
+                    ew.apps.itag.state.def.set.slaveLatency = val;
+                };
+            }
+        };
+    },
+    bar: function() {
+        ew.is.bar = 0;
+        ew.UI.c.start(0, 1);
+        ew.UI.c.end();
+        ew.UI.btn.c2l("main", "_bar", 6,  ew.face.appCurr.toUpperCase(), "",15, 0, 1.3);
+        
+    },
+    clear: function(o) {
+        ew.is.slide = 0; /*TC.removeAllListeners();*/
+        if (this.tid) clearTimeout(this.tid);
+        this.tid = 0;
+        if (ew.apps.itag.state.focus || (ew.apps.itag.state.def.set.persist && ew.face.appCurr === "itag") || (ew.face.appCurr.startsWith("itag") && !ew.face.pageCurr)) return;
+        else ew.apps.itag.stopScan();
+        return true;
+    },
+    off: function(o) {
+        g.off();
+        this.clear(o);
+    }
+};
+
+
+settings gia to store
+
+//itag store settings
+
+ew.UI.nav.next.replaceWith(() => {
+    ew.sys.buzz.nav(ew.sys.buzz.type.na);
+});
+ew.UI.nav.back.replaceWith(ew.UI.nav.next);
+ew.face[0] = {
+    run: false,
+    offms: (ew.def.face.off[ew.face.appCurr]) ? ew.def.face.off[ew.face.appCurr] : 60000,
+    init: function(c) {
+        if (!ew.def.face.off[ew.face.appCurr])  ew.def.face.off[ew.face.appCurr] = this.offms;
+
+        if (ew.apps.itag.state.def.set.scanAll) {
+            ew.face.go("itag-dev", 0);
+            ew.UI.btn.ntfy(0, 1, 0, "_bar", 6, "SCAN ALL IS", "ENABLED", 15, 13);
+            return;
+        }
+        ew.UI.ele.ind(0, 0, 0, 0);
+        this.array = ew.apps.itag.state.def.set.show ? ew.apps.itag.state.def.hiddenOrder : ew.apps.itag.state.def.storeOrder;
+        
+        this.bar();
+        this.page1();
+    },
+    show: function(o) {return;},
+            
+    page1: function() {
+        ew.UI.c.start(1, 0);
+        ew.UI.ele.fill("_main", 12, 0);
+        ew.UI.btn.c2l("main", "_2x3", 1, "ADD", ew.apps.itag.state.def.set.storeLock ? "OFF" : "ON", 15, ew.apps.itag.state.def.set.storeLock ? 1 : 4);
+        ew.UI.btn.c2l("main", "_2x3", 2, "HIDDEN", ew.apps.itag.state.def.set.show ? "ON" : "OFF", 15, ew.apps.itag.state.def.set.show ? 4 : 1);
+        ew.UI.btn.img("main", "_2x3", 3, "move", "MOVE", 15, 4);
+        ew.UI.btn.c2l("main", "_2x3", 4, ew.apps.itag.state.def.set.show ? "UNHIDE" : "HIDE", "", ew.apps.itag.state.def.set.show ?15:0, ew.apps.itag.state.def.set.show ? 4 : 9, 0.8);
+        ew.UI.btn.img("main", "_2x3", 6, "trash", "DEL", 15, 13);
+        ew.UI.c.end();
+
+        ew.UI.c.main._2x3 = (i, l) => {
+            if (i == 1) {
+                ew.sys.buzz.nav(ew.sys.buzz.type.ok);
+                ew.apps.itag.state.def.set.storeLock = 1 - ew.apps.itag.state.def.set.storeLock;
+                ew.UI.btn.c2l("main", "_2x3", 1, "ADD", ew.apps.itag.state.def.set.storeLock ? "OFF" : "ON", 15, ew.apps.itag.state.def.set.storeLock ? 1 : 4);
+                if (ew.def.face.info) ew.UI.btn.ntfy(0, 1, 0, "_bar", 6, "ADDING DEVICES", ew.apps.itag.state.def.set.storeLock ? "DISABLED" : "ENABLED", 0, 15);
+                return;
+            }
+            if (i == 2) {
+                ew.sys.buzz.nav(ew.sys.buzz.type.ok);
+
+                ew.apps.itag.state.def.set.show = 1 - ew.apps.itag.state.def.set.show;
+                if (!ew.apps.itag.state.def.hiddenOrder.length && ew.apps.itag.state.def.set.show) {
+                    ew.apps.itag.state.def.set.show = 0;
+                    ew.UI.btn.ntfy(0, 1, 0, "_bar", 6, "HIDDEN LIST", "IS EMPTY", 15, 13);
+                    return;
+                }
+                ew.face.go("itag-dev", 0);
+                if (ew.def.face.info) ew.UI.btn.ntfy(0, 1, 0, "_bar", 6, "HIDDEN LIST", ew.apps.itag.state.def.set.show ? "ENABLED" : "DISABLED", 0, 15);
+                return;
+            }
+            if (i == 3) {
+                ew.sys.buzz.nav(ew.sys.buzz.type.ok);
+                ew.apps.itag.state.move = ew.apps.itag.state.def.set.pos;
+                ew.face.go("itag-dev", 0, "move");
+                if (ew.def.face.info) ew.UI.btn.ntfy(0, 0.5, 0, "_bar", 6, "MOVE", "ENABLED", 0, 15);
+                return;
+            }
+            if (i == 4) {
+                ew.sys.buzz.nav(ew.sys.buzz.type.ok);
+                ew.is.bar = 1;
+                ew.is.slide = 0;
+                ew.UI.btn.ntfy(0, 1.5, 1, "_bar", 6, "", "", 15, 0);
+                ew.UI.c.start(0, 1);
+                ew.UI.btn.c2l("bar", "_bar", 6, ew.apps.itag.state.def.set.show ? "PRESS TO UNHIDE" : "PRESS TO HIDE", "", ew.apps.itag.state.def.set.show ?15:0, ew.apps.itag.state.def.set.show ? 4 : 9, 1.4);
+                ew.UI.c.end();
+                ew.UI.c.bar._bar = (i) => {
+                    ew.sys.buzz.nav(ew.sys.buzz.type.ok);
+                    if (i == 6) {
+                        let array = ew.apps.itag.state.def.set.show ? ew.apps.itag.state.def.hiddenOrder : ew.apps.itag.state.def.storeOrder;
+                        let dev = ew.apps.itag.state.def.store[array[ew.apps.itag.state.def.set.pos]];
+                        let name = dev.name;
+                        let id = dev.id;
+                        if (ew.apps.itag.state.def.set.show) {
+                            ew.apps.itag.state.def.hiddenOrder.splice(ew.apps.itag.state.def.set.pos, 1);
+                            ew.apps.itag.state.def.storeOrder.push(dev.id);
+                            if (!ew.apps.itag.state.def.hiddenOrder.length) ew.apps.itag.state.def.set.show = 0;
+                        }
+                        else {
+                            ew.apps.itag.state.def.storeOrder.splice(ew.apps.itag.state.def.set.pos, 1);
+                            ew.apps.itag.state.def.hiddenOrder.push(dev.id);
+                        }
+                        ew.face.go("itag-dev", 0);
+                        ew.UI.btn.ntfy(1, 1, 0, "_bar", 6, name.toUpperCase(), ew.apps.itag.state.def.set.show ? "UNHIDDEN" : "HIDEN", 0, 9);
+                    }
+                };
+                return;
+            }
+            if (i == 6) {
+                if (l) {
+                    ew.sys.buzz.nav(ew.sys.buzz.type.alert);
+                    ew.sys.buzz.nav(ew.sys.buzz.type.ok);
+                    ew.is.bar = 1;
+                    ew.is.slide = 0;
+                    ew.UI.btn.ntfy(0, 1.5, 1, "_bar", 6, "", "", 15, 0);
+                    ew.UI.c.start(0, 1);
+                    ew.UI.btn.c2l("bar", "_bar", 6, "DELETE ALL ?", "", 15, 13, 1.5);
+                    ew.UI.c.end();
+                    ew.UI.c.bar._bar = (i) => {
+                        ew.sys.buzz.nav(ew.sys.buzz.type.ok);
+                        if (i == 6) {
+                            ew.apps.itag.state.def = 0;
+                            ew.UI.btn.ntfy(1, 1, 0, "_bar", 6, "REBOOTING", "", 15, 13);
+                            ew.sys.reboot();
+                        }
+                    };
+                }
+                else {
+
+                    ew.sys.buzz.nav(ew.sys.buzz.type.ok);
+                    ew.is.bar = 1;
+                    ew.is.slide = 0;
+                    ew.UI.btn.ntfy(0, 1.5, 1, "_bar", 6, "", "", 15, 0);
+                    ew.UI.c.start(0, 1);
+                    ew.UI.btn.img("bar", "_bar", 6, "trash", "DELETE?", 15, 13);
+                    ew.UI.c.end();
+                    ew.UI.c.bar._bar = (i) => {
+                        ew.sys.buzz.nav(ew.sys.buzz.type.ok);
+                        if (i == 6) {
+                            let array = ew.apps.itag.state.def.set.show ? ew.apps.itag.state.def.hiddenOrder : ew.apps.itag.state.def.storeOrder;
+                            let dev = ew.apps.itag.state.def.store[array[ew.apps.itag.state.def.set.pos]];
+                            let name = dev.name;
+                            delete ew.apps.itag.state.def.store[dev.id];
+                            array.splice(ew.apps.itag.state.def.set.pos, 1);
+                            //delete from scan dev list too
+                            delete ew.apps.itag.state.dev[dev.id];
+                            var index = ew.apps.itag.state.devA.indexOf(dev.id);
+                            if (index !== -1)
+                                ew.apps.itag.state.devA.splice(index, 1);
+                            ew.face.go("itag-dev", 0);
+                            ew.UI.btn.ntfy(1, 1, 0, "_bar", 6, name.toUpperCase(), "DELETED", 15, 13);
+                        }
+
+                    };
+                    return;
+                }
+            }
+        };
+
+    },
+    bar: function() {
+        ew.is.bar = 0;
+        ew.UI.c.start(0, 1);
+        ew.UI.c.end();
+        ew.UI.ele.fill("_bar", 6, 1);
+        ew.UI.btn.c2l("main", "_bar", 6,  ew.face.appCurr.toUpperCase(), "",15, 1, 1.3);
+    },
+
+    clear: function(o) {
+        ew.is.slide = 0;
+        if (this.tid) clearTimeout(this.tid);
+        this.tid = 0;
+        if (ew.apps.itag.state.focus || (ew.apps.itag.state.def.set.persist && ew.face.appCurr === "itag") || (ew.face.appCurr.startsWith("itag") && !ew.face.pageCurr)) return;
+        else ew.apps.itag.stopScan();
+        return true;
+    },
+    off: function(o) {
+        g.off();
+        this.clear(o);
+    }
+};
+
+
+απο κκατω σου βαζω ενα launcher του βανγλε, gia na deiw pvw briskei kai kalei ta bangle apps
+
+
+
+{
+  const s = require("Storage");
+  const settings = Object.assign({
+    showClocks: true,
+    fullscreen: false,
+    direct: false,
+    oneClickExit: true,
+    swipeExit: false,
+    timeOut:"Off"
+  }, s.readJSON("iconlaunch.json", true) || {});
+  let font = g.getFonts().includes("28") ? "28" : "12x20";
+
+  if (!settings.fullscreen) {
+    Bangle.loadWidgets();
+    Bangle.drawWidgets();
+  } else { // for fast-load, if we had widgets then we should hide them
+    require("widget_utils").hide();
+  }
+
+  let selectedItem = -1;
+  const R = Bangle.appRect;
+  const iconSize = 48;
+  const appsN = Math.floor(R.w / iconSize);
+  const whitespace = Math.floor((R.w - appsN * iconSize) / (appsN + 1));
+  const iconYoffset = Math.floor(whitespace/4)-1;
+  const itemSize = iconSize + whitespace;
+
+  // show some grey blocks as a loading screen
+  g.clearRect(Bangle.appRect).setColor("#888");
+  for (var y=R.y+whitespace/2;y<R.h;y+=itemSize)
+    for (var x=R.x+whitespace/2;x<R.w;x+=itemSize)
+      g.drawRect(x+16,y+16,x+32,y+32);
+  g.flip();
+
+  let launchCache = s.readJSON("iconlaunch.cache.json", true)||{};
+  let launchHash = s.hash(/\.info/);
+  if (launchCache.hash!=launchHash) {
+    launchCache = {
+      hash : launchHash,
+      apps : s.list(/\.info$/)
+      .map(app=>{let a=s.readJSON(app,1);return a&&{name:a.name,type:a.type,icon:a.icon,sortorder:a.sortorder,src:a.src};})
+      .filter(app=>app && (app.type=="app" || (app.type=="clock" && settings.showClocks) || !app.type))
+      .sort((a,b)=>{
+        let n=(0|a.sortorder)-(0|b.sortorder);
+        if (n) return n; // do sortorder first
+        if (a.name<b.name) return -1;
+        if (a.name>b.name) return 1;
+        return 0;
+      }) };
+    s.writeJSON("iconlaunch.cache.json", launchCache);
+  }
+
+  // cache items
+  const ICON_MISSING = s.read("iconlaunch.na.img");
+  let count = 0;
+
+
+
+  launchCache.items = {};
+  for (let c of launchCache.apps){
+    let i = Math.floor(count/appsN);
+    if (!launchCache.items[i])
+      launchCache.items[i] = {};
+    launchCache.items[i][(count%3)] = c;
+    count++;
+  }
+
+  let texted;
+  let drawItem = function(itemI, r) {
+    let x = whitespace, i = itemI * appsN - 1, selectedApp, c, selectedRect, item = launchCache.items[itemI];
+    if (texted == itemI){
+      g.clearRect(r.x, r.y, r.x + r.w - 1, r.y + r.h - 1);
+      texted = undefined;
+    }
+    for (c of item) {
+      i++;
+      let id = c.icondata || (c.iconData = (c.icon ? s.read(c.icon) : ICON_MISSING));
+      g.drawImage(id,x + r.x - 1, r.y + iconYoffset - 1, x + r.x + iconSize, r.y + iconYoffset + iconSize);
+      if (selectedItem == i) {
+        selectedApp = c;
+        selectedRect = [
+          x + r.x - 1,
+          r.y + iconYoffset - 1,
+          x + r.x + iconSize,
+          r.y + iconYoffset + iconSize
+        ];
+      }
+      x += iconSize + whitespace;
+    }
+    if (selectedRect) {
+      g.drawRect.apply(null, selectedRect);
+      drawText(itemI, r.y, selectedApp);
+      texted=itemI;
+    }
+    if (firstRun) g.flip(); // at startup
+  };
+  let firstRun = true;
+  let drawText = function(i, appY, selectedApp) {
+    const idy = (selectedItem - (selectedItem % 3)) / 3;
+    if (i != idy) return;
+    appY = appY + itemSize/2;
+    g.setFontAlign(0, 0, 0).setFont(font);
+    const rect = g.stringMetrics(selectedApp.name);
+    let r = {
+      x : (R.w - rect.width) / 2 - 7,
+      y : appY - rect.height / 2 - 6,
+      w : rect.width + 15,
+      h : rect.height + 10,
+      r : 4
+    };
+    g.setBgColor(g.theme.bgH).clearRect(r).setBgColor(g.theme.bg2).clearRect({x:r.x+2, y:r.y+2, w:r.w-4, h:r.h-4, r:3}).drawString(selectedApp.name, R.w / 2, appY).setBgColor(g.theme.bg);
+  };
+
+  let selectItem = function(id, e) {
+    const iconN = E.clip(Math.floor((e.x - R.x) / itemSize), 0, appsN - 1);
+    const appId = id * appsN + iconN;
+    if( settings.direct && launchCache.apps[appId])
+    {
+      load(launchCache.apps[appId].src);
+      return;
+    }
+    if (appId == selectedItem && launchCache.apps[appId]) {
+      const app = launchCache.apps[appId];
+      if (!app.src || s.read(app.src) === undefined) {
+        E.showMessage( /*LANG*/ "App Source\nNot found");
+      } else {
+        load(app.src);
+      }
+    }
+    selectedItem = appId;
+    if (scroller) scroller.draw();
+  };
+  const itemsN = Math.ceil(launchCache.apps.length / appsN);
+
+  let idWatch = null;
+  let options = {
+    h: itemSize,
+    c: itemsN,
+    draw: drawItem,
+    select: selectItem,
+    remove: function() {
+      if (timeout) clearTimeout(timeout);
+      Bangle.removeListener("drag", updateTimeout);
+      Bangle.removeListener("touch", updateTimeout);
+      Bangle.removeListener("swipe", swipeHandler);
+      if (settings.fullscreen) { // for fast-load, if we hid widgets then we should show them again
+        require("widget_utils").show();
+      }
+      if(idWatch) clearWatch(idWatch);
+    }
+  };
+
+  //work both the fullscreen and the oneClickExit
+  if( settings.fullscreen && settings.oneClickExit) {
+      idWatch=setWatch(function(e) {
+        Bangle.showClock();
+      }, BTN, {repeat:false, edge:'rising' });
+
+  } else if( settings.oneClickExit ) {
+      options.back=Bangle.showClock;
+  }
+
+  let scroller = E.showScroller(options);
+  firstRun = false; // this stops us flipping the screen after each line we draw
+
+  let timeout;
+  const updateTimeout = function(){
+    if (settings.timeOut!="Off"){
+      let time=parseInt(settings.timeOut);  //the "s" will be trimmed by the parseInt
+      if (timeout) clearTimeout(timeout);
+      timeout = setTimeout(Bangle.showClock,time*1000);
+    }
+  };
+
+  let swipeHandler = (h,_) => { if(settings.swipeExit && h==1) { Bangle.showClock(); } };
+
+  Bangle.on("swipe", swipeHandler)
+  Bangle.on("drag", updateTimeout);
+  Bangle.on("touch", updateTimeout);
+
+  updateTimeout();
+}
+
+
+τα δικα μου αππς ειπαμε τα βρισκουμε κοιτονντας τα κειδια του ew.apps (παραδειγμα ew.apps.itag)  και τα καλουμε με ew.face.go("itag",0);
+
+
+Προσοχή, δεν θθελω να χρησιμοποιήσεις τίποτα που υπαρχει στο αντικειμενο Bangle, θελω να τρεχει στο βανγλε, αλλα να ειναι συμβατ΄ς με καθε εσπρουινο που τρεχει το UI  μου
+με αυτα τα δεδομενα, μπορεις πιστευεις να φτιαξει ενα launcher? 
+
+

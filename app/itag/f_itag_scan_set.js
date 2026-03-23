@@ -1,23 +1,10 @@
 //itag connected viewer
 
 ew.UI.nav.next.replaceWith(() => {
-    if (ew.UI.ntid && !ew.is.UIpri) {
-        clearTimeout(ew.UI.ntid);
-        ew.UI.ntid = 0;
-    }
     ew.sys.buzz.nav(ew.sys.buzz.type.ok);
-    ew.face[0].page2();
+    ew.face[0][(ew.face[0].page===1)?"page2":"page1"]();
 });
-ew.UI.nav.back.replaceWith(() => {
-    if (ew.UI.ntid && !ew.is.UIpri) {
-        clearTimeout(ew.UI.ntid);
-        ew.UI.ntid = 0;
-    }
-    ew.sys.buzz.nav(ew.sys.buzz.type.ok);
-    if (ew.face[0].page===1) ew.face.go("itag-scan",0);
-    else ew.face[0].page1();
-
-});
+ew.UI.nav.back.replaceWith(ew.UI.nav.next);
 
 ew.face[0] = {
     run: false,
@@ -26,7 +13,7 @@ ew.face[0] = {
         if (!ew.def.face.off[ew.face.appCurr])  ew.def.face.off[ew.face.appCurr] = this.offms;
 
         if (ew.apps.itag.state.focus) {
-            ew.face.go("itag-scan", 0);
+            ew.face.go("itag", 0);
             ew.UI.btn.ntfy(0, 1, 0, "_bar", 6, "FOCUS IS", "ENABLED", 15, 13);
             return;
         }
@@ -39,11 +26,11 @@ ew.face[0] = {
     page1: function() {
         this.page=1;
         // header
-        ew.UI.ele.ind(1, 2, 0, 0);
+        ew.UI.ele.ind(1, 2, 0, 15);
 
         this.phyMode = ["1MBPS", "CODED", "1MBPS + CODED", "2MBPS"];
         ew.UI.c.start(1, 1);
-        ew.UI.ele.fill("_main", 9, 0);
+        ew.UI.ele.fill("_main", 12, 0);
         ew.UI.btn.c2l("main", "_2x3", 1, "PHY", ew.apps.itag.state.def.set.phy.toString(), 15, 6);
         ew.UI.btn.c2l("main", "_2x3", 2, "RSSI", ew.apps.itag.state.def.set.rssi ? "ON" : "OFF", 15, ew.apps.itag.state.def.set.rssi ? 4 : 1);
         ew.UI.btn.c2l("main", "_2x3", 3, "PER", ew.apps.itag.state.def.set.persist ? "ON" : "OFF", 15, ew.apps.itag.state.def.set.persist ? 13 : 1);
@@ -125,11 +112,11 @@ ew.face[0] = {
     page2: function() {
         this.page=2;
         // header
-        ew.UI.ele.ind(2, 2, 0, 0);
+        ew.UI.ele.ind(2, 2, 0, 15);
 
         ew.UI.c.start(1, 1);
-        ew.UI.ele.fill("_main", 9, 0);
-        ew.UI.btn.c2l("main", "_2x3", 1, "AUTO", ew.apps.itag.state.def.set.auto ? "ON" : "OFF", 15, ew.apps.itag.state.def.set.auto ? 4 : 1);
+        ew.UI.ele.fill("_main", 12, 0);
+        ew.UI.btn.c2l("main", "_2x3", 1, "AUTO", ew.apps.itag.state.def.set.auto ? ew.apps.itag.state.def.set.auto : "OFF", 15, ew.apps.itag.state.def.set.auto ? 4 : 1);
         ew.UI.btn.c2l("main", "_2x3", 3, "RSSI", ew.apps.itag.state.def.set.rssiHandler ? "ON" : "OFF", 15, ew.apps.itag.state.def.set.rssiHandler ? 4 : 1);
         ew.UI.btn.c2l("main", "_2x3", 4, "MIN", ew.apps.itag.state.def.set.minInterval, 15, 1);
         ew.UI.btn.c2l("main", "_2x3", 5, "MAX", ew.apps.itag.state.def.set.maxInterval, 15, 1);
@@ -139,11 +126,30 @@ ew.face[0] = {
         ew.UI.c.main._2x3 = (i) => {
             if (i == 1) {
                 ew.sys.buzz.nav(ew.sys.buzz.type.ok);
-                ew.apps.itag.state.def.set.auto = !ew.apps.itag.state.def.set.auto? 10:0;
+                ew.UI.btn.ntfy(1, 3, 0, "_bar", 6, "AUTO INTERVAL", "-MIN-", 15, 6, 1);
+                ew.is.slide = 1;
+                ew.sys.TC.val = { cur: ew.apps.itag.state.def.set.auto, dn: 0, up: 360, tmp: 0 };
+                ew.UI.c.tcBar = (a, b, r) => {
+                    let val = ew.apps.itag.state.def.set.auto;
+                    ew.UI.btn.ntfy(0, 2, 1);
+                    if (11 < r && ew.sys.TC.val.dn < val && val < ew.sys.TC.val.up) val = val + (a * (20 < r ? 10 : 5));
+                    else val = b;
+                    ew.sys.TC.val.cur = val;
+                    //
+                    ew.UI.btn.c2l("main", "_2x3", 1, "AUTO", val ? val : "OFF", 15, val ? 4 : 1);
+                    ew.apps.itag.state.def.set.auto = val;
+                };
+            }
+            /*
+            
+            if (i == 1) {
+                ew.sys.buzz.nav(ew.sys.buzz.type.ok);
+                ew.apps.itag.state.def.set.auto = !ew.apps.itag.state.def.set.auto? 15:0;
                 if (ew.def.face.info) ew.UI.btn.ntfy(1, 1.5, 0, "_bar", 6, "AUTO SCAN", ew.apps.itag.state.def.set.auto ? "ENABLED" : "DISABLED", 0, 15);
                 ew.UI.btn.c2l("main", "_2x3", 1, "AUTO", ew.apps.itag.state.def.set.auto ? "ON" : "OFF", 15, ew.apps.itag.state.def.set.auto ? 4 : 1);
                 ew.apps.itag.auto(ew.apps.itag.state.def.set.auto);
             }
+            */
             if (i == 3) {
                 ew.sys.buzz.nav(ew.sys.buzz.type.ok);
                 if (ew.apps.itag.state.def.set.rssiHandler == undefined) ew.apps.itag.state.def.set.rssiHandler = 0;
@@ -153,9 +159,9 @@ ew.face[0] = {
             }
             if (i == 4) {
                 ew.sys.buzz.nav(ew.sys.buzz.type.ok);
-                ew.UI.btn.ntfy(1, 3, 0, "_bar", 6, "MAX INTERVAL", "-MS-", 15, 6, 1);
+                ew.UI.btn.ntfy(1, 3, 0, "_bar", 6, "MIN INTERVAL", "-MS-", 15, 6, 1);
                 ew.is.slide = 1;
-                ew.sys.TC.val = { cur: ew.apps.itag.state.def.set.minInterval, dn: 15, up: ew.apps.itag.state.def.set.maxInterval, tmp: 0 };
+                ew.sys.TC.val = { cur: ew.apps.itag.state.def.set.minInterval, dn: 7.5, up: ew.apps.itag.state.def.set.maxInterval, tmp: 0 };
                 ew.UI.c.tcBar = (a, b, r) => {
                     let val = ew.apps.itag.state.def.set.minInterval;
                     ew.UI.btn.ntfy(0, 2, 1);
@@ -203,14 +209,16 @@ ew.face[0] = {
         ew.is.bar = 0;
         ew.UI.c.start(0, 1);
         ew.UI.c.end();
-        ew.UI.btn.c2l("main", "_bar", 6,  ew.face.appCurr.toUpperCase(), "",15, 0, 1.3);
+        ew.UI.ele.fill("_bar", 6, 0);
+        ew.UI.btn.img("bar", "_bar", 6, "ew_i_"+ew.face.appCurr.split("-")[0]+".img", ew.face.appCurr.split("-")[0].toUpperCase(), 15, 0,0.8,1,1);
+        //ew.UI.btn.c2l("main", "_bar", 6,  ew.face.appCurr.toUpperCase(), "",15, 1, 1.3);
         
     },
     clear: function(o) {
         ew.is.slide = 0; /*TC.removeAllListeners();*/
         if (this.tid) clearTimeout(this.tid);
         this.tid = 0;
-        if (ew.apps.itag.state.focus || (ew.apps.itag.state.def.set.persist && ew.face.appCurr === "itag-scan") || (ew.face.appCurr.startsWith("itag") && !ew.face.pageCurr)) return;
+        if (ew.apps.itag.state.focus || (ew.apps.itag.state.def.set.persist && ew.face.appCurr === "itag") || (ew.face.appCurr.startsWith("itag") && !ew.face.pageCurr)) return;
         else ew.apps.itag.stopScan();
         return true;
     },

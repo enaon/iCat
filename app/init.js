@@ -49,8 +49,9 @@ else {
 
 // ---- watchDog ----
 let noWd=(require("Storage").readJSON("ew.json", 1) && require("Storage").readJSON("ew.json", 1).sys) && require("Storage").readJSON("ew.json", 1).sys.noWd? require("Storage").readJSON("ew.json", 1).sys.noWd : 0
+if (process.env.BOARD === "BANGLEJS2" || process.env.BOARD === "NANO" ) noWd=1;
 
-if (!noWd && process.env.BOARD != "NANO") {
+if (!noWd ) {
   E.kickWatchdog();
   ew.sys.kickWD = function() {
     "ram";
@@ -124,7 +125,8 @@ if ((BTN1.read() || require("Storage").read("devmode")) && process.env.BOARD != 
 else {
 
   // ---- screen driver  ----
-  if (process.env.BOARD === "BANGLEJS2" && require('Storage').read('ew_display_b2')) global.g = require('ew_display_b2').g;
+  //if (process.env.BOARD === "BANGLEJS2" && require('Storage').read('ew_display_b2')) global.g = require('ew_display_b2').g;
+  if (process.env.BOARD === "BANGLEJS2" && require('Storage').read('ew_display_b2')) eval(require('Storage').read('ew_display_b2'));
   else if ((process.env.BOARD == "MAGIC3" || process.env.BOARD == "ROCK") && require('Storage').read('ew_display')) global.g = require('ew_display').g;
   else if (process.env.BOARD == "DSD6" && require('Storage').read('ew_display_dsd6')) global.g = require('ew_display_dsd6').g;
   // ---- handler ----
@@ -146,7 +148,7 @@ else {
   if (process.env.BOARD == "MAGIC3" || process.env.BOARD == "ROCK" || process.env.BOARD == "BANGLEJS2") {
     digitalPulse(ew.pin.BUZZ, ew.pin.BUZ0, [100, 30, 50]);
     setTimeout(function() {
-      ew.face.go('main', 0);
+      ew.face.go(ew.def.face.main, 0);
       setTimeout(function() {
         if (ew.def.dev.tilt===undefined)ew.def.dev.tilt=0;
         if (ew.def.dev.tap===undefined)ew.def.dev.tap=0;

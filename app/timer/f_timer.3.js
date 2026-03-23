@@ -40,7 +40,7 @@ ew.face[0] = {
         this.rep = 0;
         ew.UI.ele.ind(this.page, 5, 0, 2);
         ew.UI.c.start(1, 1);
-        ew.UI.ele.coord("main", "_main", 6);
+        ew.UI.ele.coord("main", "_main", 9);
         ew.UI.ele.coord("main", "_header", 6);
 
         ew.UI.c.end();
@@ -94,7 +94,7 @@ ew.face[0] = {
         }
 
         this.info(ew.apps.timer.getTimerStatus(this.page).minutes);
-        ew.UI.btn.c2l("main", "_headerS", 6, ew.apps.timer.getTimerStatus(ew.face[0].page).name, "", 15, 0, 1.5);
+        ew.UI.btn.c2l("main", "_header", 6, ew.apps.timer.getTimerStatus(ew.face[0].page).name, "", 15, 0, 1.5);
 
         this.bar();
         this.run = 1;
@@ -230,7 +230,7 @@ ew.face[0] = {
                 ew.sys.TC.val = { cur: ew.apps.timer.state.def[ew.face[0].page].rep, dn: 0, up: 10, tmp: 0, reverce: 0, loop: 0 };
                 ew.UI.c.tcBar = (a, b) => {
                     ew.apps.timer.state.def[ew.face[0].page].rep = b;
-                    ew.UI.btn.i2l("main", "_main", 6, "", b ? "Repeat: " + b : "fill", 15, 1, 1);
+                    ew.UI.btn.i2l("main", "_main", 9, "", b ? "Repeat: " + b : "fill", 15, 1, 1);
                     g.flip();
                 };
             }

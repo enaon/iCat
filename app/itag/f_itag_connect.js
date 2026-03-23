@@ -10,6 +10,12 @@ ew.UI.nav.back.replaceWith(() => {
 ew.face[0] = {
     run: false,
     tid:0,
+    data:{
+        img:{
+            alarm:"mEwwIKH/ACBh8Agf+AoN/4EH/+AgH/+EP//AgP//EfAoMDAo38n4dDAoIpCj4FB8E//kHAoPA///wIFBwYFB8AFBGAI0BvkeFQIuBnkcn/wDgM4FgOAgIyC/41CAQIICn4OB/kB4EfAoP4AoMPKAPwAo8H8ABBAo8DAoJ2BAo5EBAYIFF8AFE+AFE/gFC8BMBEYQFBh+DAocHw4fCL4IJBAoZTBL4IFE/inCZAJ3EQYzaBR4abBh4aDU4QFEBYU/AoIXCvwFB3wFBvjbBjwFBXYMAAoQAEA=",
+            power:"lkuwIKHgP4AocfwAKN+P4+AJCz+fBYMH/P5/wKB/4KBCAMfBQP/wED/0fw/8gF/4P4n/gg/wFYIbB/w2BBAXABQM/wP8BQMD/AIBAIWD/BMC/k/JgUP4fwBQd+BQUH8/gBQV+BSJwCBQQABBQw2BAAI2CAoRBBRgUfNYKbDMQIFBMQQEBMQMPEwV/AIQlBQYIQBSIIXBCAN/4EB//An4pBh//AAIdCAgISBCAP/HIQQCaoa5BAoU/IYQAEA=",
+        }
+    },
     offms: (ew.def.face.off[ew.face.appCurr]) ? ew.def.face.off[ew.face.appCurr] : 60000,
     init: function() {
         if (!ew.def.face.off[ew.face.appCurr])  ew.def.face.off[ew.face.appCurr] = this.offms;
@@ -37,13 +43,14 @@ ew.face[0] = {
                         ew.UI.btn.ntfy(1, 0.5, 0, "_bar", 6, "CONNECTED", "", 0, 15);
                     }
                 }).catch(e=>{
-                    ew.face.go("itag-scan", 0);
+                    ew.face.go("itag", 0);
                     ew.UI.btn.ntfy(1, 0.5, 0, "_bar", 6, "TOO FAR", "", 15, 13);
                 });
             }, 800);
             ew.UI.btn.ntfy(1, 10, 0, "_bar", 6, "CONNECTING", "", 0, 15);
         }
         else this.bar();
+        ew.UI.ele.ind(0, 0, 0, 0);
 
         this.info(this.dev.batt, this.dev.id.split(" ")[0]);
         this.run=true;
@@ -52,7 +59,7 @@ ew.face[0] = {
         if (!this.run) return;
 
         if (ew.comm.mstr.rssi){
-            ew.UI.btn.i2l("main", "_main", 6, ew.comm.mstr.rssi+" ", "dBm", 15, 1, 3);
+            ew.UI.btn.i2l("main", "_main", 9, ew.comm.mstr.rssi+" ", "dBm", 15, 1, 3);
             g.flip();
         }
         if (this.tid) { clearTimeout(this.tid);}
@@ -63,7 +70,7 @@ ew.face[0] = {
     },
     info: function(batt, id) {
         if (!ew.apps.itag.state.connected) {
-            ew.UI.btn.i2l("main", "_main", 6, "WAIT", "fill", 15, 1, 2);
+            ew.UI.btn.i2l("main", "_main", 9, "WAIT", "fill", 15, 1, 2);
             g.flip();
         }
         else {
@@ -86,12 +93,12 @@ ew.face[0] = {
         ew.UI.c.start(0, 1);
 
         if (!ew.apps.itag.state.connected && (!ew.comm.mstr.connection || ew.comm.mstr.connection && !ew.comm.mstr.connection.connected)) {
-            ew.UI.btn.img("bar", "_bar", 6, "power", "", 15, 13);
+            ew.UI.btn.img("bar", "_bar", 6, "power.face", "", 15, 13);
 
         }
         else {
-            ew.UI.btn.img("bar", "_bar", 4, "alarm", "ALERT", 15, ew.apps.itag.state.alert ? 4 : 1);
-            ew.UI.btn.img("bar", "_bar", 5, "power", "DISC", 15, 13);
+            ew.UI.btn.img("bar", "_bar", 4, "alarm.face", "ALERT", 15, ew.apps.itag.state.alert ? 4 : 1);
+            ew.UI.btn.img("bar", "_bar", 5, "power.face", "DISC", 15, 13);
         }
         ew.UI.c.end();
 
@@ -112,7 +119,7 @@ ew.face[0] = {
                 }
                 else {
                     ew.apps.itag.state.alert = 1 - ew.apps.itag.state.alert;
-                    ew.UI.btn.img("bar", "_bar", 4, "alarm", "ALERT", 15, ew.apps.itag.state.alert ? 4 : 1);
+                    ew.UI.btn.img("bar", "_bar", 4, "alarm.face", "ALERT", 15, ew.apps.itag.state.alert ? 4 : 1);
                     if (ew.def.face.info) ew.UI.btn.ntfy(1, 0.6, 0, "_bar", 6, "ALERT", ew.apps.itag.state.alert ? "ON" : "OFF", 0, 15);
                     ew.apps.itag.state.ble.alert.writeValue(ew.apps.itag.state.alert ? 1 : 0);
                 }
@@ -122,7 +129,7 @@ ew.face[0] = {
                 if (this.dev.board != undefined) {
                     if (l) {
                         ew.comm.mstr.disconnect().then(r => {
-                            ew.face.go("itag-scan", 0);
+                            ew.face.go("itag", 0);
                             ew.UI.btn.ntfy(1, 1, 0, "_bar", 6, r.m.toUpperCase(), "", 0, 15);
                         });
                         return;
@@ -132,7 +139,7 @@ ew.face[0] = {
                         return ew.comm.mstr.disconnect();
                     }).then(r => {
                         ew.UI.btn.ntfy(1, 1, 0, "_bar", 6, r.m.toUpperCase(), "", 0, 15);
-                        setTimeout(()=>{ew.face.go("itag-scan", 0);},1000);
+                        setTimeout(()=>{ew.face.go("itag", 0);},1000);
                     });
 
                 }

@@ -566,13 +566,13 @@ ew.UI = {
 		ew.UI.btn.ntfy(0, 1.3, 1);
 		ew.UI.ele.fill("_bar", 6, 1);
 		ew.UI.c.start(0, 1);
-		ew.UI.btn.img("bar", "_bar", 1, "settings", 0, 3, 0);
+		ew.UI.btn.img("bar", "_bar", 1, "q.panel", 0, 3, 0);
 		ew.UI.btn.img("bar", "_bar", 2, "watch", 0, 3, 0);
 		ew.UI.btn.img("bar", "_bar", 3, "dash", 0, 3, 0);
 		ew.UI.c.end();
 		ew.UI.c.bar._bar = (i) => {
 			ew.sys.buzz.nav(ew.sys.buzz.type.ok);
-			ew.face.go("settings", 0, i);
+			ew.face.go("q.panel", 0, i);
 
 		};
 	}
@@ -694,10 +694,10 @@ ew.UI.nav = {
 			ew.UI.rtb();
 			return;
 		}
-		if (ew.face.appCurr == "main" && ew.face.pageCurr != -1)
-			ew.face.go("main", -1);
+		if (ew.face.appCurr == "clock" && ew.face.pageCurr != -1)
+			ew.face.go(ew.def.face.main, -1);
 		else
-			ew.face.go("main", 0);
+			ew.face.go(ew.def.face.main, 0);
 
 	},
 	up: function(x, y) {
@@ -713,7 +713,7 @@ ew.UI.nav = {
 			if (ew.face[0].bar) {
 				ew.UI.btn.ntfy(1, 1, 0, "_bar", 6, "BRIGHTNESS", "GESTURE", 0, 15, 0);
 				g.flip();
-				if (ew.face.appCurr == "settings" && ew.face[0].page == "set") ew.UI.btn.img("main", "_2x3", 3, "bri", ew.def.face.bri == 7 ? 7 : ew.is.bri, 15, 6, 1);
+				if (ew.face.appCurr == "q.panel" && ew.face[0].page == "set") ew.UI.btn.img("main", "_2x3", 3, "bri", ew.def.face.bri == 7 ? 7 : ew.is.bri, 15, 6, 1);
 			}
 		}
 		else {

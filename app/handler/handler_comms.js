@@ -36,6 +36,7 @@ ew.comm.updt = function() {
       ],
       connectable: (ew.def.bt.conn ? true : false),
       scannable: (ew.def.bt.phyA === "1mbps" ? true : false),
+      //whenConnected: true,
       phy: ew.def.bt.phyA,
       interval: ew.def.bt.intA
     };
@@ -902,7 +903,7 @@ ew.comm.updt();
 ew.sys.on('hour', ew.comm.updt);
 
 
-
+//ew.sys.on('hour', function() {print (Date())});
 
 
 /*

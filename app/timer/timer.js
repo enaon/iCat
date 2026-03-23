@@ -1,4 +1,5 @@
 ew.apps.timer = {
+
   state: {
     def: {
       1: { min: 5, active: 0, buzz: 1, buzzRep: 5, buzzDelay: 2000, snooze: 5, wake: 0, rep: 0, repLeft: 0, remaining: 0, paused: 0, name: "Timer 1" },
@@ -61,6 +62,7 @@ ew.apps.timer = {
   // Εκκίνηση timer (ξεκινάει την μέτρηση)
   startTimer: function(timerId) {
     if (timerId < 1 || timerId > 5) return false;
+    
 
     var timer = this.state.def[timerId];
     // Έλεγχος αν ο timer έχει ρυθμιστεί
@@ -89,6 +91,9 @@ ew.apps.timer = {
     var self = this;
     var timer = this.state.def[timerId];
     var tid = this.state.tid[timerId];
+
+    this.state.run=1;
+
 
     var startTime = Date.now();
 
@@ -207,6 +212,7 @@ ew.apps.timer = {
         this._startTimer(timerId, timer.remaining);
       }
     }
+    this._isActive();
   },
 
 
@@ -243,29 +249,29 @@ ew.apps.timer = {
 
     ew.UI.btn.ntfy(1, 2, 0, "_bar", 6, name.toUpperCase(), "", 15, 13, true, false, false);
     ew.UI.c.bar._ntfy = function() {
-      ew.UI.btn.ntfy(1, 3, 0, "_bar", 6, "", "", 15, 0, false, false, true);
-      ew.UI.c.start(0, 1);
-      if (!ew.apps.timer.state.def[timerId].rep) {
-        ew.UI.btn.img("bar", "_bar", 4, "snooze", "SNOOZE", 15, 4);
-        ew.UI.btn.img("bar", "_bar", 5, "confirm", "MUTE", 0, 14);
-      }
-      else
-        ew.UI.btn.img("bar", "_bar", 6, "confirm", "MUTE", 0, 14);
-      ew.UI.c.end();
-      ew.UI.c.bar._bar = function(i, l) {
-        ew.is.UIpri = 0;
-        ew.sys.buzz.nav(ew.sys.buzz.type.ok);
-        if (i == 4) {
-          ew.apps.timer.snoozeTimer(timerId);
-          if (ew.def.face.info) ew.UI.btn.ntfy(1, 1.5, 0, "_bar", 6, name.toUpperCase(), "SNOOZE", 0, 15);
-
+        ew.UI.btn.ntfy(1, 3, 0, "_bar", 6, "", "", 15, 0, false, false, true);
+        ew.UI.c.start(0, 1);
+        if (!ew.apps.timer.state.def[timerId].rep) {
+          ew.UI.btn.img("bar", "_bar", 4, "snooze", "SNOOZE", 15, 4);
+          ew.UI.btn.img("bar", "_bar", 5, "confirm", "MUTE", 0, 14);
         }
-        else {
-          ew.apps.timer.stopBuzz(timerId);
-          if (ew.def.face.info) ew.UI.btn.ntfy(1, 1.5, 0, "_bar", 6, "MUTED", "", 0, 15);
-
-        }
-      };
+        else
+          ew.UI.btn.img("bar", "_bar", 6, "confirm", "MUTE", 0, 14);
+        ew.UI.c.end();
+        ew.UI.c.bar._bar = function(i, l) {
+          ew.is.UIpri = 0;
+          ew.sys.buzz.nav(ew.sys.buzz.type.ok);
+          if (i == 4) {
+            ew.apps.timer.snoozeTimer(timerId);
+            if (ew.def.face.info) ew.UI.btn.ntfy(1, 1.5, 0, "_bar", 6, name.toUpperCase(), "SNOOZE", 0, 15);
+    
+          }
+          else {
+            ew.apps.timer.stopBuzz(timerId);
+            if (ew.def.face.info) ew.UI.btn.ntfy(1, 1.5, 0, "_bar", 6, "MUTED", "", 0, 15);
+    
+          }
+        };
     };
 
   },
@@ -282,6 +288,7 @@ ew.apps.timer = {
         clearTimeout(tid.buzz);
       }
       tid.buzz = 0;
+      this._isActive();
       return true;
     }
     return false;
@@ -295,6 +302,7 @@ ew.apps.timer = {
         stopped = true;
       }
     }
+    this._isActive();
     return stopped;
   },
 
@@ -315,6 +323,7 @@ ew.apps.timer = {
 
     // Stop buzz when clearing timer
     this.stopBuzz(timerId);
+
   },
 
   // Καθαρισμός timer (stop)
@@ -329,6 +338,8 @@ ew.apps.timer = {
     timer.remaining = timer.min * 60000; // Επαναφορά στο αρχικό χρόνο
     timer.repLeft = timer.rep > 0 ? timer.rep : 0; // Επαναφορά και των επαναλήψεων
     if (ew.face.appCurr === "timer") ew.face[0].init();
+    this._isActive();
+
 
     return true;
   },
@@ -338,6 +349,20 @@ ew.apps.timer = {
     for (var i = 1; i <= 5; i++) {
       this.stopTimer(i);
     }
+    this.state.run=0;
+  },
+
+  // check active
+  _isActive: function() {
+        let isActive = 0;
+
+        for (let i = 1; i <= 5; i++) {
+            let status = this.getTimerStatus(i);
+            if (status.active && !status.paused) 
+              isActive=1;
+          
+        }
+        this.state.run=isActive;        
   },
 
   // Λήψη κατάστασης timer
@@ -457,5 +482,25 @@ ew.apps.timer = {
 if (require('Storage').readJSON('ew.json', 1).timer)
   ew.apps.timer.state.def = require('Storage').readJSON('ew.json', 1).timer;
 
-// Αρχικοποίηση κατά την φόρτωση
+ew.UI.icon.confirm="mEwwIdah/wAof//4ECgYFB4AFBg4FB8AFBj4FB/AFBn4FB/gFBv4FEAgIFGC4MBAoQ2BFwQpB4AFD4PAGgX/wYFEg/gAoX+h4FD/kf8EP/IuBn/wMYIuBv4FCv/gA4MPB4PBAoQbBwYFCE4ImBAoP/gwCBAoWAOYPwBwPAOYI7C8BzBAoQ2BAoZCBAoJlDDQIFFPoYsBRIa0CAoqhC/ytHXIrFFaIrdFdIwAVA==";
+ew.UI.icon.snooze="mEwwIWTvgCBnkAgP/AoP/wEDAQIIB4EHBYfgh/+AoN/+EP/kP+E/+Ef/F//0fAoPx///x/4j/nAoPnAoPPAoPzAoOfAoP5/EPn4FB/nwhwFDuEEv4FB/0gHwIACIgRLBj5ZCAo3+n5cB/EHAov8v5oCJYJxDK4IfBgZdBLYIFCn/jAoMBDYPDQwQjBGoIFHJoYFGLJAFDNYYFHPoYFBj4FB/ALHC4v5AoOfAoPwX4MPAoPgY4MHf6IAM";
+ew.UI.icon.pause="mEwwIif//Agf/gEB//gg//wAIB8EPAoWAuEOgIUBAv4F/AvLFEaIsAv4IB/z/dgA";
+ew.UI.icon.play="mEwwIurhwFEj4FF4AFE8AFDn/4Aon+Aon/AooeDAoIeDAoIeDAoP8AogeDAoWAAogeCAoXwAogkCAoQkCApARFDoopFGopNKLIplFOIqJKSoihFVozFKAFA=";
+ew.UI.icon.stop="mEwwI63h////wAoM/AoP8Ao9/AoP+Av4F/ApabLVooA0";
+
+
+//ew.UI.icon.timer="mUywgNKgMRAAMQEqQXDDKgXEDFhKYGQgXTDIYXVDDMiAAIVSmYAFxGIC6oZQC5AZOC5UznAZKgYPCn//+YCBDI2AGBQUBDAODAYRMMGAQXC//4DAQZEGRALCCQQxEAAJlKGAwABAogyDDAIyEPQYYEAAh+KGAU4GQowDxBLJF4U4LwgADBISXHJIRYCJJDPCMgwYBI5BNGMgyTHDBpLCSRaYHDEvykMRiYYUC4IABl7jHDAszYofzC4URj4WDwYYIHAKXCDAhLDCYIYIbwgYICwQYHMZJ9FPh0xDC5LDDBx6CGQ0SDBcDDA/yDAyLBDAWADBR+CDA4wBDAhkCM4gyBDAIlCVogYCMgfzxAyEDAU4wYYFC4QYDBwR+FDARiEDAhLCnBmF+YxBCwRJHWBHzGwgZDGAoYDPYgYFBgRJGJYgZDDAhJLGQhNCDAYJDGBAZGABAXKJggAHGAJIHDJoXNDJIXPM44XBB5A=";
+//ew.UI.icon.timer="mEwwg96hWq1WgDCgXWxGZzOICqQABC4QABCyIXFDBsICIeJyfznAFBwAWPC4Of///mYYMCwgXBl4XB/4xCFxwABn4XCDAQwICw2ICwf/+YwJxGDHoQXHGARGIn/4C5QwBJAwQDC5QLCIw6GEC5BIGIwQLBJAgXGJAwXEJAgXPHgoXIEYIXFLwRIFC484C4h2DJAoIFPA+Ix4MGAAJoDHYgXKf4QXUJAYJGC5p5CF6hIBO44XNABIXGEw4AIU4rXFC5jvFc5AAHxAXGQwwAHQAIXcPCB2FC4RgOB4IXFJBxGHJB5GHJAYwKFwIXIJAIwKFwJGHGAYYICwIuIGAeImYWFmYJBFxIYEwZjC+YtCCxZJDAA4WMDBIWODIwVRAH4AXA==";
+//ew.UI.icon.timer="mEwwkEogAgp8zmc0C6czkUhiIXTkUiiIXUCoMRihgUgAuUAAJeUoaNBmRhBmYKECxh1CAAIYBVQXzki7KIgIUBDQUSkYiBmUSXZIWBkZIBJQQYBkVDBYKXHBQUz/4AEDALGLBoItBC4oYBGAIuKifzCwwABmMiOxAuBn8/C5HzGAIuHmMTCpBJDC5Ehl4XL+ZIHNQJFBmIaKSIIXFkRGC+USJCBGE+ZLK+QXFoUhRgZMBMB9CUoIMDGBIXHFIowKC5gwKmQXERwYNEiLeHC4sSBw3ziMRC6n/C68xI5tBBw/zV4YXKUBKnMC6DXBigXFH44XgCwYABiMjC5sykIXU+YXHJBxeGC4YwMmReGJAUiIyYwOmZGHGAhhICwIuIGAYYHmZdBFxIwCDAMzLYYWCiIWKGAIYCkczCoQWNDAZjBAAUhiJFLJQoAECp4ZEFaAAqA=";
+//ew.UI.icon.timer="mEwwhC/AFMIxAACwAX/C+MAhOZzOQSCYXXI4YeDDhwWDDAY1BCyQABJoQWTAAJkMUgmImZKGFx8zmc4C5ouFC4QYDbZRaGC4RKDC5eDIIYXDA4RGLmeJzAXFGARIIC4ODE4OZC4wwBC5BGCmcyGAQXGJBApElAwBC4hICC5gwBMBB2KGAZ4PC40yC6wQCC6sikQXVAAwXgU4oXKd5YAId5gXVMBheJC4cjCw7dCC5BICyQXHlJGJC4eJMI04zAXLJAWZJIuJIxYwEDAcyzIuMGAgYBAAQWCFxYwDAA4WMDBIWODA4WQMYhbNAH4AEA==";
+//ew.UI.icon.timer="mEwwhC/AB0P///+czAAWIAAOACpIUBCwgUCAAoXIFIUiAAMoC58ykMRAAsa1QABxGKlBIIFgQAEGIpgJgQXGiUikcjmcgC5UwTRQLKC/4XPgbHBC6EPbYUkolDn4XLgYLB+czmVEAANCmYXMgE/IIIrBAAYvNgEzgYVEAAIvB+YWKJAPzC6pIBmgXFoZGMJAXwklCCwf/VAIAMO4PzkSOCmHzFxoYCLAM0RgIWQPQc0bIIWRMQUyC4PwCqEPeAIACn4YQ///JIJFBh//DB0PB4QXCDAQuOPIYIEGBguDC4oJEFxgSBBRIXSGBcDBYgXGbZUCBYgXX+YdFC57uCCQgXO+cz7vdDAgXKdIUPmc+C4PTDAYXNFwMzogABoczBgKnLmUjCwPu9owBDARkFAAuIAAIPBkQAElAKBCxEPnAYCABJLCFxAAMC74ZNwAWJAH4ACA";
+//ew.UI.icon.timer="mEwwhC/AHkIxAAMwAX3DBoWJC+EAmYAKVJYX/C+8DCxMwC5k07oAGoYXMJAIXHIxgXCnoWF6YXOMAMtCwfSLxqREpoWB6iNNDA0koQWSYQwWTmUjDCLYDC4h3Od5IXRF4gXNIwYXGJBgXEAAoXMCIgvFJBgQElvSC6kt7vdDAgXOmgWBAANDC6NNC4fUC6AuEGAgWKhGIABWAC/AWMDBQXvAH4Az";
+
+// install icon
+if (!require('Storage').read("ew_i_timer.img"))  {
+  let icon="mEwwhC/AHkIxAAMwAX3DBoWJC+EAmYAKVJYX/C+8DCxMwC5k07oAGoYXMJAIXHIxgXCnoWF6YXOMAMtCwfSLxqREpoWB6iNNDA0koQWSYQwWTmUjDCLYDC4h3Od5IXRF4gXNIwYXGJBgXEAAoXMCIgvFJBgQElvSC6kt7vdDAgXOmgWBAANDC6NNC4fUC6AuEGAgWKhGIABWAC/AWMDBQXvAH4Az";
+  require('Storage').write("ew_i_timer.img", require("heatshrink").decompress(atob(icon)));
+}
+
+// start
 ew.apps.timer.init();

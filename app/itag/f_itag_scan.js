@@ -10,24 +10,34 @@ ew.UI.nav.back.replaceWith(() => {
 });
 
 ew.face[0] = {
-    data: { source: 0, name: 0, key: 0, key_1: 0, key_2: 0, key_3: 0, lowLimit: 0, hiLimit: 0, fields: 0, totLowField: 0, ref: 0, style: 0, posL: 0 },
+    data: { 
+        img:{
+	        pause:"mEwwIif//Agf/gEB//gg//wAIB8EPAoWAuEOgIUBAv4F/AvLFEaIsAv4IB/z/dgA",
+            scan:"mEwwIcZg/+Aocfx+AAoV4gPgAoQDBuAEBgPAgE4AoQVBjgFBgYCBhgoCAQMGAQUgAolACggFL6AFGGQQFJEZsGsAFEIIhNFLIplFgBxBnwFCPYP/AoU8gf/BwKVB/+/SAUD/kf+CjDh/4V4n8AoYeBAoq1DgIqDAAP/XYcAv4qEn4qEGwsfC4kPEYkHF4Z1DACA=",
+        },
+        source: 0, name: 0, key: 0, key_1: 0, key_2: 0, key_3: 0, lowLimit: 0, hiLimit: 0, fields: 0, totLowField: 0, ref: 0, style: 0, posL: 0 
+    },
     gatt: {},
     run: false,
     offms: (ew.def.face.off[ew.face.appCurr]) ? ew.def.face.off[ew.face.appCurr] : 60000,
-    init: function() {
+    init: function(o) {
         if (!ew.def.face.off[ew.face.appCurr])  ew.def.face.off[ew.face.appCurr] = this.offms;
         if (ew.apps.itag.state.ble.gatt.connected|| (ew.comm.mstr.connection  && ew.comm.mstr.connection.connected)) {
             ew.face.go("itag-connect", 0);
             return;
         }
+        if (o==="jump") {
+            ew.face.go("itag-dev", 0);
+            return;
+        }
         ew.is.bar = 0;
         if (ew.face.appPrev === "itag-dev") this.started = 1
-        ew.UI.ele.ind(2, 2, 0, 3);
+        ew.UI.ele.ind(1, 2, 0, 15);
 
         this.data.key = "rssi";
         // UI control Start
         ew.UI.c.start(1, 1);
-        ew.UI.ele.coord("main", "_main", 6);
+        ew.UI.ele.coord("main", "_main", 9);
         ew.UI.c.end();
 
         // button hander
@@ -97,14 +107,15 @@ ew.face[0] = {
         name = this.data.source[id] ? this.data.source[id].name : name;
         let brd =(this.data.source[id] &&this.data.source[id].board )?this.data.source[id].board:0;
         let boCo=[0,0,0,6,1]
-        ew.UI.btn.i2l("main", "_main", 6, oflc ? oflc : rssi + " ", oflc ? "OFFLINE" : (ew.apps.itag.state.def.set.scanAll) ? id.split(" ")[0].toUpperCase() : "dBm", oflc ? 13 : 4, 15, process.env.BOARD === "BANGLEJS2" ? 3 : 4);
+        ew.UI.btn.i2l("main", "_main", 9, oflc ? oflc : rssi + " ", oflc ? "OFFLINE" : (ew.apps.itag.state.def.set.scanAll) ? id.split(" ")[0].toUpperCase() : "dBm", oflc ? 13 : 4, 15, process.env.BOARD === "BANGLEJS2" ? 3 : 4);
         //name
-        ew.UI.btn.c2l("main", "_headerS", 6, name, "", 15, boCo[brd], 1.5);
+        ew.UI.btn.c2l("main", "_header", 6, name, "", 15, boCo[brd], 1.5);
+        //ew.UI.btn.c2l("main", "_header", 6, name, "", 15, boCo[brd], 2,-2,"Intl");
+
 
     },
     bar: function() {
         if (ew.is.UIpri) { ew.notify.alert("error", ew.notify.log.error[0], 1, 1); return; }
-
         if (ew.is.bar) return;
         
         // set the bar control
@@ -121,8 +132,8 @@ ew.face[0] = {
 
         if (!ew.apps.itag.state.devA.length) {
             ew.UI.ele.fill("_bar", 6, 0);
-            ew.UI.btn.img("main", "_main", 6, "scan", "WAIT", 4, 15, 3);
-            ew.UI.btn.c2l("main", "_headerS", 6, "SCANNING", "", 15, 0, 1.2);
+            ew.UI.btn.img("main", "_main", 9, "scan.face", "WAIT", 4, 15, 1);
+            ew.UI.btn.c2l("main", "_header", 6, "SCANNING", "", 15, 0, 1.2);
 
             if (!this.started && ew.def.face.info) {
                 ew.UI.btn.ntfy(1, 1.5, 0, "_bar", 6, "ITAG", "SCANNER", 15, 1);
@@ -135,28 +146,160 @@ ew.face[0] = {
     },
 
     update: function(listReniew) {
-        if (ew.is.bar) return;
+        if (ew.is.bar || ew.UI.ntid) return;
       
         ew.UI.ele.fill("_bar", 6, 0);
 
         ew.sys.TC.val = { cur: this.data.posL, dn: 0, up: ew.apps.itag.state.devA.length - 1, tmp: 0, reverce: 0, loop: 1 };
         // graph the bar
+
         if (ew.apps.itag.state.devA.length) {
             if (ew.apps.itag.state.lastId && (ew.apps.itag.state.dev[ew.apps.itag.state.lastId]))
                 this.data.posL = ew.apps.itag.state.devA.indexOf(ew.apps.itag.state.lastId);
             else this.data.posL = 0;
 
             let v = this.graph(ew.apps.itag.state.devA, this.data.posL, 0, this.data.key);
-            this.info(v[0], v[1], v[2], v[3]);
+            if (!ew.apps.itag.state.def.set.persist&&!g.isOn)
+            ew.UI.btn.img("main", "_main", 9, "pause.face", "Paused", 4, 15, 2);
+            else this.info(v[0], v[1], v[2], v[3]);
 
         }
         else {
-            ew.UI.btn.img("main", "_bar", 6, "scan", "WAIT", 14, 0, 3);
+            ew.UI.btn.img("main", "_bar", 6, "scan.face", "WAIT", 14, 0, 1);
             //ew.UI.ele.fill("_bar", 6, 0);
             g.flip();
         }
     },
-    graph: function(data, pos, update, focus) {
+      graph: function(data, pos, update, focus) {
+    // vars
+    const width = g.getWidth() - (process.env.BOARD == "BANGLEJS2" ? 0 : 30);
+    const bottom = g.getHeight() - (process.env.BOARD == "BANGLEJS2" ? 0 : 15);
+    const height = bottom / (process.env.BOARD == "BANGLEJS2" ? 3.65 : 3.65) | 0;
+    const value = this.data.key;
+    const source = ew.apps.itag.state.dev;
+    const fields = data.length;
+    const margin = process.env.BOARD == "BANGLEJS2" ? 0 : 15;
+    
+    // Μέγιστο πλάτος μπάρας
+    const MAX_BAR_WIDTH = 40;
+    
+    // Υπολογισμός πλάτους μπάρας
+    let bw, startX;
+    
+    if (fields * (MAX_BAR_WIDTH + 2) <= width) {
+        // Χωράνε όλες με το μέγιστο πλάτος - κεντράρουμε
+        bw = MAX_BAR_WIDTH;
+        let totalWidth = fields * (bw + 2);
+        startX = margin + (width - totalWidth) / 2;
+    } else {
+        // Δεν χωράνε - δυναμικό πλάτος όπως πριν
+        bw = (width - (fields * 2)) / fields;
+        startX = margin;
+    }
+    
+    if (!data[pos]) return;
+
+    // get scale
+    let scale = (process.env.BOARD == "BANGLEJS2" ? 0.9 : 1.1);
+    let rssi = ew.apps.itag.state.def.set.rssi;
+    let limits = source[data[pos]].live;
+    let abs_pos = (source[data[pos]][value] ^ (source[data[pos]][value] >> 31)) - (source[data[pos]][value] >> 31);
+    let abs_posL = (source[data[this.data.posL]][value] ^ (source[data[this.data.posL]][value] >> 31)) - (source[data[this.data.posL]][value] >> 31);
+    
+    if (update) {
+        // top dot - erase last
+        g.setCol(1, 0);
+        g.fillRect(startX + 2 + (this.data.posL * (bw + 2)) + bw - 2, bottom - height + 0, 
+                   startX + 2 + (this.data.posL * (bw + 2)), bottom - height + 5);
+        
+        // top dot - create current
+        g.setCol(1, 14);
+        if (fields) {
+            g.fillRect(startX + 2 + (pos * (bw + 2)) + bw - 2, bottom - height + 0, 
+                       startX + 2 + (pos * (bw + 2)), bottom - height + 5);
+        }
+        
+        limits = source[data[this.data.posL]].live;
+
+        // style 1
+        if (!rssi) {
+            // bar - clear previous 
+            g.setCol(1, limits ? 4 : 13);
+            g.fillRect(startX + 2 + (this.data.posL * (bw + 2)) + bw - 2, 
+                       bottom - (limits ? 50 : 50 - source[data[this.data.posL]].oflc), 
+                       startX + 2 + (this.data.posL * (bw + 2)), bottom);
+            
+            // bar - highlight current
+            g.setCol(1, 14);
+            limits = source[data[pos]].live;
+            g.drawRect(startX + 2 + (pos * (bw + 2)) + bw - 2, 
+                       bottom - (limits ? 50 : 50 - source[data[pos]].oflc), 
+                       startX + 2 + (pos * (bw + 2)), bottom);
+        }
+        // style 0
+        else {
+            // limits color coding
+            g.setCol(1, limits ? 4 : 13);
+            // bar - clear previous
+            g.drawRect(startX + 2 + (this.data.posL * (bw + 2)) + bw - 2, 
+                       bottom - (limits ? ((100 - abs_posL) * scale) : 50 - source[data[this.data.posL]].oflc), 
+                       startX + 2 + (this.data.posL * (bw + 2)), bottom);
+            
+            // bar - highlight current 
+            g.setCol(1, 14);
+            limits = source[data[pos]].live;
+            g.drawRect(startX + 2 + (pos * (bw + 2)) + bw - 2, 
+                       bottom - (limits ? ((100 - abs_pos) * scale) : 50 - source[data[pos]].oflc), 
+                       startX + 2 + (pos * (bw + 2)), bottom);
+        }
+        this.data.posL = pos;
+        ew.apps.itag.state.lastId = data[pos];
+    }
+    else {
+        // first draw
+        // dot highlight current
+        g.setCol(1, 14);
+        if (1 < fields) {
+            g.fillRect(startX + 2 + (pos * (bw + 2)) + bw - 2, bottom - height + 0, 
+                       startX + 2 + (pos * (bw + 2)), bottom - height + 5);
+        }
+
+        // bar - draw bars
+        for (let i in data) {
+            if (fields < i) break;
+            limits = source[data[i]].live;
+            g.setCol(1, limits ? 4 : 13);
+            
+            if (rssi) {
+                let abs_i = (source[data[i]][value] ^ (source[data[i]][value] >> 31)) - (source[data[i]][value] >> 31);
+                g.fillRect(startX + 2 + (i * (bw + 2)) + bw - 2, 
+                           bottom - (limits ? ((100 - abs_i) * scale) : 50 - source[data[i]].oflc), 
+                           startX + 2 + (i * (bw + 2)), bottom);
+            } else {
+                g.fillRect(startX + 2 + (i * (bw + 2)) + bw - 2, 
+                           bottom - (limits ? 50 : 50 - source[data[i]].oflc), 
+                           startX + 2 + (i * (bw + 2)), bottom);
+            }
+        }
+        
+        // bar - highlight current
+        g.setCol(1, 14);
+        limits = source[data[pos]].live;
+        if (rssi) {
+            g.drawRect(startX + 2 + (pos * (bw + 2)) + bw - 2, 
+                       bottom - (limits ? ((100 - abs_pos) * scale) : 50 - source[data[pos]].oflc), 
+                       startX + 2 + (pos * (bw + 2)), bottom);
+        } else {
+            g.drawRect(startX + 2 + (pos * (bw + 2)) + bw - 2, 
+                       bottom - (limits ? 50 : 50 - source[data[pos]].oflc), 
+                       startX + 2 + (pos * (bw + 2)), bottom);
+        }
+    }
+
+    return [source[data[pos]].rssi, data[pos], source[data[pos]].name, source[data[pos]].oflc];
+},
+    
+   /* graph: function(data, pos, update, focus) {
 
         // vars
         const width = g.getWidth() - (process.env.BOARD == "BANGLEJS2" ? 0 : 30);
@@ -244,15 +387,16 @@ ew.face[0] = {
 
         return [source[data[pos]].rssi, data[pos], source[data[pos]].name, source[data[pos]].oflc];
     },
+    */
     clear: function(o) {
         ew.is.slide = 0; /*TC.removeAllListeners();*/
         if (this.tid) clearTimeout(this.tid);
         this.tid = 0;
-        if (ew.apps.itag.state.focus || (ew.apps.itag.state.def.set.persist && ew.face.appCurr === "itag-scan") /*|| (ew.face.appCurr.startsWith("itag") && !ew.face.pageCurr)*/ )
+        if (ew.apps.itag.state.focus || (ew.apps.itag.state.def.set.persist && ew.face.appCurr === "itag") /*|| (ew.face.appCurr.startsWith("itag") && !ew.face.pageCurr)*/ )
             return;
 
         else {
-            if (ew.face.appCurr === "itag-scan") ew.UI.btn.img("main", "_main", 6, "pause", "Paused", 4, 15, 2);
+            if (ew.face.appCurr === "itag") ew.UI.btn.img("main", "_main", 9, "pause.face", "Paused", 4, 15, 2);
             ew.apps.itag.state.time = (getTime() | 0);
             ew.apps.itag.stopScan();
         }

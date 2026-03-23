@@ -1,25 +1,29 @@
-//itag scan viewer
+//itag store viewer
 
 ew.UI.nav.next.replaceWith(() => {
     ew.sys.buzz.nav(ew.sys.buzz.type.ok);
-    ew.face.go("itag-scan", 0);
+    ew.face.go("itag", 0);
 
 });
 ew.UI.nav.back.replaceWith(() => {
     ew.sys.buzz.nav(ew.sys.buzz.type.ok);
-    ew.face.go("itag-scan", 0);
+    ew.face.go("itag", 0);
 
 });
 
 ew.face[0] = {
-    data: { source: 0, name: 0, key: 0, key_1: 0, key_2: 0, key_3: 0, lowLimit: 0, hiLimit: 0, fields: 0, totLowField: 0, ref: 0, style: 1, posL: 0 },
+    data: { img:{
+        scan:"mEwwIcZg/+Aocfx+AAoV4gPgAoQDBuAEBgPAgE4AoQVBjgFBgYCBhgoCAQMGAQUgAolACggFL6AFGGQQFJEZsGsAFEIIhNFLIplFgBxBnwFCPYP/AoU8gf/BwKVB/+/SAUD/kf+CjDh/4V4n8AoYeBAoq1DgIqDAAP/XYcAv4qEn4qEGwsfC4kPEYkHF4Z1DACA=",
+        },
+        source: 0, name: 0, key: 0, key_1: 0, key_2: 0, key_3: 0, lowLimit: 0, hiLimit: 0, fields: 0, totLowField: 0, ref: 0, style: 1, posL: 0 
+    },
     gatt: {},
     run: false,
-    coord: (process.env.BOARD == "BANGLEJS2") ? { "main": [0, 35, 176, 123], "id": [88, 104], "batt": [88, 72], "unit": [45, 75], "last": [88, 42] } : { "main": [0, 55, 240, 185], "id": [120, 160], "batt": [120, 120], "unit": [70, 122], "last": [120, 70] },
+    coord: (process.env.BOARD == "BANGLEJS2") ? { "main": [0, 29, 176, 115], "id": [88, 97], "batt": [88, 65], "unit": [45, 70], "last": [88, 35] } : { "main": [0, 55, 240, 185], "id": [120, 160], "batt": [120, 120], "unit": [70, 122], "last": [120, 70] },
     offms: (ew.def.face.off[ew.face.appCurr]) ? ew.def.face.off[ew.face.appCurr] : 60000,
     init: function(o) {
         if (!ew.def.face.off[ew.face.appCurr])  ew.def.face.off[ew.face.appCurr] = this.offms;
-        ew.UI.ele.ind(1, 2, 0, 3);
+        ew.UI.ele.ind(2, 2, 0, 15);
         this.moveDo = 0;
             
         // ---- scan mode setup ----
@@ -40,18 +44,15 @@ ew.face[0] = {
             this.data.posL = this.data.array[ew.apps.itag.state.def.set.pos] ? ew.apps.itag.state.def.set.pos : 0;
         }
 
-        //return [source[data[pos]][value], data[pos], source[data[pos]].name, source[data[pos]].lastseen];
-        //info: function(batt, id, name, last) {
-
-        this.info(this.data.source[this.data.array[this.data.posL]].batt, this.data.array[this.data.posL], this.data.source[this.data.array[this.data.posL]].name, this.data.source[this.data.array[this.data.posL]].last);
-        ew.UI.btn.img("main", "_bar", 6, "scan", "WAIT", 14, 0, 3);
+        let dev=this.data.array[this.data.posL];
+        this.info(this.data.source[dev].batt, dev, this.data.source[dev].name, this.data.source[dev].lastseen);
+        ew.UI.btn.img("main", "_bar", 6, "scan.face", "WAIT", 14, 0, 1);
 
         this.bar();
 
-
         // ---- UI control Start ----
         ew.UI.c.start(1, 1);
-        ew.UI.ele.coord("main", "_main", 6);
+        ew.UI.ele.coord("main", "_main", 9);
         ew.UI.c.end();
 
         // ---- button hander ----
@@ -67,16 +68,29 @@ ew.face[0] = {
                     if (ew.def.face.info) ew.UI.btn.ntfy(1, 0.4, 0, "_bar", 6, this.moveDo ? "DRAG TO MOVE" : "MOVED", "", 0, 15);
                 }
                 else {
+                    // set focus mode
                     if (ew.apps.itag.state.focus == this.data.array[this.data.posL]) {
                         ew.apps.itag.state.focus = 0;
                         ew.apps.itag.stopScan();
                         if (ew.apps.itag.state.def.set.persist) ew.apps.itag.scan();
+                        ew.apps.itag.state.run=0;
+                        if (ew.apps.itag.tid.focus) {
+                            clearTimeout(ew.apps.itag.tid.focus);
+                            ew.apps.itag.tid.focus=0
+                        }
                     }
                     else {
                         ew.apps.itag.state.focus = this.data.array[this.data.posL];
                         ew.apps.itag.stopScan();
                         ew.apps.itag.scan((this.data.source[ew.apps.itag.state.focus].phy===2?2:"0"));
-
+                        ew.apps.itag.state.run=1;
+                        //stop scan after half an hour
+                        ew.apps.itag.tid.focus=setTimeout(()=>{
+                            ew.apps.itag.state.focus = 0;
+                            ew.apps.itag.stopScan();
+                            ew.apps.itag.state.run=0;
+                            ew.notify.alert("error", {title: "ITAG SCANNER", body: "FOCUS TIMEOUT" }, 0, 1);
+                        },60000*30)
                     }
                     let v = this.graph(ew.face[0].data.array, this.data.posL, 1, this.data.key);
                     this.info(v[0], v[1], v[2], v[3]);
@@ -120,7 +134,9 @@ ew.face[0] = {
         g.drawString(id.split(" ")[0].toUpperCase(), this.coord.id[0] - g.stringWidth(id.split(" ")[0].toUpperCase()) / 2, this.coord.id[1]); //
 
         // name
-        ew.UI.btn.c2l("main", "_headerS", 6, name, "", 15, 0, 1.5);
+        //g.setFont("Teletext10x18Ascii");
+        ew.UI.btn.c2l("main", "_header", 6, name, "", 15, 0, 1.5);
+        //ew.UI.btn.c2l("main", "_header", 6, name, "", 15, 0, 2,-2,"Intl");
 
     },
     formatTimeDiff: function(mins) {
@@ -136,6 +152,8 @@ ew.face[0] = {
     },
     bar: function() {
         if (ew.is.UIpri) { ew.notify.alert("error", ew.notify.log.error[0], 1, 1); return; }
+        if (ew.UI.ntid) return;
+
         //"ram";
 
         if (this.data.array.length === 0) {
@@ -263,7 +281,7 @@ ew.face[0] = {
         if (ew.face.appCurr != "itag-dev-set") ew.apps.itag.state.move = -1;
         ew.apps.itag.state.def.set.pos = this.data.posL;
         this.tid = 0;
-        if (ew.apps.itag.state.focus || (ew.apps.itag.state.def.set.persist && ew.face.appCurr === "itag-scan") || (ew.face.appCurr.startsWith("itag") && !ew.face.pageCurr)) return;
+        if (ew.apps.itag.state.focus || (ew.apps.itag.state.def.set.persist && ew.face.appCurr === "itag") || (ew.face.appCurr.startsWith("itag") && !ew.face.pageCurr)) return;
         else ew.apps.itag.stopScan();
         return true;
     },

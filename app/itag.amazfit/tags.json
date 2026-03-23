@@ -1,0 +1,62 @@
+{
+  "cats": [
+    {
+      "id": "ff:ff:11:bb:13:c1",
+      "name": "Xixou",
+      "batt": 100,
+      "silent": 0,
+      "alert": 0,
+      "lastseen": 1770489619
+    },
+    {
+      "id": "ff:ff:11:9e:69:e5",
+      "name": "Happy",
+      "batt": 75,
+      "silent": 0,
+      "alert": 0,
+      "lastseen": 1769571140
+    },
+    {
+      "id": "20:25:07:00:24:d0",
+      "name": "Mike",
+      "batt": 100,
+      "silent": true,
+      "alert": 0,
+      "lastseen": 1768405134
+    },
+    {
+      "id": "ff:ff:11:ba:ef:a6",
+      "name": "Power",
+      "batt": 100,
+      "silent": true,
+      "alert": 0,
+      "lastseen": 1770620305
+    },
+    {
+      "id": "ff:ff:11:a1:9f:a9",
+      "name": "Buba",
+      "batt": 100,
+      "silent": true,
+      "alert": 0,
+      "lastseen": 1767947564
+    },
+    {
+      "id": "ff:ff:11:b7:a4:54",
+      "name": "Key W",
+      "batt": 100,
+      "silent": true,
+      "alert": 0,
+      "lastseen": 1770637783
+    },
+    {
+      "id": "ff:ff:11:b4:0f:55",
+      "name": "Light B",
+      "batt": 100,
+      "silent": true,
+      "alert": 0,
+      "lastseen": 1759513109
+    }
+  ],
+  "timestamp": "2026-02-14T03:24:36.493Z",
+  "version": "1.0"
+}

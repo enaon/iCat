@@ -156,7 +156,7 @@ document.addEventListener('DOMContentLoaded', function() {
             statusTextHeader.textContent = t.statusConnecting;
 
             currentDevice = await navigator.bluetooth.requestDevice({
-                filters: [{ namePrefix: 'eW' }],
+                filters: [{ namePrefix: 'eW' },{ namePrefix: 'eL' }],
                 optionalServices: [UART_SERVICE_UUID]
             });
 

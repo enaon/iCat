@@ -46,13 +46,26 @@ if (process.env.BOARD == "NANO") {
 }
 else {
 	ew.sys.batt = function(i, c) {
-		let v = (process.env.BOARD == "BANGLEJS2") ?
-			13.245 * analogRead(ew.pin.BAT)
-			:4.20 / 0.60 * analogRead(ew.pin.BAT);
-		let l = 3.5,
-			h = 4.15;
-		let hexString = ("0x" + (0x50000700 + (ew.pin.BAT * 4)).toString(16));
-		poke32(hexString, 2); // disconnect pin for power saving, otherwise it draws 70uA more 	
+		let l = 3.55, h = 4.15, v=0;
+		if (process.env.SERIAL === "27f646e3-bf692765") {
+			//E.getAnalogVRef();
+    		//v=E.getVDDH()-1.55;
+			//analogRead(D4);
+			//v=E.getVDDH()+2.5;
+			analogRead(D3);
+			v=E.getVDDH()-1.75;
+			//setTimeout(()=>{ew.is.batt = E.getVDDH();},100);
+		}
+		else {
+			v = (process.env.BOARD == "BANGLEJS2") ?
+				13.245 * analogRead(ew.pin.BAT) :
+				4.20 / 0.60 * analogRead(ew.pin.BAT);
+
+			let hexString = ("0x" + (0x50000700 + (ew.pin.BAT * 4)).toString(16));
+			poke32(hexString, 2); // disconnect pin for power saving, otherwise it draws 70uA more 	
+			if (ew.is.ondc)  v=v-0.05;
+		}
+
 		let per = (100 * (v - l) / (h - l) | 0);
 		// stable battery indicator support 
 		if (i === "info" && !g.isOn) ew.is.batS = (c ? per : (v <= l) ? 0 : (h <= v) ? 100 : per);

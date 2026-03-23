@@ -37,7 +37,7 @@ ew.face[0] = {
         this.rep = 0;
         ew.UI.ele.ind(this.page, 5, 0, 2);
         ew.UI.c.start(1, 1);
-        ew.UI.ele.coord("main", "_main", 6);
+        ew.UI.ele.coord("main", "_main", 9);
         ew.UI.ele.coord("main", "_header", 6);
 
         ew.UI.c.end();
@@ -91,7 +91,7 @@ ew.face[0] = {
 
         }
         this.info();
-        ew.UI.btn.c2l("main", "_headerS", 6, ew.apps.timer.getTimerStatus(ew.face[0].page).name, "", 15, 0, 1.5);
+        ew.UI.btn.c2l("main", "_header", 6, ew.apps.timer.getTimerStatus(ew.face[0].page).name, "", 15, 0, 1.5);
 
         this.bar();
         this.run = 1;

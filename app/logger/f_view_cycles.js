@@ -4,7 +4,7 @@ ew.UI.nav.next.replaceWith(() => {
 });
 ew.UI.nav.back.replaceWith(() => {
     ew.sys.buzz.nav(ew.sys.buzz.type.ok);
-    ew.face.go("main", 0);
+    ew.face.go(ew.def.face.main, 0);
 });
 
 //simple log viewer
@@ -36,7 +36,7 @@ ew.face[0] = {
             check = this.select_years();
         if (!check) {
             ew.notify.alert("error", { body: "NO LOGS FOUND", title: "LOGGER ERROR" }, 0, 1);
-            //ew.face.go("main", 0);
+            //ew.face.go(ew.def.face.main, 0);
         }
 
         if (this.dbg) console.log("face in, view", this.view);
@@ -45,7 +45,7 @@ ew.face[0] = {
         ew.UI.c.start(1, 1); //set UI control Start
         ew.UI.ele.coord("main", "_header", 4);
         ew.UI.ele.coord("main", "_header", 5);
-        ew.UI.ele.coord("main", "_main", 6);
+        ew.UI.ele.coord("main", "_main", 9);
         ew.UI.c.end();
         // UI control end
 

@@ -5,7 +5,7 @@ ew.face={
 	appPrev:"none",
 	pageCurr:-1,
 	pagePrev:-1,	
-	pageArg:"",
+	pageArg:null,
 	faceSave:-1,
 	mode:0,
 	offid:0,
@@ -21,7 +21,8 @@ ew.face={
 		},this.offms,this.pageCurr);
 	},
 	go:function(app,page,arg){
-		//arg= arg||this.pagArg;
+		//print(app,page,arg);
+		//arg= arg||this.pageArg;
 		if(!g.isOn) ew.sys.batt("info").percent;
 		this.appPrev=this.appCurr;
 		this.pagePrev=this.pageCurr;
@@ -56,14 +57,15 @@ ew.face={
 			}else eval(require('Storage').read("ew_f_"+app));
 		} 
 		this.off();
-		ew.face[page].init(arg);	
+		ew.face[page].init(arg);
 		if(!g.isOn) {
-			ew.sys.TC.start();
 			g.on();
+			ew.sys.TC.start();
 		}
 		ew.face[page].show(arg);
-		//this.pageArg="";
-		if(arg) this.pageArg=arg;
+		//ew.face[page].show(arg);
+		//this.pageArg=undefined;
+		this.pageArg=arg||undefined;
 	}
 };
 
