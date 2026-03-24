@@ -53,7 +53,7 @@ class EWLauncherCommon {
 
         this.isGitHubPages = window.location.hostname.includes('github.io');
         this.isFileProtocol = window.location.protocol === 'file:';
-        this.basePath = this.isGitHubPages ? '/'+pathParts[1] : '';
+        this.basePath = this.isGitHubPages ? '/' + pathParts[1] : '';
 
     }
 
@@ -77,13 +77,16 @@ class EWLauncherCommon {
             };
             try {
                 xhr.send();
-            } catch (e) {
+            }
+            catch (e) {
                 resolve(false);
             }
         });
     }
 
     // Έλεγχος ύπαρξης app
+
+    /*
     async checkAppExistence(appName) {
         try {
             let exists = false;
@@ -101,6 +104,31 @@ class EWLauncherCommon {
             return false;
         }
     }
+    */
+    async checkAppExistence(appName) {
+        try {
+            let exists = false;
+
+            if (this.isFileProtocol) {
+                exists = await this.checkAppExistenceFileProtocol(appName);
+            }
+            else {
+                // Χρησιμοποίησε HEAD αντί για GET
+                const response = await fetch(`${this.basePath}/app/${appName}/app.html`, {
+                    method: 'HEAD'
+                });
+                exists = response.ok;
+            }
+
+            return exists;
+        }
+        catch (e) {
+            // Το 404 θα πιάζεται εδώ, αλλά θα εμφανίζεται στην κονσόλα
+            console.log(`App ${appName} not found:`, e);
+            return false;
+        }
+    }
+
 
     // Ενημέρωση ύψους iframe
     updateAppFrameHeight(appFrame) {

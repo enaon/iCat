@@ -717,7 +717,7 @@
                     console.log("Αποστολή εντολής:", command);
                     const encoder = new TextEncoder();
                     const data = encoder.encode(command);
-                    await uartRxCharacteristic.writeValue(data);
+                    await uartRxCharacteristic.writeValueWithResponse(data);
                     console.log("Εντολή αποσταλεί επιτυχώς");
                 }
                 catch (error) {

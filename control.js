@@ -315,7 +315,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const CHUNK_SIZE = 100;
             for (let i = 0; i < data.length; i += CHUNK_SIZE) {
                 const chunk = data.slice(i, i + CHUNK_SIZE);
-                await uartRxCharacteristic.writeValue(chunk);
+                await uartRxCharacteristic.writeValueWithResponse(chunk);
                 await new Promise(resolve => setTimeout(resolve, 10));
             }
         }
