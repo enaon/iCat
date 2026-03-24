@@ -76,7 +76,7 @@ document.addEventListener('DOMContentLoaded', function() {
             });
 
 
-            //showFrame('app/handler/index.html');
+            //showFrame('app/handler/app.html');
 
             // Ενημέρωση του current app indicator
             //document.getElementById('statusTextHeader').textContent = 'System Settings';
@@ -503,10 +503,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
         let appPath;
         if (ewCommon.isFileProtocol) {
-            appPath = `app/${appName}/index.html`;
+            appPath = `app/${appName}/app.html`;
         }
         else {
-            appPath = `${ewCommon.basePath}/app/${appName}/index.html`;
+            appPath = `${ewCommon.basePath}/app/${appName}/app.html`;
         }
 
         appFrame.src = appPath;

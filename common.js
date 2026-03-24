@@ -63,7 +63,7 @@ class EWLauncherCommon {
     checkAppExistenceFileProtocol(appName) {
         return new Promise((resolve) => {
             const xhr = new XMLHttpRequest();
-            xhr.open('GET', `app/${appName}/index.html`, true);
+            xhr.open('GET', `app/${appName}/app.html`, true);
             xhr.onreadystatechange = function() {
                 if (xhr.readyState === 4) {
                     resolve(xhr.status === 0 || xhr.status === 200);
@@ -88,7 +88,7 @@ class EWLauncherCommon {
             if (this.isFileProtocol) {
                 exists = await this.checkAppExistenceFileProtocol(appName);
             } else {
-                const response = await fetch(`${this.basePath}/app/${appName}/index.html`);
+                const response = await fetch(`${this.basePath}/app/${appName}/app.html`);
                 exists = response.ok;
             }
 
