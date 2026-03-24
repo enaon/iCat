@@ -53,7 +53,7 @@ class EWLauncherCommon {
         this.isGitHubPages = window.location.hostname.includes('github.io');
         this.isFileProtocol = window.location.protocol === 'file:';
         this.basePath = this.isGitHubPages ? pathParts[1] : '';
-        console.log("pathParts*******",pathParts[1])
+        console.log("*******************pathParts*******",pathParts[1])
     }
 
     // Προσδιορισμός base URL
