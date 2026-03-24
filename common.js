@@ -53,7 +53,8 @@ class EWLauncherCommon {
 
         this.isGitHubPages = window.location.hostname.includes('github.io');
         this.isFileProtocol = window.location.protocol === 'file:';
-        this.basePath = this.isGitHubPages ? '/iCat' : '';
+        this.basePath = this.isGitHubPages ? '/'+pathParts[1] : '';
+        
         
 
         
