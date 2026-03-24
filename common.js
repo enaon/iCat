@@ -49,11 +49,14 @@ const launcherTranslations = {
 // Κοινές συναρτήσεις
 class EWLauncherCommon {
     constructor() {
-        const pathParts = window.location.pathname.split('/');
+            const pathParts = window.location.pathname.split('/');
+
         this.isGitHubPages = window.location.hostname.includes('github.io');
         this.isFileProtocol = window.location.protocol === 'file:';
-        this.basePath = this.isGitHubPages ? pathParts[1] : '';
-        console.log("*******************pathParts*******",pathParts[1])
+        this.basePath = this.isGitHubPages ? '/iCat' : '';
+        
+
+        
     }
 
     // Προσδιορισμός base URL
