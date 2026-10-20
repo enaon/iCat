@@ -1,0 +1,41 @@
+# Build 
+
+for nano 
+source scripts/provision.sh EW_NANO
+make clean && BOARD=EW_NANO RELEASE=1 make
+
+# Call DFU from Espruino 
+
+As mentioned (in a bit cryptic way) you can also run poke32(0x4000051c,0x57) from Espruino to reboot into bootloader when you plan to update. Or possibly something like setTimeout(()=>{poke32(0x4000051c,0x57)},5000); if one wants some time to properly disconnect.
+
+# GPIO to 3V
+
+first flash uf2 bootloader update file from nice nano build from that pull request https://github.com/adafruit/Adafruit_nRF52_Bootloader/actions/runs/11869109517/job/33079070051 - direct link for the zip with uf2 inside https://github.com/adafruit/Adafruit_nRF52_Bootloader/actions/runs/11869109517/artifacts/2196362940 then verify updated info in usb storage so this bootloader fix is there. then in espruino when connected over USB console (so that the softdevice can restart) run
+
+NRF.restart(function(){
+  poke32(0x4001e504,1);while(!peek32(0x4001e400)); // enable flash writing
+  poke32(0x10001304,0xfffffff8+4);while(!peek32(0x4001e400));
+  poke32(0x4001e504,0);while(!peek32(0x4001e400)); // disable flash writing
+});
+and that's it. GPIO levels should drop to 3.0V after reboot and efficiency should go back to normal with battery at 3.3V. To get it back to 3.3V you need to rewrite UICR like this
+
+NRF.restart(function(){
+  poke32(0x4001e504,2);while(!peek32(0x4001e400)); // enable flash erase
+  poke32(0x4001e514,1);while(!peek32(0x4001e400)); // erase whole uicr
+  poke32(0x4001e504,1);while(!peek32(0x4001e400)); // enable flash writing
+  poke32(0x10001014,0xF4000);while(!peek32(0x4001e400)); // set bootloader address 
+  poke32(0x10001018,0xFE000);while(!peek32(0x4001e400)); // set mbr settings
+  poke32(0x10001200,0x12);while(!peek32(0x4001e400));
+  poke32(0x10001204,0x12);while(!peek32(0x4001e400));
+  poke32(0x1000120c,0xfffffffe);while(!peek32(0x4001e400)); // nfc as gpio
+  poke32(0x10001304,0xfffffff8+5);while(!peek32(0x4001e400));
+  poke32(0x4001e504,0);while(!peek32(0x4001e400)); // disable flash writing
+});
+
+or get your own UICR backup batch of poke32 commands to put inside (while(!peek32(0x4001e400)); flash ready busy loop is missing)
+
+for (a=0x10001000;a<0x10001400;a+=4){if (peek32(a)!=0xffffffff) print("poke32(0x"+a.toString(16)+",0x"+peek32(a).toString(16)+");")}
+So I just need one pin, I want to drive this module below
+
+I guess nrf52 gpio output at 3.0V can drive it too or the VCC pin controlled by D13 should still be 3.3V (but would draw more current)
+
