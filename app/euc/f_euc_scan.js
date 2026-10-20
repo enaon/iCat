@@ -192,7 +192,7 @@ ew.face[0] = {
 
     },
     bar: function() {
-        if (ew.is.UIpri) { ew.notify.alert("error", ew.notify.log.error[0], 1, 1); return; }
+        //if (ew.is.UIpri) { ew.notify.alert("error", ew.notify.log.error[0], 1, 1); return; }
 
         // reset UI control, bar only
         ew.UI.c.start(0, 1);

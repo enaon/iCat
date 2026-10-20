@@ -644,6 +644,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
             // Αποστολή reset command
             await sendCommand('\x10ew.sys.updt(10);\n');
+            //await sendCommand('\x10E.reboot();\n');
 
             // Μικρή καθυστέρηση για να δούμε το μήνυμα
             await new Promise(resolve => setTimeout(resolve, 2000));
@@ -699,7 +700,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
 
             // Επιβεβαίωση
-            await sendCommand('console.log("Time synced - UTC: " + getTime() + ", Local: " + (getTime()+E.getTimeZone()*3600));\n');
+            await sendCommand('console.log("Time synced - UTC: " + getTime() + ", Local: " + (getTime()*3600));\n');
 
             alert(t.syncSuccess);
 

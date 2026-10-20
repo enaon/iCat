@@ -20,6 +20,13 @@ ew.face[0] = {
     init: function() {
         if (!ew.def.face.off[ew.face.appCurr]) ew.def.face.off[ew.face.appCurr] = this.offms;
         ew.apps.launcher.state.selP = 0;
+        
+        //reset page memmory
+        if (!ew.apps.launcher.state.def.mem) {
+            ew.apps.launcher.state.def.pos=0; 
+            ew.apps.launcher.state.def.page=0;
+            ew.apps.launcher.state.curP=0;
+        }
         ew.apps.launcher.prep(false);
         this.bar();
         this.draw();
@@ -83,6 +90,8 @@ ew.face[0] = {
                     ew.UI.btn.ntfy(1, 1, 0, "_bar", 6, "LINK", "ADDED", 0, 15, false, false, false);
                     state.selP = 0;
                     launcher.link(this.quicklink, apps[idx]);
+                    launcher.init();
+                    this.init();  
                 } else {
                     launcher.goID(idx);
                 }
@@ -101,6 +110,7 @@ ew.face[0] = {
     },
 
     bar: function() {
+        if (ew.UI.ntid) return;
         ew.is.bar = 0;
         ew.UI.c.start(0, 1);
         ew.UI.ele.fill("_bar", 6, 0);
@@ -111,14 +121,10 @@ ew.face[0] = {
         for (let i = 0; i < 3; i++) {
             let pos = i + 1;
             let link = links[positions[i]];
-            
+            //print("link",link)
             if (link) {
-                let app = ew.apps.launcher.getA(link.id, link.type);
-                if (app && app.icon) {
-                    ew.UI.btn.img("bar", "_bar", pos, app.icon, "", 15, 4, 1.1, 0, 1);
-                } else {
-                    ew.UI.btn.c2l("bar", "_bar", pos, link.name, "", 15, 4, 0.8);
-                }
+                ew.UI.btn.img("bar", "_bar", pos, link.icon, "", 15, 4, 1.1, 0, 1);
+
             } else {
                 ew.UI.ele.coord("bar", "_bar", pos);
             }
@@ -141,6 +147,8 @@ ew.face[0] = {
                     if (link) {
                         ew.UI.btn.ntfy(1, 1, 0, "_bar", 6, "LINK", "REMOVED", 0, 15, false, false, false);
                         ew.apps.launcher.link(position);
+                        ew.apps.launcher.init();
+                        this.init();
                     } else {
                         ew.UI.btn.ntfy(1, 1, 0, "_bar", 6, "SELECT", "APP", 0, 15, false, false, false);
                         ew.apps.launcher.state.selP = 1;

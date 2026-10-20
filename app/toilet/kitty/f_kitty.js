@@ -118,7 +118,7 @@ ew.face[0] = {
 
 	},
 	bar: function(page) {
-		if (ew.is.UIpri) { ew.notify.alert("error",ew.notify.log.error[0], 1, 1);return;}
+		//if (ew.is.UIpri) { ew.notify.alert("error",ew.notify.log.error[0], 1, 1);return;}
 		if (ew.UI.ntid) return;
 		this.barL = 1;
 		ew.is.bar = 0;
@@ -133,18 +133,22 @@ ew.face[0] = {
 			ew.sys.buzz.nav(ew.sys.buzz.type.ok);
 			if (i == 4) {
 				if (l) {
-					if (ew.logger.kitty.getStats("activity").length == 0) ew.notify.alert("info", { body: "", title: "NO ACTIVITY YET" }, 0, 0);
+					if (ew.logger.kitty.getStats("activity").length == 0) 
+                    	ew.UI.btn.ntfy(1, 1.5, 0, "_bar", 6, "NO ACTIVITY YET", "", 0, 15, false, false, false);
+
 					else
 						ew.face.go('view_activity', 0, { source: "activity", name: "TODAY", key: "gr", key_2: "sec", key_3: "time", key_4: "clean", lowL: "0", hiL: "10000", style: 1, loop: 0 });
 				}
 				else {
-					if (Object.keys(ew.logger.kitty.getStats("year")).length == 0) ew.notify.alert("info", { body: "", title: "NO LOGS YET" }, 0, 0);
+					if (Object.keys(ew.logger.kitty.getStats("year")).length == 0)
+                    	ew.UI.btn.ntfy(1, 1.5, 0, "_bar", 6, "NO LOGS YET", "", 0, 15, false, false, false);
 					else
 						ew.face.go('view_cycles', 0, { source: "month", style: 1, loop: 1 });
 				}
 			}
 			else if (i == 5) {
-				if (!ew.logger.battery) ew.notify.alert("info", { body: "NOT INSTALLED", title: "BATTERY LOGGER" }, 0, 0);
+				if (!ew.logger.battery) 
+                    ew.UI.btn.ntfy(1, 1.5, 0, "_bar", 6, "BATTERY LOGGER",  "NOT INSTALLED", 0, 15, false, false, false);
 				else ew.face.go('view_battery', 0, { style: 1, loop: 1 });
 			}
 		};
@@ -358,7 +362,7 @@ ew.face[0] = {
 	tid: -1,
 	run: false,
 	clear: function() {
-		ew.is.bar = 0; /*TC.removeAllListeners();*/
+		ew.is.slide = 0; /*TC.removeAllListeners();*/
 		if (this.tid) clearTimeout(this.tid);
 		this.tid = 0;
 		if (ew.face[0].timer) {

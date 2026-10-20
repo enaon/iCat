@@ -24,17 +24,28 @@ ew.sys.cPin = {
 if (process.env.BOARD != "BANGLEJS2")
 	ew.sys.cPin.start();
 else{
-	Bangle.on('charging', function(charging) {
+	Bangle.on('charging', function(charger) {
 		//print(charging);
-		ew.is.ondc=charging;
-		let s={state:charging};
+		let s={};
+		let r=D25.read();
+		if(charger) {
+			s.state=r?false:true;
+			s.full=r;
+		}else{
+			s.state=false;
+			s.full=false;
+		}
+		ew.is.ondc=s.state;
 		ew.sys.emit('charge', s);
+		let hexString = ("0x" + (0x50000700 + (D25 * 4)).toString(16));
+		poke32(hexString, 2);
+		
 	});
 }
 
 if (process.env.BOARD == "DSD6") {
 	ew.sys.on('charge', (s) => {
-		"ram";
+		//"ram";
 		ew.is.chargeTick++;
 		if (ew.tid.chargeDelay) clearTimeout(ew.tid.chargeDelay);
 		ew.tid.chargeDelay = setTimeout((s) => {
@@ -49,9 +60,12 @@ if (process.env.BOARD == "DSD6") {
 }
 else {
 	ew.sys.on('charge', (s) => {
-	    ew.sys.buzz.nav(s.state?200:[100, 80, 100]);
-	    ew.UI.ele.fill("_bar",6,0)
-	    ew.UI.btn.ntfy(1, 0, 0, "_bar", 6, s.state?"CHARGING ON":"CHARGING OFF", ew.sys.batt(0)+"V", 15, s.state?4:1);
+		//print("s",s);
+	    ew.sys.buzz.sys(s.state?200:[100, 80, 100]);
+		if (ew.face.appCurr==ew.def.face.main ) ew.face[0].init();
+	    ew.UI.ele.fill("_bar",6,0);
+		ew.UI.btn.ntfy(1, 4, 0, "_bar", 6, s.full?"FULL":s.state?"CHARGING ON":"CHARGING OFF", s.full?"BATTERY":ew.sys.batt(0)+"V",  s.full?0:15, s.full?15:s.state?4:13);
 	});
 
 }
+

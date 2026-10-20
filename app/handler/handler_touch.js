@@ -1,7 +1,7 @@
 var i2c = new I2C();
 i2c.setup({ scl: ew.pin.i2c.SCL, sda: ew.pin.i2c.SDA, bitrate: 100000 });
 
-if (process.env.BOARD === "BANGLEJS2") 
+if (process.env.BOARD === "BANGLEJS2" || ew.def.dev.touchtype == "b2") 
 	eval(require('Storage').read('ew_handler_touch_b2'));
 else {
 	if (ew.def.dev.touchtype != "816" && ew.def.dev.touchtype != "716") {
@@ -12,6 +12,7 @@ else {
 	if (ew.def.dev.touchtype == "816") //816
 		eval(require('Storage').read('ew_handler_touch_816'));
 	else
-		eval(require('Storage').read('ew_handler_touch_716'));
+		eval(require('Storage').read('ew_handler_touch_b2'));
+		//eval(require('Storage').read('ew_handler_touch_716'));
 }
 

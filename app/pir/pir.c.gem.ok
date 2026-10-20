@@ -1,0 +1,127 @@
+const PIN_OUT = D24;   // Data (P0.24)
+const PIN_PWR = D32;   // Power (P1.00)
+
+var c = E.compiledC(`
+// void initPIR()
+// int readPIRForced19Bit()
+
+volatile unsigned int *P0_OUTSET     = (volatile unsigned int *)0x50000508UL;
+volatile unsigned int *P0_OUTCLR     = (volatile unsigned int *)0x5000050CUL;
+volatile unsigned int *P0_IN         = (volatile unsigned int *)0x50000510UL;
+volatile unsigned int *P0_PIN_CNF_24 = (volatile unsigned int *)0x50000760UL;
+
+volatile unsigned int *P1_OUTSET     = (volatile unsigned int *)0x50000808UL;
+volatile unsigned int *P1_PIN_CNF_0  = (volatile unsigned int *)0x50000A00UL;
+
+// Ακριβές Delay ~5 μs στα 64MHz του nRF52840
+void delay_5us() {
+    for (volatile int i = 0; i < 48; i++) {
+        __asm("nop");
+    }
+}
+
+// Ακριβές Delay ~111 μs για το Master Trigger Signal
+void delay_111us() {
+    for (volatile int i = 0; i < 1100; i++) {
+        __asm("nop");
+    }
+}
+
+void initPIR() {
+    *P1_PIN_CNF_0 = 1;       // P1.00 ως Output
+    *P1_OUTSET = (1U << 0);  // Τροφοδοσία HIGH
+    
+    // Αρχική κατάσταση γραμμής: Output LOW
+    *P0_PIN_CNF_24 = 1;
+    *P0_OUTCLR = (1U << 24);
+}
+
+int readPIRForced19Bit() {
+    unsigned int value = 0;
+
+    // --- ΒΗΜΑ ❶ & ❷: ΠΡΟΚΛΗΣΗ / ΑΝΑΓΚΑΣΜΟΣ (MASTER TRIGGER) ---
+    *P0_PIN_CNF_24 = 1;       // Output Mode
+    *P0_OUTCLR = (1U << 24);  // Διασφάλιση LOW
+    __asm("nop"); __asm("nop");
+    *P0_OUTSET = (1U << 24);  // Low-to-High Transition
+    delay_111us();            // Κράτημα HIGH για 111 μs για εξαναγκασμό του PIR
+
+    // --- ΒΗΜΑΤΑ ❸ έως ❽: CLOCKING & SAMPLING (19 BITS) ---
+    for (unsigned char i = 0; i < 19; i++) {
+        
+        // ❸: Pull DOCI low για 5 μs
+        *P0_PIN_CNF_24 = 1;       // Output Mode
+        *P0_OUTCLR = (1U << 24);  // Drive LOW
+        delay_5us();
+
+        // ❹: Rising Edge (HIGH) για 5 μs
+        *P0_OUTSET = (1U << 24);  // Drive HIGH
+        delay_5us();
+
+        // ❺ & ❻: Γύρισμα σε INPUT για δειγματοληψία
+        *P0_PIN_CNF_24 = (0 << 0) | (0 << 2); // Input Mode, No Pull
+        delay_5us();              // Χρόνος στον αισθητήρα να επιβάλει το bit (DOCI)
+
+        // Ανάγνωση του Bit
+        value <<= 1;
+        if ((*P0_IN >> 24) & 1) {
+            value |= 1;
+        }
+    }
+
+    // --- ΒΗΜΑ ❾: ΟΛΟΚΛΗΡΩΣΗ & ΚΛΕΙΣΙΜΟ ΚΥΚΛΟΥ ---
+    *P0_PIN_CNF_24 = 1;       // Επαναφορά σε Output Mode
+    *P0_OUTCLR = (1U << 24);  // Force LOW για να γίνει το εσωτερικό update του PIR
+    
+    // Κράτημα LOW για ~10 μs (υπερκαλύπτει τους 64 κύκλους του αισθητήρα)
+    for (volatile int d = 0; d < 150; d++) {
+        __asm("nop");
+    }
+
+    // Αφήνουμε τη γραμμή σε Output LOW ώστε να είναι έτοιμη για το επόμενο Low-to-High Transition
+    *P0_OUTCLR = (1U << 24);
+
+    // --- ΕΠΕΞΕΡΓΑΣΙΑ ΔΕΔΟΜΕΝΩΝ (19 BITS) ---
+    // Shift δεξιά κατά 1 bit για να πετάξουμε το tail bit
+    value = (value >> 1);
+    
+    // Απομόνωση των 16 bits δεδομένων
+    value &= 0xFFFF; 
+
+    return (int)value;
+}
+`);
+
+function startPIRForcedStream() {
+  c.initPIR();
+  console.log("Αναμονή 4 δευτερολέπτων για σταθεροποίηση...");
+  
+  setTimeout(function() {
+    console.log("Έναρξη ασταμάτητου stream με τη μέθοδο του αναγκασμού (Κάθε 200ms):");
+    
+    setInterval(function() {
+      try {
+        var rawVal = c.readPIRForced19Bit();
+        
+        // Μετατροπή των 16-bit δεδομένων σε signed short (High-Pass Filter Output)
+        var signedVal = (rawVal > 32767) ? rawVal - 65536 : rawVal;
+
+        // Σχεδίαση μπάρας με βάση την απόλυτη τιμή (ένταση κίνησης)
+        var absVal = Math.abs(signedVal);
+        var barLength = Math.floor((absVal / 2500) * 40); 
+        if(barLength > 40) barLength = 40;
+        var bar = "=".repeat(barLength) + " ".repeat(40 - barLength);
+        
+        console.log("Filter Value: " + signedVal + " [" + bar + "]");
+        
+      } catch(e) {
+        console.log("Error: ", e);
+      }
+    }, 200); // Δειγματοληψία κάθε 200ms με απόλυτη ασφάλεια
+  }, 4000);
+}
+
+startPIRForcedStream();
+
+
+

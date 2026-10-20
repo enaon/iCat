@@ -13,11 +13,9 @@ if (process.env.BOARD == "DSD6") {
 		else return Number(v.toFixed(2));
 	};
 }
-
-
-if (process.env.BOARD == "NANO") {
+else  if (process.env.BOARD == "NANO") {
 	ew.sys.batt = function(i, c) {
-		let l = 3.00,
+		let l = 3.30,
 			h = 4.15;
 		let v = E.getVDDH();
 		let per = (100 * (v - l) / (h - l) | 0);
@@ -48,12 +46,15 @@ else {
 	ew.sys.batt = function(i, c) {
 		let l = 3.55, h = 4.15, v=0;
 		if (process.env.SERIAL === "27f646e3-bf692765") {
+			h = 3.95;
+			l= 3.6;
 			//E.getAnalogVRef();
     		//v=E.getVDDH()-1.55;
 			//analogRead(D4);
 			//v=E.getVDDH()+2.5;
 			analogRead(D3);
-			v=E.getVDDH()-1.75;
+			analogRead(D3);
+			v=E.getVDDH()-2;
 			//setTimeout(()=>{ew.is.batt = E.getVDDH();},100);
 		}
 		else {
@@ -91,5 +92,19 @@ else {
 		else return +v.toFixed(2);
 	};
 	ew.sys.on('hour', function() { ew.sys.batt("info"); });
-
+		
+	if (process.env.SERIAL === "27f646e3-bf692765")
+	E.getBattery = ew.sys.batt.bind(null, 1);
 }
+
+
+/*
+E.getBattery = function() {
+  let l = 3.55, h = 4.15, v=0;
+	analogRead(D3);
+  analogRead(D3);
+	v=E.getVDDH()-2;
+  return(100 * (v - l) / (h - l) | 0);
+};
+
+*/

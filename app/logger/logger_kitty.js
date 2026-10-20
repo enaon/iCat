@@ -53,7 +53,7 @@ function loadStats() {
 function saveStats(i) {
   var year = Date().getFullYear().toString();
   if (year === "1970") {
-      ew.notify.alert("error", { body: "DATE IS 1970", title: "LOGGER ERROR" }, 1, 1);
+      ew.notify.alert("error", { src: "kitty", title: "Logger Error",body: "Date is 1970", }, 1, 1);
       return;
   }
 
@@ -98,7 +98,7 @@ function logUsage(type, data) {
   var month = now.getMonth() + 1;
   
   if (year === "1970") {
-      ew.notify.alert("error", { body: "DATE IS 1970", title: "LOGGER ERROR" }, 1, 1);
+      ew.notify.alert("error", { src: "kitty", title: "Logger Error",body: "Date is 1970", }, 1, 1);
       return;
   }
 

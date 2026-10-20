@@ -31,7 +31,7 @@ ew.face[0] = {
 		}, 500, this);
 	},
 	bar: function() {
-		if (ew.is.UIpri) { ew.notify.alert("error",ew.notify.log.error[0], 1, 1);return;}
+		//if (ew.is.UIpri) { ew.notify.alert("error",ew.notify.log.error[0], 1, 1);return;}
 		ew.is.bar = 0;
 		ew.UI.c.start(1, 1);
 		ew.UI.btn.c2l("bar","_bar",4,"SET","FULL",15,6);
@@ -79,7 +79,7 @@ ew.face[0] = {
 	tid: -1,
 	run: false,
 	clear: function() {
-		ew.is.bar = 0; /*TC.removeAllListeners();*/
+		ew.is.slide = 0; /*TC.removeAllListeners();*/
 		if (this.tid) clearTimeout(this.tid);
 		this.tid = 0;
 		return true;

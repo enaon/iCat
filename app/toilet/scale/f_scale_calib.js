@@ -30,7 +30,7 @@ ew.face[0] = {
 				ew.sys.buzz.nav(ew.sys.buzz.type.ok);
 				ew.UI.btn.ntfy(1, 3, 0, "_bar", 6, "SET", "WEIGHT *1000", 15, 6, 1);
 				ew.is.slide = 1;
-				ew.sys.TC.val = { cur: 1, dn: 3, up: 9, tmp: 0 };
+				ew.sys.TC.val = { cur: 1, dn: 3, up: 9};
 				ew.UI.c.tcBar = (a, b) => {
 					ew.UI.btn.ntfy(0, 3, 1);
 					ew.face[0].calibrate=a*1000+ew.face[0].calibrate;
@@ -43,7 +43,7 @@ ew.face[0] = {
 				ew.sys.buzz.nav(ew.sys.buzz.type.ok);
 				ew.UI.btn.ntfy(1, 3, 0, "_bar", 6, "SET", "WEIGHT *100", 15, 6, 1);
 				ew.is.slide = 1;
-				ew.sys.TC.val = { cur: 1, dn: 0, up: 99, tmp: 0 };
+				ew.sys.TC.val = { cur: 1, dn: 0, up: 99 };
 				ew.UI.c.tcBar = (a, b) => {
 					ew.UI.btn.ntfy(0, 3, 1);
 					ew.face[0].calibrate=ew.face[0].calibrate+(a*100);
@@ -56,7 +56,7 @@ ew.face[0] = {
 				ew.sys.buzz.nav(ew.sys.buzz.type.ok);
 				ew.UI.btn.ntfy(1, 3, 0, "_bar", 6, "SET", "WEIGHT *10", 15, 6, 1);
 				ew.is.slide = 1;
-				ew.sys.TC.val = { cur: 1, dn: 0, up: 99, tmp: 0 };
+				ew.sys.TC.val = { cur: 1, dn: 0, up: 99 };
 				ew.UI.c.tcBar = (a, b) => {
 					ew.UI.btn.ntfy(0, 3, 1);
 					ew.face[0].calibrate=ew.face[0].calibrate+(a*10);
@@ -78,7 +78,7 @@ ew.face[0] = {
 		}, 500, this);
 	},
 	bar: function() {
-		if (ew.is.UIpri) { ew.notify.alert("error",ew.notify.log.error[0], 1, 1);return;}
+		//if (ew.is.UIpri) { ew.notify.alert("error",ew.notify.log.error[0], 1, 1);return;}
 		ew.is.bar = 0;
 		ew.UI.c.start(0, 1);
 		ew.UI.btn.c2l("bar", "_bar", 4, "NOB","", 15, 6, 1.5);
@@ -101,7 +101,7 @@ ew.face[0] = {
 	tid: -1,
 	run: false,
 	clear: function() {
-		ew.is.bar = 0; /*TC.removeAllListeners();*/
+		ew.is.slide = 0; /*TC.removeAllListeners();*/
 		if (this.tid) clearTimeout(this.tid);
 		this.tid = 0;
 		ew.apps.scale.init();

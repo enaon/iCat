@@ -47,7 +47,7 @@ ew.face[0] = {
 		}, 250, this);
 	},
 	bar: function() {
-		if (ew.is.UIpri) { ew.notify.alert("error",ew.notify.log.error[0], 1, 1);return;}
+		//if (ew.is.UIpri) { ew.notify.alert("error",ew.notify.log.error[0], 1, 1);return;}
 		ew.is.bar = 0;
 		ew.UI.ele.fill("_bar", 6, 0);
 		this.ele.tare();
@@ -94,7 +94,7 @@ ew.face[0] = {
 	tid: -1,
 	run: false,
 	clear: function() {
-		ew.is.bar = 0; /*TC.removeAllListeners();*/
+		ew.is.slide = 0; /*TC.removeAllListeners();*/
 		if (this.tid) clearTimeout(this.tid);
 		this.tid = 0;
 		ew.apps.scale.state.is.bypass=0;

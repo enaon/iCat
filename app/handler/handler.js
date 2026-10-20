@@ -1,11 +1,16 @@
 //handler
 
 if (process.env.BOARD === "NANO" ){
+    if (require('Storage').read("ew_handler_buzzer")) eval(require('Storage').read("ew_handler_buzzer"));    
     if (require('Storage').read("ew_handler_set")) eval(require('Storage').read("ew_handler_set"));
-    if (require('Storage').read("ew_handler_batt")) eval(require('Storage').read("ew_handler_batt"));     
+    if (require('Storage').read("ew_handler_batt")) eval(require('Storage').read("ew_handler_batt"));
+    if (require('Storage').read("ew_handler_sound")) eval(require('Storage').read("ew_handler_sound"));     
     if (require('Storage').read("ew_handler_comms")) eval(require('Storage').read("ew_handler_comms"));
+    if (require('Storage').read("ew_handler_notify")) eval(require('Storage').read("ew_handler_notify"));
+    
 }
 else if (process.env.BOARD === "DSD6") {
+    if (require('Storage').read("ew_handler_buzzer")) eval(require('Storage').read("ew_handler_buzzer"));
     if (require('Storage').read("ew_handler_set")) eval(require('Storage').read("ew_handler_set"));
     if (require('Storage').read("ew_handler_batt")) eval(require('Storage').read("ew_handler_batt"));     
     if (require('Storage').read("ew_handler_comms")) eval(require('Storage').read("ew_handler_comms"));
@@ -19,6 +24,7 @@ else {
     if (require('Storage').read("ew_handler_notify")) eval(require('Storage').read("ew_handler_notify"));
     if (require('Storage').read("ew_handler_face")) eval(require('Storage').read("ew_handler_face"));
     //if (require('Storage').read("ew_handler_cron")) eval(require('Storage').read("ew_handler_cron"));
+    if (require('Storage').read("ew_handler_buzzer")) eval(require('Storage').read("ew_handler_buzzer"));    
     if (require('Storage').read("ew_handler_set")) eval(require('Storage').read("ew_handler_set"));
     if (require('Storage').read("ew_handler_batt")) eval(require('Storage').read("ew_handler_batt"));     
     if (require('Storage').read("ew_handler_comms")) eval(require('Storage').read("ew_handler_comms"));

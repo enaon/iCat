@@ -42,7 +42,7 @@ ew.face[0] = {
 
         ew.is.bar = 0;
         ew.UI.ele.fill("_bar", 6, 0);
-        ew.UI.btn.img("main", "_main", 9, "scan", "WAIT", 15, 1, 3);
+        ew.UI.btn.img("main", "_main", 9, "ew_i_scan.img", "WAIT", 15, 1, 1.5);
         ew.UI.btn.c2l("main", "_header", 6, "SCANNING", "", 15, 0, 1.2, 1);
 
         ew.UI.ele.ind(0, 0, 1, 1);
@@ -191,7 +191,7 @@ ew.face[0] = {
 
     },
     bar: function() {
-        if (ew.is.UIpri) { ew.notify.alert("error", ew.notify.log.error[0], 1, 1); return; }
+        //if (ew.is.UIpri) { ew.notify.alert("error", ew.notify.log.error[0], 1, 1); return; }
 
         // reset UI control, bar only
         ew.UI.c.start(0, 1);

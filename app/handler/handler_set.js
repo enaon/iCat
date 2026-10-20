@@ -6,12 +6,12 @@ ew.sys.cron = {
 	event: {
 		//date:()=>{ setTimeout(() =>{ ew.sys.emit('dateChange',Date().getDate());ew.sys.cron.event.date();},(Date(Date().getFullYear(),Date().getMonth(),Date().getDate()+1)-Date()));},
 		hour: () => {
-			const nextHour=3600000 - (Date.now() % 3600000);
+			const nextHour = 3600000 - (Date.now() % 3600000);
 			setTimeout(() => {
 				ew.sys.emit('hour', new Date().getHours());
 				if (ew.dbg) console.log("ew: cron emits hourly event");
 				ew.sys.cron.event.hour();
-			},nextHour);
+			}, nextHour);
 		},
 		/*min: ()=>{
 			const nextMin = 60000 - (Date.now() % 60000);
@@ -40,12 +40,13 @@ ew.sys.cron.event.hour();
 // === handle settings ===
 
 ew.sys.updt = function(i) {
- 	if (i) {
-		i = Number(i); 
-		setTimeout(function(){
+	if (i) {
+		i = Number(i);
+		NRF.sleep();
+		setTimeout(function() {
 			E.reboot();
-		}, i+2000);
-		
+		}, i + 2000);
+
 	}
 	//save apps def state
 	if (global.ew) {
@@ -81,12 +82,14 @@ ew.sys.reset = function(c) {
 			"rfTX": 0,
 			"intA": 1500,
 			"intC": "auto",
-			"mtu" :100,
+			"mtu": 100,
 			"pair": 0,
-			"code":"123456",
+			"code": "123456",
+			"act": [0, 0, 0, 0, 0, 0, 0, 0],
+			"ewtag": 0
 		},
 		"face": {
-			"main":"clock",
+			"main": "clock",
 			"info": 1,
 			"buzz": 1,
 			"scrn": 1,
@@ -96,9 +99,9 @@ ew.sys.reset = function(c) {
 			"bri": 7,
 			"off": {},
 			"bpp": 4,
-			"left":"itag",
-			"rght":"timer",
-			"btnL":"torch"
+			"left": "itag",
+			"rght": "timer",
+			"btnL": "torch"
 		},
 		"time": {
 			"hr24": 1,
@@ -108,15 +111,15 @@ ew.sys.reset = function(c) {
 			"touchtype": "0",
 			"acctype": "0",
 			"acc": 1,
-			"tilt":1, //0|1
+			"tilt": 1, //0|1
 			"tap": 2, //0|2
 			"firm": process.env.VERSION,
 			"board": process.env.BOARD
 		},
 		"name": "new",
 		"role": ["watch"],
-		"noWd":0, // -- no watchDog --
-		"frce":0 // -- force name update --
+		"noWd": 0, // -- no watchDog --
+		"frce": 0 // -- force name update --
 	};
 
 	require('Storage').erase('ERROR');
@@ -141,30 +144,27 @@ if (!ew.def || ew.def.name == "eucLight") {
 }
 
 
-ew.is.bt= 0;
-ew.is.ondc= 0;
-ew.is.btsl= 0;
-ew.is.boot= getTime();
-ew.is.lowBattery= 0;
-if (!ew.def.face.main) ew.def.face.main="clock";
+ew.is.bt = 0;
+ew.is.ondc = 0;
+ew.is.btsl = 0;
+ew.is.boot = getTime();
+ew.is.lowBattery = 0;
+if (!ew.def.face.main) ew.def.face.main = "clock";
+ew.def.dev.firm=process.env.VERSION;
+ew.def.bt.addr = NRF.getAddress();
 
-
-// ---- buzzer ----
+/*// ---- buzzer ----
 
 ew.sys.buzz = {};
 
-//if (process.env.BOARD == "MAGIC3" || process.env.BOARD == "Magic3" || process.env.BOARD == "ROCK")
-ew.sys.buzz.type = { na: [15, 15, 15], ok: 15, ln: 80, error: [50, 25, 50, 25, 50], alert: [100, 50, 50, 50, 100], on: 40, off: [20, 25, 20] };
-//else
-//	ew.sys.buzz.type = { ok: [20, 40, 20], na: 15, ln: 80, error: [50, 25, 50, 25, 50], on: 40, off: [20, 25, 20] };
+ew.sys.buzz.type = { na: [15, 15, 15], ok: 15, ln: 80, info: [75, 50, 75, 50, 75], error: [100, 50, 75, 50, 100, 200, 100, 200, 100], on: 40, off: [20, 25, 20] };
 
-//buz={ok:[20,40,20],na:25,ln:80,on:40,off:[20,25,20]};
-ew.sys.buzz.sys = digitalPulse.bind(null, ew.pin.BUZZ, ew.pin.BUZ0);
+//digitalPulse.bind(null, ew.pin.BUZZ, ew.pin.BUZ0);
 ew.sys.buzz.alrm = digitalPulse.bind(null, ew.pin.BUZZ, ew.pin.BUZ0);
 ew.sys.buzz.euc = digitalPulse.bind(null, ew.pin.BUZZ, ew.pin.BUZ0);
 if (ew.def.face.buzz) ew.sys.buzz.nav = digitalPulse.bind(null, ew.pin.BUZZ, ew.pin.BUZ0);
 else ew.sys.buzz.nav = function() { return true; };
-
+*/
 
 // ----  sleep ----
 
@@ -185,7 +185,7 @@ ew.sys.reboot = function() {
 	setTimeout(() => {
 		g.clear();
 		g.flip();
-		if (process.env.BOARD == "BANGLEJS2") E.reboot();
+		if (process.env.BOARD == "BANGLEJS2") Bangle.showClock();
 		else reset();
 	}, 1000);
 };
@@ -216,7 +216,7 @@ ew.sys.fileWrite = function(file, name, value, value2, value3) {
 	return true;
 };
 
-if (!ew.def.bt.addr) ew.def.bt.addr = NRF.getAddress();
+
 //
 //E.setTimeZone(ew.def.timezone);
 E.setDST(60, 120, 4, 0, 2, 0, 180, 4, 0, 9, 0, 240); //Greece-Athens- we have a time which is 2 hours ahead of GMT in winter (EET) and 3 hours in summer (EEST)
@@ -228,16 +228,17 @@ if (ew.def.face.size && ew.UI) {
 }
 
 // ---- auto save defaults ----
-ew.sys.on('hour', function(x){
-    if (x === 0  ) {
-    	if ( ew.sys.batt(1) < 25) {
-    		if (ew.UI) ew.UI.btn.ntfy(1, 2, 0, "_bar", 6, "AUTO SAVE", "LOW BAT", 15, 13);
-    	}else{
-	        setTimeout(()=>{
-	        	ew.sys.updt();
-	        },120000);
-    	}
+ew.sys.on('hour', function(x) {
+	if (x === 23) {
+		if (ew.sys.batt(1) < 25) {
+			if (ew.UI) ew.UI.btn.ntfy(1, 2, 0, "_bar", 6, "AUTO SAVE", "LOW BAT", 15, 13);
+		}
+		else {
+			setTimeout(() => {
+				ew.sys.updt();
+			}, 120000);
+		}
 	}
-	if (ew.def.time.hour) ew.sys.buzz.nav([100,500,100]);
-		
+	if (ew.def.time.hour) ew.sys.buzz.sys([100, 500, 100]);
+
 });

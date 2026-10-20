@@ -73,7 +73,7 @@ ew.face[0] = {
                 ew.sys.buzz.nav(ew.sys.buzz.type.ok);
                 ew.UI.btn.ntfy(1, 3, 0, "_bar", 6, "AUTO CLEAN", "DELAY (MINUTES)", 15, 6, 1);
                 ew.is.slide = 1;
-                ew.sys.TC.val = { cur: ew.apps.kitty.state.def.auto.delay, dn: 1, up: 20, tmp: 0 };
+                ew.sys.TC.val = { cur: ew.apps.kitty.state.def.auto.delay, dn: 1, up: 20 };
                 ew.UI.c.tcBar = (a, b) => {
                     ew.UI.btn.ntfy(0, 2, 1);
                     ew.UI.btn.c2l("main", "_2x3", 4, "DELAY", b, 15, (ew.apps.kitty.state.def.auto.clean) ? 6 : 1); //6
@@ -84,7 +84,7 @@ ew.face[0] = {
                 ew.sys.buzz.nav(ew.sys.buzz.type.ok);
                 ew.UI.btn.ntfy(1, 3, 0, "_bar", 6, "SET SPEED", ew.apps.kitty.state.def.sand[ew.apps.kitty.state.def.is.sandType].name.toUpperCase(), 15, 6, 1);
                 ew.is.slide = 1;
-                ew.sys.TC.val = { cur: (19 - (ew.apps.kitty.state.def.sand[ew.apps.kitty.state.def.is.sandType].speed * 10)), dn: 1, up: 9, tmp: 0 };
+                ew.sys.TC.val = { cur: (19 - (ew.apps.kitty.state.def.sand[ew.apps.kitty.state.def.is.sandType].speed * 10)), dn: 1, up: 9 };
                 ew.UI.c.tcBar = (a, b) => {
                     ew.UI.btn.ntfy(0, 2, 1);
                     ew.UI.btn.c2l("main", "_2x3", 5, "SPEED", b, 15, 6); //5
@@ -165,7 +165,7 @@ ew.face[0] = {
                 ew.sys.buzz.nav(ew.sys.buzz.type.ok);
                 ew.UI.btn.ntfy(1, 3, 0, "_bar", 6, "BALL", "CALIBRATION", 15, 6, 1);
                 ew.is.slide = 1;
-                ew.sys.TC.val = { cur: -ew.apps.kitty.state.def.is.clb * 100, dn: 0, up: 9, tmp: 0 };
+                ew.sys.TC.val = { cur: -ew.apps.kitty.state.def.is.clb * 100, dn: 0, up: 9 };
                 ew.UI.c.tcBar = (a, b) => {
                     ew.UI.btn.ntfy(0, 2, 1);
                     ew.UI.btn.c2l("main", "_2x3", 2, "CLB", E.toJS(b), 15, 6);
@@ -211,7 +211,7 @@ ew.face[0] = {
         };
     },
     bar: function() {
-        ew.is.bar = 0;
+        ew.is.slide = 0;
         ew.UI.c.start(0, 1);
         ew.UI.c.end();
         ew.UI.ele.fill("_bar", 6, 0);

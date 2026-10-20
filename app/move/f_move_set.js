@@ -78,15 +78,6 @@ ew.face[0] = {
                     ew.UI.btn.c2l("main", "_2x3", 2, "BTM", ew.apps.move.state.def.btmL, 15, 6);
                 };
             }
-            else if (i == 4) {
-                ew.sys.buzz.nav(ew.sys.buzz.type.ok);
-                if (ew.def.time.hour === undefined) ew.def.time.hour = 0;
-                ew.def.time.hour = 1 - ew.def.time.hour;
-                if (ew.def.face.info) ew.UI.btn.ntfy(1, 1.5, 0, "_bar", 6, "HOURLY BUZZ", ew.def.time.hour ? "ENABLED" : "DISABLED", 0, 15);
-                ew.UI.btn.c2l("main", "_2x3", 4, "BUZZ", ew.def.time.hour ? "ON" : "OFF", 15, ew.def.time.hour ? 4 : 1);
-            }
-
-
 
         };
     },

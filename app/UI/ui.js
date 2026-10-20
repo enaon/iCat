@@ -84,11 +84,11 @@ Graphics.prototype.setFontDylex7x13 = function() {
 ew.UI = {
 	//size: { _2x2: 20, _2x1: 25, _txt: 26, _sideSmall: 20, sideBig: 45, underSmall: 20, txt: 0.85, len: 1, sca: 1 },
 	size: { _2x2: 20, _2x1: 25, _txt: 26, t1: 10, t2: 35, t3: 42, txt: 0.85, len: 1, sca: 1 },
-	pos: { //raw X colomn
-		_2x1: [28, [120],
-			[77, 153],
-			[200],
-			[60, 60]
+	pos: { 
+		_2x1: [28, [120], // X center 
+			[77, 153], // Y center 
+			[200], // X width
+			[60, 60] // Y height
 		],
 		_2x2: [27, [60, 180],
 			[80, 200],
@@ -104,7 +104,7 @@ ew.UI = {
 		_3x1: [25, [120],
 			[40, 100, 160],
 			[240],
-			[60, 60,60]	
+			[60, 60, 60]
 		],
 		_kp4x3: [35, [40, 120, 200],
 			[50, 110, 170, 230],
@@ -112,16 +112,22 @@ ew.UI = {
 			[60, 60, 60, 60]
 		],
 
-		_bar: [23, [40, 120, 200, 60, 180, 120],
+		_bar: [28, [40, 120, 200, 60, 180, 120],
 			[240],
 			[80, 80, 80, 114, 114, 240],
 			[80]
 		],
-		_header: [23, [40, 120, 200, 70, 190, 120],
-			[30],
-			[80, 80, 80, 140, 100, 240],
-			[50]
+		_header: [23, [40, 120, 200, 70, 160, 120],
+			[27],
+			[80, 80, 80, 140, 160, 240],
+			[55]
 		],
+		
+		/*_header: [19, [25, 88, 145, 58, 113, 88],
+			[14],
+			[50, 60, 60, 120, 126, 176],
+			[28]
+		],*/
 		_main: [25, [60, 180, 120],
 			[110, 180, 125, 103, 110],
 			[120, 120, 240],
@@ -154,7 +160,7 @@ ew.UI = {
 	btn: {
 		size: { _xs: 28, _s: 22, _m: 28, _l: 35, _xl: 45, txt: 1, len: 1 },
 
-		cInd: function(loc, no, po, val, txt, fclr, bclr, size) {
+		cInd: function(loc, no, po, val, txt, fclr, bclr, size, offset, font, round, ) {
 			const p = (ew.UI.pos[no]);
 			const ln = p[1].length;
 			const x = p[1][(po - 1) % ln];
@@ -162,7 +168,7 @@ ew.UI = {
 			const szX = p[3][(po - 1) % ln] / 2;
 			const szY = p[4][((po - 1) / ln) | 0] / 2;
 			g.setCol(0, bclr);
-			g.fillRect({ x: x - szX, y: y - szY, x2: x + szX, y2: y + szY, r: 10 });
+			g.fillRect({ x: x - szX, y: y - szY, x2: x + szX, y2: y + szY, r: (round ? round : 10) });
 			g.setCol(1, fclr);
 			if (txt && ew.def.face.txt) {
 				if (process.env.BOARD == "BANGLEJS2") g.setFont("Teletext10x18Ascii");
@@ -180,6 +186,8 @@ ew.UI = {
 			//coordinates
 			if (ew.UI.c.get[loc])
 				ew.UI.c.raw[loc] = ew.UI.c.raw[loc] + `${ew.UI.c.raw[loc]==" "?'':'else '}if (${x}-${szX}<x&&x<${x}+${szX}&&${y}-${szY}<y&&y<${y}+${szY}) ew.UI.c.${loc}.${no}(${po},l);`;
+			else g.flip();
+			
 		},
 
 		i2l: function(loc, no, po, txt1, txt2, fclr, bclr, size) {
@@ -207,6 +215,8 @@ ew.UI = {
 			//coordinates
 			if (ew.UI.c.get[loc])
 				ew.UI.c.raw[loc] = ew.UI.c.raw[loc] + `${ew.UI.c.raw[loc]==" "?'':'else '}if (${x}-${szX}<x&&x<${x}+${szX}&&${y}-${szY}<y&&y<${y}+${szY}) ew.UI.c.${loc}.${no}(${po},l);`;
+			else g.flip();
+			
 		},
 
 		c1l: function(loc, no, po, txt1, txt2, fclr, bclr, size) { //type:main|bar,
@@ -232,7 +242,7 @@ ew.UI = {
 			g.drawString(txt1, x - (g.stringWidth(txt1) / 2), y + 5 - (g.stringMetrics(txt1).height / 2));
 			g.flip();
 		},
-		c2l: function(loc, no, po, txt1, txt2, fclr, bclr, size, offset, font, round) { //type:main|bar,
+		c2l: function(loc, no, po, txt1, txt2, fclr, bclr, size, offset, font, round, alignX, alignY, noDraw) { //type:main|bar,
 			//"ram";
 			//draw
 			const p = (ew.UI.pos[no]);
@@ -244,7 +254,7 @@ ew.UI = {
 
 			g.setCol(0, bclr);
 
-			g.fillRect({ x: x - szX, y: y - szY, x2: x + szX, y2: y + szY, r: (round?round:10) });
+			g.fillRect({ x: x - szX, y: y - szY, x2: x + szX, y2: y + szY, r: (round ? round : 10) });
 
 			g.setCol(1, fclr);
 			if (txt2 && txt2 != "") {
@@ -255,12 +265,10 @@ ew.UI = {
 			}
 			else {
 				if (offset) y = y + offset;
-				if (font) g.setFont(font, size ? size : 1)
+				if (font) g.setFont(font, size ? size : 1);
 				else g.setFont("Vector", p[0] * ew.UI.size.txt * (size ? size : 1));
-				g.setFontAlign(0, 0);
-				//g.drawString(txt1, x - (g.stringWidth(txt1) / 2), y + 2 - (g.stringMetrics(txt1).height / 2));
-				//g.drawString(txt1, x, y + 2 - (g.stringMetrics(txt1).height / 2));
-				g.drawString(txt1, x, y);
+				g.setFontAlign((alignX || 0), (alignY || 0));
+				g.drawString(txt1, (alignX ? (alignX === 1 ? x + szX : x - szX) : x), y);
 				g.setFontAlign(-1, -1);
 
 			}
@@ -269,23 +277,23 @@ ew.UI = {
 			if (ew.UI.c.get[loc])
 				ew.UI.c.raw[loc] = ew.UI.c.raw[loc] + `${ew.UI.c.raw[loc]==" "?'':'else '}if (${x}-${szX}<x&&x<${x}+${szX}&&${y}-${szY}<y&&y<${y}+${szY}) ew.UI.c.${loc}.${no}(${po},l);`;
 
-			else g.flip();
+			else if (!noDraw) g.flip();
 		},
 		img: function(loc, no, po, img, txt, fclr, bclr, size, side, tran) {
 			let bSize = 1;
-			size= size||1;
+			size = size || 1;
 			if (process.env.BOARD == "P8" || process.env.BOARD == "P22" || process.env.BOARD == "PINETIME") img = 0;
 			// Check if it's a Bangle icon (ends with .img)
 			else if (img.endsWith('.img')) {
 				img = require("Storage").read(img);
 				bSize = 1.3;
 			}
-			else if (img.endsWith('.face')) 
+			else if (img.endsWith('.face'))
 				img = require("heatshrink").decompress(atob(ew.face[0].data.img[img.split(".")[0]]));
-			
-			else 
+
+			else
 				img = require("heatshrink").decompress(atob(ew.UI.icon[img]));
-			
+
 			const p = (ew.UI.pos[no]);
 			let len = p[1].length;
 			let x = p[1][(po - 1) % len];
@@ -300,13 +308,13 @@ ew.UI = {
 			let imgW = g.imageMetrics(img).width;
 			let imgH = g.imageMetrics(img).height;
 			if (txt && side) {
-				g.setFont("Vector", p[0] * 1.5 * ew.UI.size.txt * size);
+				g.setFont("Vector", p[0] * ew.UI.size.txt * size);
 				let xa = x - ((imgW + g.stringWidth(txt)) / 2);
 				g.setCol(1, 11);
 				//g.drawImage(img, (xa, y - szY) (imgH / 2)*0.86*size, { scale: ew.UI.size.sca*size });
-				g.drawImage(img, xa, y - ((imgH * ew.UI.size.sca * size) / 2) * 1.3, { scale: ew.UI.size.sca * size });
+				g.drawImage(img, xa, y - ((imgH * ew.UI.size.sca*ew.UI.size.txt*size) / 2) , { scale: ew.UI.size.sca * size });
 				g.setCol(1, fclr);
-				g.drawString(txt, xa + imgW, y - (p[0] * 1.7 * ew.UI.size.txt) / 2 + 2);
+				g.drawString(txt, xa + imgW, y - (p[0] * ew.UI.size.sca*ew.UI.size.txt*size) / 2 );
 			}
 			else if (ew.def.face.txt && txt) {
 				g.drawImage(img, x - (imgW * ew.UI.size.sca * 0.65 / 2), (y - szY) + ((szY * 2) * (2 - ew.UI.size.txt) / 15), { scale: 0.75 * ew.UI.size.sca });
@@ -364,10 +372,8 @@ ew.UI = {
 					ew.is.bar = 1;
 					ew.is.slide = 0;
 
-					//ew.UI.c.raw[loc] = ew.UI.c.raw[loc] + `${ew.UI.c.raw[loc]==" "?'':'else '}if (${x}-${szX}<x&&x<${x}+${szX}&&${y}-${szY}<y&&y<${y}+${szY}) ew.UI.c.${loc}.${no}(${po},l);`;
 					ew.UI.c.raw.bar = `if (x<120&&${y}-${szY}<y&&y<${y}+${szY}) ew.UI.c.bar._ntfy(1); else if (120<x&&${y}-${szY}<y&&y<${y}+${szY}) ew.UI.c.bar._ntfy(2);`;
 					ew.UI.c.xy.replaceWith(new Function("x", "y", "l", '' + ew.UI.c.raw.main + ew.UI.c.raw.bar + ''));
-					//ew.UI.c.xy.replaceWith(new Function("x", "y", "l", 'setTimeout(()=>{' + ew.UI.c.raw.main + ew.UI.c.raw.bar + '},0);'));
 				}
 				else ew.UI.c.bar._ntfy = function() {};
 				g.flip();
@@ -375,16 +381,14 @@ ew.UI = {
 			if (txt1 && ew.face && ew.face[0]) ew.face[0].ntfy = txt1;
 			//if (!sel) g.flip();
 			ew.UI.ntid = setTimeout(function(t) {
-				if (ew.face && ew.face[0])  ew.face[0].ntfy = false;
+				if (ew.face && ew.face[0]) ew.face[0].ntfy = false;
 				ew.UI.rtb();
 			}, tmot ? tmot * 1000 : 1000);
 
 		}
 	},
 	ele: {
-
 		ind: (process.env.BOARD != "BANGLEJS2") ?
-
 			function(c, t, clrB, clrF) {
 				//"ram";
 				let p = ew.UI.pos._ind;
@@ -440,94 +444,12 @@ ew.UI = {
 
 				if (!ew.def.face.bpp) g.flip();
 			},
-
-		/*
-		ind: function(current, total, bgColor, fgColor) {
-			let p = ew.UI.pos._ind;
-
-			// Καθαρισμός
-			g.setCol(0,bgColor !== undefined ? bgColor : 0);
-			g.fillRect(p[4], p[1], p[5], p[3]);
-
-			if (!current) return;
-
-			let startX = p[0];
-			let width = p[2] - p[0];
-			let centerY = p[1] + Math.floor((p[3] - p[1]) / 2);
-
-			// Fast calculation - χωρίς κύκλους, μόνο τετράγωνα με στρογγυλεμένες άκρες
-			let btnWidth = 8;
-			let spacing = 4;
-			let totalWidth = total * btnWidth + (total - 1) * spacing;
-			let startDrawingX = startX + Math.floor((width - totalWidth) / 2);
-
-			// Background dots (fast)
-			g.setCol(0,4);
-			for (let i = 0; i < total; i++) {
-				let x = startDrawingX + i * (btnWidth + spacing);
-				g.fillRect(x, centerY - 3, x + btnWidth, centerY + 3);
-			}
-
-			// Active dot (filled)
-			if (current > 0 && current <= total) {
-				g.setCol(0,fgColor !== undefined ? fgColor : 15);
-				let x = startDrawingX + (current - 1) * (btnWidth + spacing);
-				g.fillRect(x, centerY - 3, x + btnWidth, centerY + 3);
-				// Κάνουμε το active πιο στρογγυλό με μικρές γραμμές
-				g.drawLine(x + 1, centerY - 4, x + btnWidth - 1, centerY - 4);
-				g.drawLine(x + 1, centerY + 4, x + btnWidth - 1, centerY + 4);
-			}
-
-			if (!ew.def.face.bpp) g.flip();
-		},
-		*/
-		/*ind: function(current, total, bgColor, fgColor) {
-		    let p = ew.UI.pos._ind;
-		    
-		    // Καθαρισμός
-		    g.setCol(0,bgColor !== undefined ? bgColor : 0);
-		    g.fillRect(p[4], p[1], p[5], p[3]);
-		    
-		    if (!current) return;
-		    
-		    // Χρησιμοποιούμε fixed size για ταχύτητα
-		    let charWidth = 8;
-		    let centerY = p[1] -5 ; // σταθερό offset
-		    
-		    // Fast positioning με bit operations
-		    let availableWidth = p[2] - p[0];
-		    let dotsWidth = total * charWidth;
-		    let margin = (availableWidth - dotsWidth) >> 1;
-		    let startX = p[0] + (margin > 0 ? margin : 0);
-		    
-		    g.setFont("Dylex7x13"); // Το πιο γρήγορο font
-		    
-		    // Σχεδίαση όλων των τελειών (background)
-		    g.setCol(1,4);
-		    for (let i = 0; i < total; i++) {
-		        g.drawString("o", startX + i * charWidth, centerY);
-		    }
-
-		    // Ενεργός κύκλος
-		    if (current > 0 && current <= total) {
-		        g.setCol(1,fgColor !== undefined ? fgColor : 3);
-		        
-		        // Δοκιμή διαφορετικών χαρακτήρων:
-		        // 'o' μικρό o, 'O' κεφαλαίο O, '●' filled circle αν υπάρχει
-		        let activeChar = "o"; // ή "O" για πιο μεγάλο
-		        
-		        g.drawString(activeChar, startX + (current - 1) * charWidth, centerY);
-		    }
-		    
-		    if (!ew.def.face.bpp) g.flip();
-		},
-		*/
-		fill: function(no, po, clr) {
+		fill: function(no, po, clr, round, noDraw) {
 			//"ram";
 			let m = ew.UI.loc(no, po);
 			g.setCol(0, clr);
-			g.fillRect(m.x - m.szX, m.y - m.szY, m.x + m.szX, m.y + m.szY);
-			if (!ew.def.face.bpp) g.flip();
+			g.fillRect({ x: m.x - m.szX, y: m.y - m.szY, x2: m.x + m.szX, y2: m.y + m.szY, r: (round ? round : 0) });
+			if (!ew.def.face.bpp && !noDraw) g.flip();
 		},
 		keypad: function(no, po, clr) {
 			let m = ew.UI.loc(no, po);
@@ -639,17 +561,17 @@ ew.UI = {
 		ew.UI.ele.fill("_bar", 6, process.env.BOARD == "BANGLEJS2" ? 15 : 0);
 		ew.UI.c.start(0, 1);
 		if (process.env.BOARD == "BANGLEJS2") {
-			if (ew.face.appCurr != "q.panel") ew.UI.btn.img("bar", "_bar", 1, "ew_i_q.panel.img", "", 0, 15, 0, 0,1);
-			if (ew.face.appCurr != "launcher") ew.UI.btn.img("bar", "_bar", 2, "ew_i_launcher.img", "", 0, 2, 0, 0,1);
+			if (ew.face.appCurr != "q.panel") ew.UI.btn.img("bar", "_bar", 1, "ew_i_q.panel.img", "", 0, 15, 0, 0, 1);
+			if (ew.face.appCurr != "launcher") ew.UI.btn.img("bar", "_bar", 2, "ew_i_launcher.img", "", 0, 2, 0, 0, 1);
 			//if (require('Storage').read('ew_f_' + ew.face.appCurr + "-set")) ew.UI.btn.img("bar", "_bar", 3, "dash", "", 0, 3, 0, 1);
-			if (require('Storage').read('ew_f_' + ew.face.appCurr + "-set")) ew.UI.btn.img("bar", "_bar", 3, "ew_i_"+ew.face.appCurr+".img", "", 0, 2, 0,0, 1);
+			if (require('Storage').read('ew_f_' + ew.face.appCurr + "-set")) ew.UI.btn.img("bar", "_bar", 3, "ew_i_" + ew.face.appCurr + ".img", "", 0, 2, 0, 0, 1);
 
 		}
 		else {
 			if (ew.face.appCurr != "q.panel") ew.UI.btn.img("bar", "_bar", 1, "ew_i_q.panel.img", "", 3, 0, 0, 1);
 			if (ew.face.appCurr != "launcher") ew.UI.btn.img("bar", "_bar", 2, "ew_i_launcher.img", "", 3, 0, 0, 1);
 			//if (require('Storage').read('ew_f_' + ew.face.appCurr + "-set")) ew.UI.btn.img("bar", "_bar", 3, "dash", "", 3, 0, 0, 1);
-			if (require('Storage').read('ew_f_' + ew.face.appCurr + "-set")) ew.UI.btn.img("bar", "_bar", 3, "ew_i_"+ew.face.appCurr+".img", "", 3, 0, 0, 1);
+			if (require('Storage').read('ew_f_' + ew.face.appCurr + "-set")) ew.UI.btn.img("bar", "_bar", 3, "ew_i_" + ew.face.appCurr + ".img", "", 3, 0, 0, 1);
 
 		}
 		ew.UI.c.end();
@@ -679,11 +601,7 @@ ew.UI = {
 
 eval(require('Storage').read('ew_icons'));
 
-// install q.panel icon
-if (!require('Storage').read("ew_i_q.panel.img"))  {
-    let icon="mEwwI2zgP/Ao0f////P/nE/AoP9/88ApU4EZYADAooAICg2AApE8/+/G4P4Aon8AoscCIgjLACkf8AFE+CJDz/3/B9CAoP8ApRBBDogFJF4gAsA=";
-    require('Storage').write("ew_i_q.panel.img", require("heatshrink").decompress(atob(icon)) );
-}
+
 
 // === UI control ==
 
@@ -738,7 +656,12 @@ ew.UI.theme.current = ew.UI.theme.dark;
 
 ew.UI.nav = {
 	dn: function(x, y) {
-		"ram";
+		//"ram";
+		/*	if (y < 50 && (process.env.BOARD == "BANGLEJS2")) {
+				return;
+			
+			}
+		*/
 		ew.sys.buzz.nav(ew.sys.buzz.type.ok);
 		if (ew.UI.ntid && !ew.is.UIpri) {
 			clearTimeout(ew.UI.ntid);
@@ -752,7 +675,7 @@ ew.UI.nav = {
 			ew.face.go(ew.def.face.main, 0);
 	},
 	up: function(x, y) {
-		"ram";
+		//"ram";
 		/*	if (x < 50 && g.getHeight() - (process.env.BOARD == "BANGLEJS2" ? 25 : 50) < y) {
 				ew.sys.buzz.nav(ew.sys.buzz.type.ok);
 				if (ew.def.face.bri !== ((process.env.BOARD == "BANGLEJS2") ? 10 : 7)) {
@@ -791,10 +714,10 @@ if (process.env.BOARD == "BANGLEJS2") {
 
 	ew.UI.pos = {
 
-		_2x1: [25, [89],
-			[45, 122],
+		_2x1: [25, [88],
+			[28, 88],
 			[176],
-			[78, 78]
+			[56, 56]
 		],
 		_2x2: [22, [45, 135],
 			[40, 120],
@@ -806,28 +729,31 @@ if (process.env.BOARD == "BANGLEJS2") {
 			[56, 56, 56],
 			[56, 56]
 		],
-		_3x1: [25, [90],
-			[40, 120, 200]
+
+		_3x1: [25, [88],
+			[20, 60, 100],
+			[176],
+			[35, 35, 35]
 		],
 		_kp4x3: [25, [30, 89, 145],
 			[20, 58, 100, 140],
 			[58, 58, 58],
 			[40, 40, 40, 40]
 		],
-		_bar: [16, [30, 88, 145, 43, 133, 88],
+		_bar: [24, [30, 88, 145, 43, 133, 88],
 			[150],
 			[58, 58, 58, 84, 84, 176],
 			[50]
 		],
-		_header: [19, [30, 89, 145, 45, 133, 88],
-			[15],
-			[58, 58, 58, 100, 77, 176],
-			[30]
+		_header: [19, [25, 88, 145, 58, 113, 88],
+			[14],
+			[50, 60, 60, 120, 126, 176],
+			[28]
 		],
 		_main: [20, [44, 132, 88],
-			[61, 104, 73, 57, 88],
+			[61, 104, 72, 57, 88],
 			[88, 88, 176],
-			[61, 22, 86, 116, 176]
+			[63, 22, 85, 116, 176]
 		],
 		_ind: [50, 116, 126, 124, 0, 176],
 		_foot: [142, 132, 155]

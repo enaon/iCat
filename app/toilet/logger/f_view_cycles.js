@@ -35,7 +35,7 @@ ew.face[0] = {
         if (!check)
             check = this.select_years();
         if (!check) {
-            ew.notify.alert("error", { body: "NO LOGS FOUND", title: "LOGGER ERROR" }, 0, 1);
+            ew.notify.alert("error", { src:"kitty", title: "Logger Error", body: "No logs" }, 0, 1);
             //ew.face.go(ew.def.face.main, 0);
         }
 
@@ -308,7 +308,7 @@ ew.face[0] = {
 
     },
     bar: function() {
-        if (ew.is.UIpri) { ew.notify.alert("error",ew.notify.log.error[0], 1, 1);return;}
+        //if (ew.is.UIpri) { ew.notify.alert("error",ew.notify.log.error[0], 1, 1);return;}
         g.setCol(0, 0);
         g.fillRect({ x: 0, y: 180, x2: 240, y2: 280, });
         if (this.dbg) console.log("in bar, pos,lastPos", this.cache.pos, this.cache.lastPos);
@@ -316,7 +316,7 @@ ew.face[0] = {
         //set bar control
 
 
-        ew.sys.TC.val = { cur: this.cache.pos, dn: this.view.reference, up: this.view.reference + this.view.fields - 1, tmp: 0, reverce: 0, loop: 0 };
+        ew.sys.TC.val = { cur: this.cache.pos, dn: this.view.reference, up: this.view.reference + this.view.fields - 1, tmp: 0, reverce: 0, loop: 0, fire:1 };
         ew.UI.c.tcBar = (a, b) => {
             if (this.dbg) console.log("in ew.UI.c.tcBar, pos,lastPos", this.cache.pos, this.cache.lastPos);
 
@@ -339,7 +339,7 @@ ew.face[0] = {
             //ew.face[0].info(v[0], v[1]);
             // }, 25, v);
         };
-        ew.is.bar = 1;
+        ew.is.slide = 1;
 
 
 
@@ -743,7 +743,7 @@ ew.face[0] = {
         //return data[pos][value];
     },
     clear: function(o) {
-        ew.is.bar = 0; /*TC.removeAllListeners();*/
+        ew.is.slide = 0; /*TC.removeAllListeners();*/
         if (this.tid) clearTimeout(this.tid);
         this.tid = 0;
         return true;

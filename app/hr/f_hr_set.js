@@ -32,8 +32,9 @@ ew.face[0] = {
 
         ew.UI.c.start(1, 1);
         ew.UI.btn.c2l("main", "_2x3", 1, "AUTO", this.dataString[this.data.hrm], 15, this.data.hrm ? 4 : 1);
-        ew.UI.btn.c2l("main", "_2x3", 2, "TOP", ew.apps.hr.state.def.topL, 15, 6);
-        ew.UI.btn.c2l("main", "_2x3", 3, "BTM", ew.apps.hr.state.def.btmL, 15, 6);
+        ew.UI.btn.c2l("main", "_2x3", 2, "MAX", ew.apps.hr.state.def.topL, 15, 6);
+        ew.UI.btn.c2l("main", "_2x3", 3, "MIN", ew.apps.hr.state.def.btmL, 15, 6);
+
         //ew.UI.btn.c2l("main", "_2x3", 4, "BUZZ", ew.def.time.hour ? "ON" : "OFF", 15, ew.def.time.hour ? 4 : 1);
 
         ew.UI.c.end();
@@ -54,13 +55,12 @@ ew.face[0] = {
                 ew.is.slide = 1;
                 ew.sys.TC.val = { cur: ew.apps.hr.state.def.topL, dn: 80, up: 140, tmp: 0, fire: 0 };
                 ew.UI.c.tcBar = (a, b, r) => {
-                    let val = ew.apps.hr.state.def.topL;
                     ew.UI.btn.ntfy(0, 2, 1);
                     if (11 < r && ew.sys.TC.val.dn < val && val < ew.sys.TC.val.up) val = val + (a * (20 < r ? 10 : 5));
                     else val = b;
                     ew.sys.TC.val.cur = val;
                     ew.apps.hr.state.def.topL = val;
-                    ew.UI.btn.c2l("main", "_2x3", 2, "TOP", ew.apps.hr.state.def.topL, 15, 6);
+                    ew.UI.btn.c2l("main", "_2x3", 2, "MAX", ew.apps.hr.state.def.topL, 15, 6);
                 };
             }
             else if (i == 3) {
@@ -69,24 +69,14 @@ ew.face[0] = {
                 ew.is.slide = 1;
                 ew.sys.TC.val = { cur: ew.apps.hr.state.def.btmL, dn: 40, up:80, tmp: 0, fire: 0 };
                 ew.UI.c.tcBar = (a, b, r) => {
-                    let val = Number(ew.def.time.timezone);
                     ew.UI.btn.ntfy(0, 2, 1);
                     if (11 < r && ew.sys.TC.val.dn < val && val < ew.sys.TC.val.up) val = val + (a * (20 < r ? 10 : 5));
                     else val = b;
                     ew.sys.TC.val.cur = val;
                     ew.apps.hr.state.def.btmL = val;
-                    ew.UI.btn.c2l("main", "_2x3", 3, "BTM", ew.apps.hr.state.def.btmL, 15, 6);
+                    ew.UI.btn.c2l("main", "_2x3", 3, "MIN", ew.apps.hr.state.def.btmL, 15, 6);
                 };
             }
-            else if (i == 4) {
-                ew.sys.buzz.nav(ew.sys.buzz.type.ok);
-                if (ew.def.time.hour === undefined) ew.def.time.hour = 0;
-                ew.def.time.hour = 1 - ew.def.time.hour;
-                if (ew.def.face.info) ew.UI.btn.ntfy(1, 1.5, 0, "_bar", 6, "HOURLY BUZZ", ew.def.time.hour ? "ENABLED" : "DISABLED", 0, 15);
-                ew.UI.btn.c2l("main", "_2x3", 4, "BUZZ", ew.def.time.hour ? "ON" : "OFF", 15, ew.def.time.hour ? 4 : 1);
-            }
-
-
 
         };
     },

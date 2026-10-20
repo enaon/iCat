@@ -288,7 +288,7 @@ ew.face[0] = {
     },
     
     bar: function() {
-        if (ew.is.UIpri) return;
+        //if (ew.is.UIpri) return;
         
         ew.UI.ele.fill("_bar", 6, 0);
         

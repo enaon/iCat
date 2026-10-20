@@ -1,10 +1,12 @@
 //itag scan viewer
 
 ew.UI.nav.next.replaceWith(() => {
+    if (ew.UI.ntid) {clearTimeout(ew.UI.ntid); ew.UI.ntid=0;}
     ew.sys.buzz.nav(ew.sys.buzz.type.ok);
     ew.face.go("itag-dev", 0);
 });
 ew.UI.nav.back.replaceWith(() => {
+	if (ew.UI.ntid) {clearTimeout(ew.UI.ntid); ew.UI.ntid=0;}
     ew.sys.buzz.nav(ew.sys.buzz.type.ok);
     ew.face.go("itag-dev", 0);
 });
@@ -105,7 +107,7 @@ ew.face[0] = {
     info: function(rssi, id, name, oflc) {
 
         name = this.data.source[id] ? this.data.source[id].name : name;
-        let brd =(this.data.source[id] &&this.data.source[id].board )?this.data.source[id].board:0;
+        let brd =(this.data.source[id] &&this.data.source[id].brd )?this.data.source[id].brd:0;
         let boCo=[0,0,0,6,1]
         ew.UI.btn.i2l("main", "_main", 9, oflc ? oflc : rssi + " ", oflc ? "OFFLINE" : (ew.apps.itag.state.def.set.scanAll) ? id.split(" ")[0].toUpperCase() : "dBm", oflc ? 13 : 4, 15, process.env.BOARD === "BANGLEJS2" ? 3 : 4);
         //name
@@ -115,7 +117,7 @@ ew.face[0] = {
 
     },
     bar: function() {
-        if (ew.is.UIpri) { ew.notify.alert("error", ew.notify.log.error[0], 1, 1); return; }
+        //if (ew.is.UIpri) { ew.notify.alert("error", ew.notify.log.error[0], 1, 1); return; }
         if (ew.is.bar) return;
         
         // set the bar control

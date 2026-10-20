@@ -1,0 +1,9 @@
+nano ys312 disabled -> 6 μA
+nano ys312 enabled data pin hi -> 19 μA
+nano ys312 enabled data pin low -> 125 μA
+nano empty 500ms js interval -> 27 μΑ
+nano ys312 enabled data pin hi, empty 500ms js interval -> 35 μΑ
+nano ys312 enabled data pin hi, read at 500ms js interval -> 65 μΑ
+nano ys312 enabled data pin hi, read at 250s js interval -> 90 μΑ
+nano ys312 enabled data pin hi, read at 50s js interval -> 325 μΑ
+nano ys312 enabled data pin hi, read at 20s js interval -> 980 μΑ

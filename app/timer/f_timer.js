@@ -38,8 +38,7 @@ ew.face[0] = {
     init: function(o) {
         ew.def.face.off[ew.face.appCurr] = this.offms;
         this.rep = 0;
-       
-        if (o && o !== "jump" ) this.page = o;
+        if (typeof o == "number"  ) this.page = o;
         else {
              let earliest = this.active();
             if (earliest !== null) {
@@ -206,7 +205,7 @@ ew.face[0] = {
     },
     bar: function(timer) {
         if (ew.UI.ntid) return; 
-        if (ew.is.UIpri) { if (ew.notify.log.error[0]) ew.notify.alert("error", ew.notify.log.error[0], 1, 1); return; }
+        //if (ew.is.UIpri) { if (ew.notify.log.error[0]) ew.notify.alert("error", ew.notify.log.error[0], 1, 1); return; }
         //"ram";
         ew.UI.ele.fill("_bar", 6, 0);
 

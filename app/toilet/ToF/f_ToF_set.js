@@ -48,7 +48,7 @@ ew.face[0] = {
                 ew.sys.buzz.nav(ew.sys.buzz.type.ok);
                 ew.UI.btn.ntfy(1, 3, 0, "_bar", 6, "SET TOF", "FULL (CM)", 15, 6, 1);
                 ew.is.slide = 1;
-                ew.sys.TC.val = { cur: ew.apps.kitty.state.def.tof.full * 10, dn: 250, up: 450, tmp: 0 };
+                ew.sys.TC.val = { cur: ew.apps.kitty.state.def.tof.full * 10, dn: 250, up: 450 };
                 ew.UI.c.tcBar = (a, b) => {
                     ew.UI.btn.ntfy(0, 2, 1);
                     ew.UI.btn.c2l("main", "_2x3", 2, "FULL", b / 10, 15, ew.apps.kitty.state.def.is.tof ? 6 : 1);
@@ -59,7 +59,7 @@ ew.face[0] = {
                 ew.sys.buzz.nav(ew.sys.buzz.type.ok);
                 ew.UI.btn.ntfy(1, 3, 0, "_bar", 6, "SET TOF", "EMPTY (CM)", 15, 6, 1);
                 ew.is.slide = 1;
-                ew.sys.TC.val = { cur: ew.apps.kitty.state.def.tof.empty * 10, dn: 250, up: 450, tmp: 0 };
+                ew.sys.TC.val = { cur: ew.apps.kitty.state.def.tof.empty * 10, dn: 250, up: 450 };
                 ew.UI.c.tcBar = (a, b) => {
                     ew.UI.btn.ntfy(0, 2, 1);
                     ew.UI.btn.c2l("main", "_2x3", 3, "EMPTY", b / 10, 15, ew.apps.kitty.state.def.is.tof ? 6 : 1);
@@ -83,7 +83,7 @@ ew.face[0] = {
                 ew.sys.buzz.nav(ew.sys.buzz.type.ok);
                 ew.UI.btn.ntfy(1, 3, 0, "_bar", 6, "SET MAX", "SAND WEIGHT (KG)", 15, 6, 1);
                 ew.is.slide = 1;
-                ew.sys.TC.val = { cur: ew.apps.kitty.state.def.sand[ew.apps.kitty.state.def.is.sandType].max / 100, dn: 15, up: 40, tmp: 0 };
+                ew.sys.TC.val = { cur: ew.apps.kitty.state.def.sand[ew.apps.kitty.state.def.is.sandType].max / 100, dn: 15, up: 40 };
                 ew.UI.c.tcBar = (a, b) => {
                     ew.UI.btn.ntfy(0, 2, 1);
                     ew.UI.btn.c2l("main", "_2x3", 5, "MAX", b / 10, 15, ew.apps.kitty.state.def.is.scale ? 6 : 1); //6
@@ -94,7 +94,7 @@ ew.face[0] = {
                 ew.sys.buzz.nav(ew.sys.buzz.type.ok);
                 ew.UI.btn.ntfy(1, 3, 0, "_bar", 6, "SET MIN", "SAND WEIGHT (KG)", 15, 6, 1);
                 ew.is.slide = 1;
-                ew.sys.TC.val = { cur: ew.apps.kitty.state.def.sand[ew.apps.kitty.state.def.is.sandType].min / 100, dn: 5, up: 15, tmp: 0 };
+                ew.sys.TC.val = { cur: ew.apps.kitty.state.def.sand[ew.apps.kitty.state.def.is.sandType].min / 100, dn: 5, up: 15 };
                 ew.UI.c.tcBar = (a, b) => {
                     ew.UI.btn.ntfy(0, 2, 1);
                     ew.UI.btn.c2l("main", "_2x3", 6, "MIN", b / 10, 15, ew.apps.kitty.state.def.is.scale ? 6 : 1); //6

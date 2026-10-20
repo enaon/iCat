@@ -1,44 +1,64 @@
 E.setFlags({ pretokenise: 1 });
 E.setFlags({ onErrorSave: true });
+
 //0x20000000+0x10000-process.memory().stackEndAddress
 
 global.save = function() { throw new Error("save() is not used on eucWatch"); };
 
-// ---- ew setup ----
-
+// ---- ew object setup ----
 global.ew = { "sys": {}, "apps": {}, "dbg": 0, "logger": {}, "notify": {}, "log": [], "def": {}, "is": {}, "comm": {}, "tid": {}, "pin": {} };
 
+// ---- board type ----
 if (process.env.BOARD == "MAGIC3" || process.env.BOARD == "ROCK") {
-  ew.pin = { BAT: D30, BTN2: D46, CHRG: D8, BUZZ: D6, BUZ0: 0, BL: D12, i2c: { SCL: D14, SDA: D15 }, touch: { SCL: D14, SDA: D15, RST: D39, INT: D32, SLP: 0xA5 }, disp: { CS: D3, DC: D47, RST: D2, BL: D12 }, acc: { SCL: D14, SDA: D15, INT: D16 } };
+  ew.pin = { BAT: D30, BTN2: D46, CHRG: D8, SND:D6, BUZZ: D6, BUZ0: 0, BL: D12, i2c: { SCL: D14, SDA: D15 }, touch: { SCL: D14, SDA: D15, RST: D39, INT: D32, SLP: 0xA5 }, disp: { CS: D3, DC: D47, RST: D2, BL: D12 }, acc: { SCL: D14, SDA: D15, INT: D16 } };
   E.showMessage = console.log; //apploader suport
   D7.write(1); // turns off sp02 red led
   ew.is.maxTx = 8;
 }
 
 else if (process.env.BOARD == "DSD6") {
-  ew.pin = { BAT: D3, CHRG: D2, BUZZ: D25, BUZ0: 1, BL: D12, i2c: { SCL: D13, SDA: D14 }, touch: { RST: D13, INT: D28 }, disp: { SPI: D5, MOSI: D6, CS: D29, DC: D28, RST: D04, BL: D14 }, acc: { INT: D8 }, serial: { rx: D22, tx: D23 } };
+  ew.pin = { BAT: D3, CHRG: D2, BUZZ: D25, SND:D25, BUZ0: 1, BL: D12, i2c: { SCL: D13, SDA: D14 }, touch: { RST: D13, INT: D28 }, disp: { SPI: D5, MOSI: D6, CS: D29, DC: D28, RST: D04, BL: D14 }, acc: { INT: D8 }, serial: { rx: D22, tx: D23 } };
   E.showMessage = print; //apploader suport
   D26.reset();
   ew.is.maxTx = 4;
 }
 
 else if (process.env.BOARD == "BANGLEJS2") {
-  ew.pin = { BAT: D3, CHRG: D23, BUZZ: D19, BUZ0: 1, BL: D8, i2c: { SCL: D34, SDA: D33 }, touch: { SCL: D34, SDA: D33, RST: D35, INT: D36, SLP: 0xE5 }, disp: { CS: D5, DC: D6, RST: D7, BL: D8 }, acc: { SDA: D37, SLC: D38, INT: D39 } };
-  Bangle.setOptions({ wakeOnTouch: 0, lockTimeout: 0, backlightTimeout: 0, wakeOnBTN1: 0, wakeOnTwist: 0, wakeOnFaceUp: 0, powerSave: 1, btnLoadTimeout: 5000 });
+ /* Bangle.loadWidgets();
+  Bangle.drawWidgets();
+  Bangle.setUI({
+    mode: "clock",
+    remove: function() {
+      console.log("remove called");
+    }
+  });
+  */
+  //Bangle.loadWidgets();
+
+  ew.pin = { BAT: D3, CHRG: D23,  BUZZ: D19, BUZ0: 1, BL: D8, i2c: { SCL: D34, SDA: D33 }, touch: { SCL: D34, SDA: D33, RST: D35, INT: D36, SLP: 0xE5 }, disp: { CS: D5, DC: D6, RST: D7, BL: D8 }, acc: { SDA: D37, SLC: D38, INT: D39 } };
+  Bangle.setOptions({ wakeOnTouch: 0, lockTimeout: 0, backlightTimeout: 0, wakeOnBTN1: 0, wakeOnTwist: 0, wakeOnFaceUp: 0, powerSave: 1, btnLoadTimeout: 5000, twistThreshold: 1000, twistTimeout: 450, twistMaxY: 500, });
   Bangle.setLocked(0);
-  ew.is.maxTx = 8; //disable VCC output
+  ew.is.maxTx = 8; 
 }
 
 else if (process.env.BOARD == "NANO") {
-  ew.pin = { BUZZ: D13, BUZ0: 1, BL: D15, i2c: { SCL: D9, SDA: D10 }, serial: { rx: D22, tx: D23 } };
-  //ew.pin = { BAT: D3, CHRG: D23, BUZZ: D19, BUZ0: 1, BL: D8, i2c: { SCL: D34, SDA: D33 }, touch: { SCL: D34, SDA: D33, RST: D35, INT: D36 ,SLP: 0xE5}, disp: { CS: D5, DC: D6, RST: D7, BL: D8 }, acc: { SDA: D37, SLC: D38, INT: D39 } };
+  ew.pin = { BUZZ: D13, SND:D13, BUZ0: 1, BL: D15, i2c: { SCL: D9, SDA: D10 }, serial: { rx: D22, tx: D23 } };
   E.showMessage = print; //apploader suport
+  E.rebootOr=E.reboot; 
+  global.resetOr=reset;
+ 
   D13.reset(); //turn off VCC output
-  BTN1 = { read: function() { return false } } //fake Btn
+  if (!global.BTN1 || global.BTN1==D38){
+    ew.is.BTN1=1;
+    //print("in bt1");
+    //pinMode(D6,"input_pullup");
+    //global.BTN1 =  {};
+    //global.BTN1.read=function(){return !D6.read()};
+  } 
   //pinMode(D39, "input_pullup");
   ew.is.maxTx = 8;
   g = Graphics.createArrayBuffer(8, 8, 8);
-  g.flip = function() { return; }
+  g.flip = function() { return; };
 }
 
 else {
@@ -48,25 +68,24 @@ else {
 }
 
 // ---- watchDog ----
-let noWd=(require("Storage").readJSON("ew.json", 1) && require("Storage").readJSON("ew.json", 1).sys) && require("Storage").readJSON("ew.json", 1).sys.noWd? require("Storage").readJSON("ew.json", 1).sys.noWd : 0
-if (process.env.BOARD === "BANGLEJS2" || process.env.BOARD === "NANO" ) noWd=1;
+let noWd = (require("Storage").readJSON("ew.json", 1) && require("Storage").readJSON("ew.json", 1).sys) && require("Storage").readJSON("ew.json", 1).sys.noWd ? require("Storage").readJSON("ew.json", 1).sys.noWd : 0;
+if (process.env.BOARD === "BANGLEJS2" ) noWd = 1;
 
-if (!noWd ) {
+if (!noWd) {
   E.kickWatchdog();
   ew.sys.kickWD = function() {
-    "ram";
-    if ((typeof(BTN1) == 'undefined') || (!BTN1.read())) E.kickWatchdog();
+    //"ram";
+    if ((typeof(global.BTN1) == 'undefined') || (!global.BTN1.read())) E.kickWatchdog();
   };
   ew.tid.WD = setInterval(ew.sys.kickWD, 2000);
-  E.enableWatchdog(process.env.BOARD == "DSD6" ? 5 : 10, false);
+  E.enableWatchdog(process.env.BOARD == "DSD6" ? 5 : 100, false);
 }
 
 // === devmode ===
 
-
-if ((BTN1.read() || require("Storage").read("devmode")) && process.env.BOARD != "BANGLEJS2") {
-
-  var exitDev = function() {
+if ( ( (global.BTN1 && global.BTN1.read()) || require("Storage").read("devmode") ) && process.env.BOARD != "BANGLEJS2") {
+  NRF.wake();
+  var devExit = function() {
     require("Storage").erase("devmode");
     require("Storage").erase("devmode.info");
     NRF.setServices({}, { uart: false });
@@ -75,10 +94,13 @@ if ((BTN1.read() || require("Storage").read("devmode")) && process.env.BOARD != 
     NRF.wake();
     setTimeout(() => {
       reset();
-    }, 500);
+    }, 1500);
   };
+  
+  var devSleep = function() {
+    NRF.sleep();
+  };  
 
-  //if ((BTN1.read() || require("Storage").read("devmode")) && process.env.BOARD != "BANGLEJS2") {
   let mode = (require("Storage").read("devmode"));
   if (mode == "loader") {
     digitalPulse(ew.pin.BUZZ, ew.pin.BUZ0, 80);
@@ -93,21 +115,20 @@ if ((BTN1.read() || require("Storage").read("devmode")) && process.env.BOARD != 
     digitalPulse(ew.pin.BUZZ, ew.pin.BUZ0, [80, 50, 80, 50, 80]);
     print("Welcome!\n*** DevMode ***\nShort press the side button\nto restart in WorkingMode");
 
-    var timeout = setTimeout(exitDev, 30000);
-    NRF.on('connect', function() { clearTimeout(timeout) });
+    //var timeout = setTimeout(devExit, 30000);
+    var timeout = setTimeout(devSleep, 30000);
+    NRF.on('connect', function() { clearTimeout(timeout); });
 
   }
 
-  setWatch(exitDev, BTN1, { repeat: false, edge: "rising" });
+  setWatch(devExit, BTN1, { repeat: false, edge: "rising" });
 
 
-
+  // ---- Magic3/Rock put touch/acc to sleep ----
   if (process.env.BOARD == "MAGIC3" || process.env.BOARD == "ROCK") {
-    // ---- put touch/acc to sleep ----
     setTimeout(() => {
       var i2c = new I2C();
       i2c.setup({ scl: ew.pin.i2c.SCL, sda: ew.pin.i2c.SDA, bitrate: 100000 });
-
       // ---- acc sleep ----
       i2c.writeTo(0x18, 0x20, 0x07); //Clear LPen-Enable all axes-Power down
       i2c.writeTo(0x18, 0x26);
@@ -136,12 +157,26 @@ else {
   if (process.env.BOARD != "NANO" && require('Storage').read('ew_clock')) eval(require('Storage').read('ew_clock'));
 
   // ---- apps ----
-  require("Storage").list(/^ew_a/).forEach(appKey => {
+  require("Storage").list(/^ew_a_/).forEach(appKey => {
     eval(require('Storage').read(appKey));
   });
 
   if (require('Storage').read('ew_logger_kitty')) ew.logger.kitty = require("ew_logger_kitty");
 
+  // ---- loggers ----
+    /*
+    if (require('Storage').read('ew_logger_kitty')) {
+      ew.logger.kitty=require("ew_logger_kitty");
+      ew.sys.on('hour', function(x){ if (x == 0) ew.logger.kitty.saveStats("day"); });
+    }
+    if (require('Storage').read('ew_logger_battery')) {
+      ew.logger.battery=require("ew_logger_battery");
+       ew.sys.on('hour', function(x){
+        ew.logger.battery.log();
+        if (x === 0) ew.logger.battery.saveStats();
+      });
+    }
+    */
 
   // ---- start ----
 
@@ -150,9 +185,9 @@ else {
     setTimeout(function() {
       ew.face.go(ew.def.face.main, 0);
       setTimeout(function() {
-        if (ew.def.dev.tilt===undefined)ew.def.dev.tilt=0;
-        if (ew.def.dev.tap===undefined)ew.def.dev.tap=0;
-        ew.sys.acc.updt(ew.def.dev.tilt+ew.def.dev.tap);
+        if (ew.def.dev.tilt === undefined) ew.def.dev.tilt = 0;
+        if (ew.def.dev.tap === undefined) ew.def.dev.tap = 0;
+        ew.sys.acc.updt(ew.def.dev.tilt + ew.def.dev.tap);
       }, 1000);
       digitalPulse(ew.pin.BUZZ, ew.pin.BUZ0, 100);
     }, 200);

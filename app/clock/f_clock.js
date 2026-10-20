@@ -33,7 +33,6 @@ ew.face[0] = {
 		if (!ew.def.face.off[ew.face.appCurr]) ew.def.face.off[ew.face.appCurr] = this.offms;
 
 		this.startTime = getTime();
-		this.v = ew.sys.batt(1);
 
 		ew.UI.c.start(1, 1);
 		ew.UI.c.end();
@@ -42,7 +41,7 @@ ew.face[0] = {
 
 		this.gui = process.env.BOARD == "BANGLEJS2" ? {
 			top: [0, 0, 176, 34],
-			date: [7, 6, 85, 29],
+			date: [7, 6, 85, 28],
 			bat: [110, 4, 156, 28],
 			time24: [84, 92, 51],
 			time12: [63, 73, 51],
@@ -82,9 +81,13 @@ ew.face[0] = {
 		g.setCol(0, 0);
 		g.fillRect(this.gui.top[0], this.gui.top[1], this.gui.top[2], this.gui.top[3]);
 
-		g.setCol(0, 1);
-		g.fillRect({ x: this.gui.btm[0], y: this.gui.btm[1], x2: this.gui.btm[2], y2: this.gui.btm[3], r: 6 });
+        ew.UI.ele.fill("_main", 9,  1, 10,1);
 
+		//g.setCol(0, 1);
+		//g.fillRect({ x: this.gui.btm[0], y: this.gui.btm[1], x2: this.gui.btm[2], y2: this.gui.btm[3], r: 6 });
+
+		//require("widget_utils").swipeOn();
+		//require("widget_utils").show();
 		//first run
 		this.bat();
 		this.date();
@@ -97,12 +100,12 @@ ew.face[0] = {
 
 	show: function() {
 		if (!this.run) return;
-		if (this.batt != ew.is.ondc) {
-			this.bat();
-		}
-		if (this.bt != ew.is.bt) {
-			this.date();
-		}
+		//if (this.batt != ew.is.ondc) {
+		//	this.bat();
+		//}
+		//if (this.bt != ew.is.bt) {
+		//	this.date();
+		//}
 		this.time();
 		if (ew.tid.time) clearTimeout(ew.tid.time);
 		ew.tid.time = setTimeout(() => {
@@ -118,7 +121,7 @@ ew.face[0] = {
 	},
 
 	bar: function() {
-		if (ew.is.UIpri) { ew.notify.alert("error",ew.notify.log.error[0], 1, 1);return;}
+		//if (ew.is.UIpri) { ew.notify.alert("error",ew.notify.log.error[0], 1, 1);return;}
 		if (ew.UI.ntid) return;
 		ew.UI.ele.fill("_bar", 6, 0);
 		
@@ -135,7 +138,8 @@ ew.face[0] = {
 			else pos=[1,2,3];
 			
 			for (let app in this.ewA) {
-				ew.UI.btn.img("bar", "_bar", pos[app], "ew_i_" + this.ewA[app].id + ".img", this.ewA[app].id.toUpperCase(), 15, 4, 1.3, 0, 1);
+				//ew.UI.btn.img("bar", "_bar", pos[app], "ew_i_" + this.ewA[app].id + ".img", ew.apps[this.ewA[app].id].state.run, 15, 4, 1.3, 0, 1);
+				ew.UI.btn.img("bar", "_bar", pos[app], "ew_i_" + this.ewA[app].id + ".img", "", 15, 4, 1.3, 0, 1);
 				if (2 < app) break;
 			}
 
@@ -145,7 +149,7 @@ ew.face[0] = {
 			};
 		}
 		else if (this.v < 25)
-			ew.UI.btn.ntfy(1, 1.5, 0, "_bar", 6, "LOW BATTERY", "CHARGE ME", 15, 13);
+			ew.UI.btn.ntfy(1, 1.5, 0, "_bar", 6, "LOW BATTERY", ew.is.ondc?"CHARGING":"CHARGE ME", 15, ew.is.ondc?1:13);
 
 		ew.UI.c.end();
 
@@ -174,7 +178,7 @@ ew.face[0] = {
 
 	bat: function() {
 		this.batt = ew.is.ondc;
-		this.v = ew.sys.batt(1);
+		this.v = ew.is.batS; //ew.sys.batt(1);
 
 		//color tagging
 		if (this.batt === 1) g.setCol(0, 9);
@@ -187,24 +191,20 @@ ew.face[0] = {
 		g.setCol(1, ew.UI.theme.current.clock.batF);
 		g.setFontAlign(1, -1);
 
-		if (this.v <= 0) {
+		/*if (this.v <= 0) {
 			g.setFont("Vector", this.gui.txtM);
 			g.drawString("EMPTY", this.gui.bat[2], this.gui.bat[1]);
 
 			//}else if (this.v<100) {
 		}
-		else {
+		else {*/
 			//if (100<this.v) this.v=100;
 			g.setFont("Vector", this.gui.txtM);
 			g.drawString(this.v, this.gui.bat[2], this.gui.bat[1]);
 			g.drawImage((this.batt) ? require("heatshrink").decompress(atob("jEYwIKHiACEnACHvACEv/AgH/AQcB/+AAQsAh4UBAQUOAQ8EAQgAEA==")) : require("heatshrink").decompress(atob("jEYwIEBngCDg//4EGgFgggCZgv/ASUEAQQaBHYPgJYQ=")), this.gui.bat[2], this.gui.bat[1], { scale: 0.75 });
 			//g.drawImage(this.image("batteryMed"),212,12);
-		}
-		/*else  {
-			g.setFont("Vector",this.gui.txtM);
-			g.drawString("FULL",this.gui.bat[2],this.gui.bat[1]); 
-		} 
-		*/
+	//	}
+
 		g.setFontAlign(-1, -1);
 		//g.flip();
 	},
@@ -292,6 +292,8 @@ ew.face[0] = {
 			clearTimeout(ew.tid.time);
 			ew.tid.time = 0;
 		}
+		//require("widget_utils").hide();
+
 		return true;
 	},
 	off: function() {

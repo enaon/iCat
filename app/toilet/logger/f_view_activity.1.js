@@ -101,7 +101,7 @@ ew.face[0] = {
 
     },
     bar: function() {
-        if (ew.is.UIpri) { ew.notify.alert("error",ew.notify.log.error[0], 1, 1);return;}
+        //if (ew.is.UIpri) { ew.notify.alert("error",ew.notify.log.error[0], 1, 1);return;}
         //"ram";
         g.setCol(0, 0);
         g.fillRect({ x: 0, y: 180, x2: 250, y2: 280, });
@@ -124,7 +124,7 @@ ew.face[0] = {
                 this.info(v[0], v[1], this.lowField(v[2]).toUpperCase(), v[3]);
             }, 25, v);
         };
-        ew.is.bar = 1;
+        ew.is.slide = 1;
 
         // reset UI control, bar only
         ew.UI.c.start(0, 1);
@@ -231,7 +231,7 @@ ew.face[0] = {
         g.flip();
     },
     clear: function(o) {
-        ew.is.bar = 0; /*TC.removeAllListeners();*/
+        ew.is.slide = 0; /*TC.removeAllListeners();*/
         if (this.tid) clearTimeout(this.tid);
         this.tid = 0;
         return true;

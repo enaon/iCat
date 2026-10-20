@@ -299,7 +299,7 @@ ew.apps.scale = {
 
             // check if retying too much, maybe sensitinity is too low. 
             if ( 300 == ew.apps.scale.state.value.counter.retry)
-                ew.notify.alert("error", { body: "300 TIMEOUTS", title: "SCALE ERROR" }, 0, 1);
+                ew.notify.alert("error", { src:"scale", title: "Error" , body: "300 Timeouts"}, 0, 1);
 
             // turn off ball light if auto light is enabled and some time  of stillness passed.
             //if (ew.apps.scale.state.value.counter.still == ew.apps.scale.state.value.event.stillTimeout / 2 )
@@ -318,7 +318,7 @@ ew.apps.scale = {
              
              //check the weight, maybe it is sleeping inside
             if (ew.apps.kitty.state.def.sand[ew.apps.kitty.state.def.is.sandType].max + 500 <= ew.apps.scale.state.log.average(ew.apps.scale.state.log.event)) {
-                ew.notify.alert("error", { body: "SCALE", title: "IS A CAT SLEEPING?" }, 0, 0);
+                ew.notify.alert("error", { src:"scale", title: "Overload", body: "Is a Cat sleeping?"}, 0, 0);
             }
             if (ew.apps.scale.state.def.type == "side")
                 // log event        
@@ -445,7 +445,7 @@ ew.apps.scale = {
         if (ew.apps.scale.tid.entry) {
             clearTimeout(ew.apps.scale.tid.entry);
             ew.apps.scale.tid.entry = 0;
-            ew.notify.alert("error", { body: "ENTRY TID ACTIVE", title: "LOG ERROR" }, 0, 1);
+            ew.notify.alert("error", { src:"scale", title: "Error" , body: "Entry tid Active"}, 0, 1);
         }
 
         // reset counters
@@ -539,7 +539,7 @@ ew.apps.scale = {
 
         // ---- check for low battery ----
         if ( ew.is.batS <= 0){
-            ew.notify.alert("error", { body: "", title: "low Battery" }, 1, 1);
+            ew.notify.alert("error", { src:"scale", title: "Error", body: "low Battery" }, 1, 1);
             ew.apps.scale.stop("low battery");   
             return;                
         }

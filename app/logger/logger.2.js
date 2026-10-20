@@ -1,0 +1,420 @@
+
+// logger.js - Ultra-compact generic logger with short internal field names
+// Usage:
+/*  
+  ew.logger.lamp = ew.logger.cd('solarLamp', {
+     fmap: { ev:'events', ti:'time', ch:'charging',bt:'battery',in:'intensity' },
+     pCnt: 'ev', cnt: ['ev'], acc: ['ti'], lat:['ch','bt','in'], af: ['ti','in'],
+     ma:20, pd:31, pm:12
+   });
+   
+   
+   ew.logger.lamp.log({ charging:false, battery:12.6, intensity:"sun", time:3600, events:5 });
+   ew.logger.lamp.getStats()  // full names
+
+  ew.logger.bat = ew.logger.cd('battery', {
+    fmap: { bt: 'battery' },
+    lat: ['bt'],
+    ses: {
+      f: 'bt', th: 15, hm: 5,
+      calc: function(dailyLevels, currentSession) {
+        // εδώ βάζεις ό,τι ακριβώς υπολογισμό θέλεις
+        // π.χ. μπορείς να διαβάσεις ew.def.battCap, E.getTemperature(), κλπ.
+        // και να επιστρέψεις τον ρυθμό εκφόρτισης (%/ημέρα)
+        return yourCalculatedRate;
+      }
+    }
+  });
+    
+    // every time you read battery:
+    ew.logger.bat.log({ battery: ew.sys.batt(1) });
+    
+    // get stats:
+    var stats = ew.logger.bat.getStats();
+    console.log(stats.session.currentSession.predictedDaysLeft);
+    console.log(stats.session.history);
+
+
+
+
+  stats.dayHours[1][3]._10m[40].events
+*/
+
+var L = {
+  D: {},
+  C: {},
+  N: function() { return (Date.now()/1000)|0; },
+
+  cd: function(nm, cf) {
+    if (!this.D[nm]) {
+      this.D[nm] = {
+        at: {}, ys: {}, ms: {},
+        dh: [], db: 0,
+        act: [], ats: {},
+        lat: {}
+      };
+    }
+    cf.rMap = {};
+    for (var s in cf.fmap) cf.rMap[cf.fmap[s]] = s;
+    this.C[nm] = cf;
+    var self = this;
+    return {
+      nm: nm,
+      log: function(e) { self._l(nm, e); },
+      getStats: function() { return self._g(nm); }
+    };
+  },
+
+  _l: function(nm, e) {
+    var d = this.D[nm], c = this.C[nm];
+    if (!d || !c) return;
+
+    var es = {};
+    for (var k in e) {
+      var sk = c.rMap[k];
+      if (sk !== undefined) es[sk] = e[k];
+    }
+
+    var n = this.N();
+    var dt = new Date(n*1000);
+    var y = dt.getFullYear();
+    var mo = dt.getMonth()+1;
+    var dm = dt.getDate();
+    var h = dt.getHours();
+    var mi = dt.getMinutes();
+    var m10 = Math.floor(mi/10)*10;
+    var de = Math.floor(n/86400);
+    var pd = c.pd || 31;
+
+    if (d.db === undefined) { d.db = de; d.dh = new Array(pd); }
+    var slot = (de - d.db) % pd;
+    if (!d.dh[slot] || d.dh[slot].d !== de) { d.dh[slot] = { d: de, h: {} }; }
+    var bufDay = d.dh[slot];
+
+    var fl = (c.cnt || []).concat(c.acc || []);
+    for (var i=0; i<fl.length; i++) {
+      var f = fl[i], v = es[f];
+      if (v !== undefined) {
+        this._a(d, f, v, y, mo, dm, bufDay, h, m10);
+        if (c.cnt && c.cnt.indexOf(f)>=0) {
+          if (f === c.pCnt) d.ats.tot = (d.ats.tot || 0) + v;
+        }
+        if (c.acc && c.acc.indexOf(f)>=0) {
+          d.ats[f] = (d.ats[f] || 0) + v;
+        }
+      }
+    }
+
+    // latest values
+    if (c.lat) {
+      for (var i=0; i<c.lat.length; i++) {
+        var lf = c.lat[i];
+        if (es[lf] !== undefined) d.lat[lf] = es[lf];
+      }
+    }
+
+    // activity record
+    if (c.af && c.af.length) {
+      var rec = { ts: n };
+      for (var i=0; i<c.af.length; i++) { rec[c.af[i]] = es[c.af[i]]; }
+      d.act.push(rec);
+      var ma = c.ma || 20;
+      if (d.act.length > ma) d.act.splice(0, d.act.length - ma);
+    }
+
+    // session tracking (if configured)
+    if (c.ses && c.ses.f && es[c.ses.f] !== undefined) {
+      this._s(d, c, es[c.ses.f], dt);
+    }
+
+    this._uA(d, c);
+    this._pM(d, dt, c.pm || 12);
+  },
+
+  _a: function(d, f, v, y, mo, dm, bufDay, h, m10) {
+    // years
+    if (!d.ys[y]) d.ys[y] = {};
+    if (!d.ys[y][mo]) d.ys[y][mo] = {};
+    d.ys[y][mo][f] = (d.ys[y][mo][f]||0) + v;
+    // months
+    if (!d.ms[mo]) d.ms[mo] = {};
+    if (!d.ms[mo][dm]) d.ms[mo][dm] = {};
+    d.ms[mo][dm][f] = (d.ms[mo][dm][f]||0) + v;
+    // dayHour (buffer)
+    if (!bufDay.h[h]) bufDay.h[h] = {};
+    bufDay.h[h][f] = (bufDay.h[h][f]||0) + v;
+    // 10-minute slot inside the hour
+    if (!bufDay.h[h]._10m) bufDay.h[h]._10m = {};
+    if (!bufDay.h[h]._10m[m10]) bufDay.h[h]._10m[m10] = {};
+    bufDay.h[h]._10m[m10][f] = (bufDay.h[h]._10m[m10][f]||0) + v;
+  },
+
+  _uA: function(d, c) {
+    var tot = d.ats.tot || 0;
+    if (c.acc) {
+      for (var i=0; i<c.acc.length; i++) {
+        var f = c.acc[i], sum = d.ats[f] || 0;
+        if (tot > 0) d.ats['av'+f] = sum / tot;
+      }
+    }
+  },
+
+  _pM: function(d, dt, maxM) {
+    var cy = dt.getFullYear(), cm = dt.getMonth()+1;
+    for (var k in d.ms) {
+      var m = parseInt(k,10);
+      var diff = cm - m;
+      if (diff < 0) diff += 12;
+      if (diff >= maxM) delete d.ms[k];
+    }
+  },
+
+  // ---------- session tracking ----------
+
+  _s: function(d, c, v, dt) {
+    var s = d._s;
+    if (!s) {
+      s = { cur: { sd: null, sl: null, ll: null, lu: null, dr: null }, hist: [], dly: [] };
+      d._s = s;
+    }
+    var cur = s.cur;
+    var today = dt.toLocalISOString().split('T')[0];
+    var th = (c.ses && c.ses.th) || 15;
+
+    // charging detection
+    if (cur.ll !== null && v > cur.ll + th) {
+      this._finalizeSession(d, c);
+      // start new session
+      cur.sd = today;
+      cur.sl = v;
+      cur.ll = v;
+      cur.lu = dt.toLocalISOString();
+      cur.dr = null;
+      s.dly = [v];
+      return;
+    }
+
+    // first value ever
+    if (cur.lu === null) {
+      cur.sd = today;
+      cur.sl = v;
+      cur.ll = v;
+      cur.lu = dt.toLocalISOString();
+      s.dly = [v];
+      return;
+    }
+
+    // daily level snapshot
+    var lastUpdDate = new Date(cur.lu).toLocalISOString().split('T')[0];
+    if (today !== lastUpdDate) {
+      s.dly.push(v);
+      cur.ll = v;
+      cur.lu = dt.toLocalISOString();
+    } else {
+      cur.ll = v;
+      cur.lu = dt.toLocalISOString();
+    }
+
+    // discharge rate
+    this._calcDischarge(d, c, dt);
+  },
+
+  _finalizeSession: function(d, c) {
+    var s = d._s;
+    var cur = s.cur;
+    if (!cur.sd || cur.ll === null) return;
+
+    var days = ((new Date(cur.lu) - new Date(cur.sd)) / 86400000).toFixed(0);
+    var lost = cur.sl - cur.ll;
+    if (days >= 1 && lost >= 5) {
+      var entry = {
+        sd: cur.sd,
+        ed: new Date(cur.lu).toLocalISOString().split('T')[0],
+        dl: days,
+        pl: lost.toFixed(0),
+        ad: (lost / days).toFixed(1)
+      };
+      s.hist.unshift(entry);
+      var hm = (c.ses && c.ses.hm) || 5;
+      if (s.hist.length > hm) s.hist.length = hm;
+    }
+  },
+
+  _calcDischarge: function(d, c, dt) {
+    var s = d._s, cur = s.cur;
+    // allow user‑supplied calculator
+    if (c.ses && c.ses.calc) {
+      cur.dr = c.ses.calc(s.dly, cur);
+      return;
+    }
+    // default: linear drop over calendar days
+    if (s.dly.length >= 2) {
+      var days = ((new Date(dt) - new Date(cur.sd)) / 86400000);
+      if (days < 1) days = 1;
+      var drop = s.dly[0] - cur.ll;
+      var rate = drop / days;
+      if (rate < 0) rate = 0.1;   // small positive fallback
+      cur.dr = rate;
+    } else {
+      cur.dr = null;
+    }
+  },
+
+  _gSession: function(d, c) {
+    var s = d._s;
+    if (!s) return undefined;
+    var cur = s.cur;
+
+    // days elapsed from start to now (or last update)
+    var daysElapsed = 0;
+    if (cur.sd) {
+      daysElapsed = ((new Date() - new Date(cur.sd)) / 86400000).toFixed(0);
+    }
+
+    var dr = cur.dr;
+    var predicted = null;
+    if (dr && dr > 0 && cur.ll !== null) {
+      predicted = (cur.ll / dr).toFixed(0);
+    }
+
+    return {
+      currentLevel: cur.ll,
+      lastUpdate: cur.lu,
+      currentSession: {
+        startDate: cur.sd,
+        startLevel: cur.sl,
+        daysElapsed: daysElapsed,
+        dischargeRate: dr,
+        predictedDaysLeft: predicted
+      },
+      history: s.hist.map(function(e) {
+        return {
+          startDate: e.sd,
+          endDate: e.ed,
+          daysLasted: e.dl,
+          percentLost: e.pl,
+          avgDailyLoss: e.ad
+        };
+      }),
+      dailyLevels: s.dly
+    };
+  },
+
+  // ---------- getStats ----------
+
+  _g: function(nm) {
+    var d = this.D[nm], c = this.C[nm];
+    if (!d) return {};
+    var fm = c.fmap;
+    var out = { allTime: d.at, years: {}, months: {}, dayHours: {},
+                activity: [], allTimeStats: {}, latest: {} };
+
+    // years
+    for (var y in d.ys) {
+      var yr = {};
+      for (var m in d.ys[y]) {
+        var dmObj = {};
+        for (var sf in d.ys[y][m]) {
+          dmObj[fm[sf]||sf] = d.ys[y][m][sf];
+        }
+        yr[m] = dmObj;
+      }
+      out.years[y] = yr;
+    }
+
+    // months
+    for (var m in d.ms) {
+      var md = {};
+      for (var day in d.ms[m]) {
+        var dayObj = {};
+        for (var sf in d.ms[m][day]) {
+          dayObj[fm[sf]||sf] = d.ms[m][day][sf];
+        }
+        md[day] = dayObj;
+      }
+      out.months[m] = md;
+    }
+
+    // dayHours from circular buffer
+    var nowDe = Math.floor(this.N()/86400);
+    var pd = c.pd || 31;
+    if (d.dh) {
+      for (var i=0; i<pd; i++) {
+        var slot = d.dh[i];
+        if (slot && nowDe - slot.d <= pd) {
+          var dt2 = new Date(slot.d * 86400000);
+          var dayKey = dt2.getDate();
+          if (!out.dayHours[dayKey]) out.dayHours[dayKey] = {};
+          for (var hr in slot.h) {
+            if (!out.dayHours[dayKey][hr]) out.dayHours[dayKey][hr] = {};
+            var hObj = slot.h[hr];
+            for (var sf in hObj) {
+              if (sf === '_10m') continue;
+              out.dayHours[dayKey][hr][fm[sf]||sf] =
+                (out.dayHours[dayKey][hr][fm[sf]||sf]||0) + hObj[sf];
+            }
+            if (hObj._10m) {
+              if (!out.dayHours[dayKey][hr]._10m) out.dayHours[dayKey][hr]._10m = {};
+              for (var m10 in hObj._10m) {
+                if (!out.dayHours[dayKey][hr]._10m[m10]) out.dayHours[dayKey][hr]._10m[m10] = {};
+                for (var sf in hObj._10m[m10]) {
+                  out.dayHours[dayKey][hr]._10m[m10][fm[sf]||sf] =
+                    (out.dayHours[dayKey][hr]._10m[m10][fm[sf]||sf]||0) + hObj._10m[m10][sf];
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+
+    // activity
+    for (var i=0; i<d.act.length; i++) {
+      var rec = d.act[i];
+      var longRec = { ts: rec.ts };
+      for (var sf in rec) {
+        if (sf === 'ts') continue;
+        longRec[fm[sf]||sf] = rec[sf];
+      }
+      out.activity.push(longRec);
+    }
+
+    // allTimeStats
+    var ats = d.ats;
+    out.allTimeStats.total = ats.tot || 0;
+    for (var k in ats) {
+      if (k === 'tot') continue;
+      if (k.indexOf('av') === 0) {
+        var sf = k.slice(2);
+        var long = fm[sf];
+        if (long) {
+          out.allTimeStats['avg'+long.charAt(0).toUpperCase()+long.slice(1)] = ats[k];
+        }
+      } else {
+        out.allTimeStats[fm[k]||k] = ats[k];
+      }
+    }
+
+    // latest
+    for (var sf in d.lat) {
+      out.latest[fm[sf]||sf] = d.lat[sf];
+    }
+
+    // session stats (if any)
+    if (d._s) {
+      out.session = this._gSession(d, c);
+    }
+
+    return out;
+  },
+
+  save: function() {
+    try { require("Storage").writeJSON("lgr", this.D); } catch(e) {}
+  },
+  load: function() {
+    try { var s = require("Storage").readJSON("lgr"); if (s) this.D = s; } catch(e) {}
+  }
+};
+
+if (typeof ew === "undefined") global.ew = {};
+ew.logger = L;

@@ -1,17 +1,16 @@
 // launcher_set face - QUICK LINKS SETTINGS
 
 ew.UI.nav.next.replaceWith(() => {
+    ew.sys.buzz.nav(ew.sys.buzz.type.na);
+});
+ew.UI.nav.back.replaceWith(ew.UI.nav.next);
+
+/*ew.UI.nav.back.replaceWith(() => {
     ew.sys.buzz.nav(ew.sys.buzz.type.ok);
     ew.face[0].page = ew.face[0].page == 1 ? 2 : 1;
     ew.face[0].init();
 });
-
-ew.UI.nav.back.replaceWith(() => {
-    ew.sys.buzz.nav(ew.sys.buzz.type.ok);
-    ew.face[0].page = ew.face[0].page == 1 ? 2 : 1;
-    ew.face[0].init();
-});
-
+*/
 ew.face[0] = {
     run: false,
     page: 1,
@@ -33,56 +32,64 @@ ew.face[0] = {
             this.selectedApp = this.curL[this.selectedIdx];
         }
 
-        if (this.page === 1) {
+        //if (this.page === 1) {
             this.page1();
-        }
-        else {
-            this.page2();
-        }
+        //}
+        //else {
+         //   this.page2();
+        //}
         this.bar();
 
-        this.run = true;
+        //this.run = true;
     },
 
     show() {},
 
     page1() {
-        ew.UI.ele.ind(1, 2, 0, 15);
+        ew.UI.ele.ind(0, 0, 0, 15);
 
-        ew.UI.c.start(1, 1);
         ew.UI.ele.fill("_main", 12, 0);
 
         print("page", this.selectedApp)
-        // Δείξε το επιλεγμένο app
-        if (this.selectedApp) {
-            ew.UI.btn.c2l("main", "_header",6, this.selectedApp.name, "", 15, 0 , 1);
-        }
-        else {
-            ew.UI.btn.c2l("main", "_header", 6, "NO APP", "", 15, 13 , 1);
-        }
-
+        
+        // header
+        //ew.UI.btn.img("bar", "_header", 6, this.selectedApp.icon, this.selectedApp.name, 15, 0,1,1,1);
+        
+        //ew.UI.btn.c2l("main", "_header",6, this.selectedApp.name, "", 15, 0 , 1);
+       
+        ew.UI.c.start(1, 1);
         // Τα 3 κουμπιά για quick links
-        ew.UI.btn.c2l("main", "_2x3", 4, "LEFT", "", 15, 1, 0.6);
-        ew.UI.btn.c2l("main", "_2x3", 5, "BTN", "", 15, 1, 0.6);
-        ew.UI.btn.c2l("main", "_2x3", 6, "RIGHT", "", 15, 1, 0.);
+        ew.UI.btn.c2l("main", "_2x3", 1, "<-", "", 15, 1, 1);
+        ew.UI.btn.c2l("main", "_2x3", 2, "MAIN", "", 15, 1, 1);
+        ew.UI.btn.c2l("main", "_2x3", 3, "->", "", 15, 1, 1);
+        ew.UI.btn.c2l("main", "_2x3", 6, "BTN", "", 15, 1, 1);
+        ew.UI.ele.fill("_2x3", 5, 0);
+        ew.UI.btn.img("main", "_2x3", 4, "ew_i_trash.img", "DEL", 15, 1);
 
         ew.UI.c.end();
 
         ew.UI.c.main._2x3 = (i, l) => {
-            if (!l) return; // Μόνο long press
 
             ew.sys.buzz.nav(ew.sys.buzz.type.ok);
-
-            // Θέσε το quick link
-            if (i >= 4 && i <= 6) {
-                let position = i === 4 ? "left" : (i === 5 ? "btnL" : "rght");
-                
-                ew.def.face[position]=this.selectedApp.id;
-                //ew.apps.launcher.link(position, this.selectedApp);
-                ew.UI.btn.ntfy(1, 1, 0, "_bar", 6,
-                    "QUICK LINK SET", position.toUpperCase(), 0, 15);
-
+            
+             if (i==4) { 
+                ew.UI.btn.ntfy(1, 1, 0, "_bar", 6, "DELETE ?", "", 15, 13);
+                return; 
             }
+            if (!l) {
+                ew.UI.btn.ntfy(1, 1, 0, "_bar", 6, "USE", "LONG PRESS", 0, 15);
+                return; 
+            }
+
+  
+
+            let position = i === 1 ? "left" : (i === 2 ? "main" : i === 3? "rght":"btnL");
+                
+            ew.def.face[position]=this.selectedApp.id;
+            ew.UI.btn.ntfy(1, 1, 0, "_bar", 6,
+            "QUICK LINK SET", position.toUpperCase(), 0, 15);
+
+            //}
         };
     },
 
@@ -129,11 +136,8 @@ ew.face[0] = {
         ew.UI.c.start(0, 1);
         ew.UI.c.end();
         ew.UI.ele.fill("_bar", 6, 0);
-
-        let pageText = this.page === 1 ? "SET" : "VIEW";
-        ew.UI.btn.img("bar", "_bar", 6, "ew_i_"+ew.face.appCurr.split("-")[0]+".img", "", 15, 0,1.4,0,0);
-        
-        //ew.UI.btn.c2l("main", "_bar", 6, pageText, "", 15, 1, 1.3);
+        ew.UI.btn.img("bar", "_bar", 6, this.selectedApp.icon, this.selectedApp.name, 15, 0,1,1,1);    
+        //ew.UI.btn.img("bar", "_bar", 6, "ew_i_"+ew.face.appCurr.split("-")[0]+".img", ew.face.appCurr.split("-")[0].toUpperCase(), 15, 0,0.8,1,1);
     },
 
     clear() {

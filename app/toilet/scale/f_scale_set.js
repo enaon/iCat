@@ -62,7 +62,7 @@ ew.face[0] = {
                 ew.sys.buzz.nav(ew.sys.buzz.type.ok);
                 ew.UI.btn.ntfy(1, 3, 0, "_bar", 6, "SET MAX", "SAND WEIGHT (KG)", 15, 6, 1);
                 ew.is.slide = 1;
-                ew.sys.TC.val = { cur: ew.apps.kitty.state.def.sand[ew.apps.kitty.state.def.is.sandType].max / 100, dn: 14, up: 40, tmp: 0 };
+                ew.sys.TC.val = { cur: ew.apps.kitty.state.def.sand[ew.apps.kitty.state.def.is.sandType].max / 100, dn: 14, up: 40 };
                 ew.UI.c.tcBar = (a, b) => {
                     ew.UI.btn.ntfy(0, 2, 1);
                     ew.UI.btn.c2l("main", "_2x3", 2, "MAX", b / 10, 15, ew.apps.kitty.state.def.is.scale ? 6 : 1); //6
@@ -73,7 +73,7 @@ ew.face[0] = {
                 ew.sys.buzz.nav(ew.sys.buzz.type.ok);
                 ew.UI.btn.ntfy(1, 3, 0, "_bar", 6, "SET MIN", "SAND WEIGHT (KG)", 15, 6, 1);
                 ew.is.slide = 1;
-                ew.sys.TC.val = { cur: ew.apps.kitty.state.def.sand[ew.apps.kitty.state.def.is.sandType].min / 100, dn: 5, up: 15, tmp: 0 };
+                ew.sys.TC.val = { cur: ew.apps.kitty.state.def.sand[ew.apps.kitty.state.def.is.sandType].min / 100, dn: 5, up: 15 };
                 ew.UI.c.tcBar = (a, b) => {
                     ew.UI.btn.ntfy(0, 2, 1);
                     ew.UI.btn.c2l("main", "_2x3", 3, "MIN", b / 10, 15, ew.apps.kitty.state.def.is.scale ? 6 : 1); //6
@@ -84,7 +84,7 @@ ew.face[0] = {
                 ew.sys.buzz.nav(ew.sys.buzz.type.ok);
                 ew.UI.btn.ntfy(1, 3, 0, "_bar", 6, "TRIGGER TOLLERANCE", "WEIGTH (GRAMS)", 15, 6, 1);
                 ew.is.slide = 1;
-                ew.sys.TC.val = { cur: ew.apps.scale.state.value.tolerance / 10, dn: 40, up: 150, tmp: 0 };
+                ew.sys.TC.val = { cur: ew.apps.scale.state.value.tolerance / 10, dn: 40, up: 150 };
                 ew.UI.c.tcBar = (a, b) => {
                     ew.UI.btn.ntfy(0, 2, 1);
                     ew.apps.scale.state.value.tolerance = b * 10;
@@ -95,7 +95,7 @@ ew.face[0] = {
                 ew.sys.buzz.nav(ew.sys.buzz.type.ok);
                 ew.UI.btn.ntfy(1, 3, 0, "_bar", 6, "MOVE SENSITIVIY", "WEIGTH (GRAMS)", 15, 6, 1);
                 ew.is.slide = 1;
-                ew.sys.TC.val = { cur: ew.apps.scale.state.value.sensitivity, dn: 5, up: 20, tmp: 0 };
+                ew.sys.TC.val = { cur: ew.apps.scale.state.value.sensitivity, dn: 5, up: 20};
                 ew.UI.c.tcBar = (a, b) => {
                     ew.UI.btn.ntfy(0, 2, 1);
                     ew.apps.scale.state.value.sensitivity = b;

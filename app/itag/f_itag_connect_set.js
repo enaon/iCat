@@ -15,10 +15,12 @@ ew.face[0] = {
         this.conn = ew.apps.itag.state.ble.ffe1;
 
         this.dev = ew.apps.itag.state.def.store[ew.apps.itag.state.ble.id];
-        if (this.dev.board != undefined)
+        if (this.dev.brd != undefined)
             this.ewtag();
         else
             this.itag();
+            
+        this.bar();
 
     },
     show: function(o) { return; },
@@ -42,11 +44,11 @@ ew.face[0] = {
                 ew.UI.btn.c2l("main", "_2x3", 2, "UART", r.v.uart ? "ON" : "OFF", 15, 4);
                 ew.UI.btn.c2l("main", "_2x3", 3, "INT", r.v.intA, 15, 4);
                 //ew.UI.btn.c2l("main", "_2x3", 5, "RBT", "", 15, 13);
-                if (this.dev.board != 3) ew.UI.btn.c2l("main", "_2x3", 6, "PHY", r.v.phyA.substring(0, 3).toUpperCase(), 15, 4);
+                if (this.dev.brd != 3) ew.UI.btn.c2l("main", "_2x3", 6, "PHY", r.v.phyA.substring(0, 3).toUpperCase(), 15, 4);
             }
             ew.comm.mstr.get("ew.frce", null, "f").then(r => {
                 if (r.s === 'ok') {
-                    print("frce", r.v, r)
+                    //print("frce", r.v, r)
                     this.frce = r.v;
                     ew.UI.btn.c2l("main", "_2x3", 4, "FORCE", r.v ? "ON" : "OFF", 15, r.v ? 13 : 1);
                 }
@@ -58,7 +60,7 @@ ew.face[0] = {
         ew.UI.c.main._2x3 = (i) => {
             if (i == 1) {
                 ew.sys.buzz.nav(ew.sys.buzz.type.ok);
-                const options = (this.dev.board === 3 ? ["-4", "0", "+4"] : ["-8", "-4", "0", "+4", "+8"])
+                const options = (this.dev.brd === 3 ? ["-4", "0", "+4"] : ["-8", "-4", "0", "+4", "+8"])
                 const currentIndex = options.indexOf(this.rfTX);
                 const nextIndex = (currentIndex + 1) % options.length;
                 const newValue = options[nextIndex];
@@ -135,9 +137,9 @@ ew.face[0] = {
                 if (this.phy === "1mbps") this.phy = "coded";
                 else this.phy = "1mbps";
 
-                print("phy", this.phy);
+                //print("phy", this.phy);
                 ew.comm.mstr.set("ew.bt.phyA", this.phy, "b").then(r => {
-                    print(r);
+                    //print(r);
                     if (r.s == "ok") {
                         this.phy = r.v;
                         if (ew.def.face.info) ew.UI.btn.ntfy(1, 1.5, 0, "_bar", 6, "PHY MODE", r.v.toUpperCase(), 0, 15);
@@ -158,17 +160,17 @@ ew.face[0] = {
         ew.UI.ele.fill("_main", 12, 0);
         
         ew.UI.c.start(1, 0);
-        ew.UI.btn.c2l("main", "_2x3", 1, "SLNT", this.dev.silent?"ON":"OFF", 15, this.dev.silent?4:1);
+        ew.UI.btn.c2l("main", "_2x3", 1, "SLNT", this.dev.sil?"ON":"OFF", 15, this.dev.sil?4:1);
         ew.UI.c.end();
 
         ew.UI.c.main._2x3 = (i) => {
 
             if (i == 1) {
                 ew.sys.buzz.nav(ew.sys.buzz.type.ok);
-                this.dev.silent = 1 - this.dev.silent;
-                ew.UI.btn.c2l("main", "_2x3", 1, "SLNT", this.dev.silent?"ON":"OFF", 15, this.dev.silent?4:1);
-                if (ew.def.face.info) ew.UI.btn.ntfy(1, 1.5, 0, "_bar", 6, "SILENT ", this.dev.silent ? "ENABLED" : "DISABLED", 0, 15);
-                ew.apps.itag.state.ble.silence.writeValue( (this.dev.silent ? 0 : 1) );
+                this.dev.sil = 1 - this.dev.sil;
+                ew.UI.btn.c2l("main", "_2x3", 1, "SLNT", this.dev.sil?"ON":"OFF", 15, this.dev.sil?4:1);
+                if (ew.def.face.info) ew.UI.btn.ntfy(1, 1.5, 0, "_bar", 6, "SILENT ", this.dev.sil ? "ENABLED" : "DISABLED", 0, 15);
+                ew.apps.itag.state.ble.silence.writeValue( (this.dev.sil ? 0 : 1) );
             }
 
         };
@@ -186,7 +188,7 @@ ew.face[0] = {
 
     clear: function(o) {
         ew.is.slide = 0; /*TC.removeAllListeners();*/
-        if (this.dev.board != undefined) ew.comm.mstr.set("ew.bt.intA", this.int, "i");
+        if (this.dev.brd != undefined) ew.comm.mstr.set("ew.bt.intA", this.int, "i");
         if (this.tid) clearTimeout(this.tid);
         this.tid = 0;
         if (ew.apps.itag.state.focus || (ew.apps.itag.state.def.set.persist && ew.face.appCurr === "itag") || (ew.face.appCurr.startsWith("itag") && !ew.face.pageCurr)) return;

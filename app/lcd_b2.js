@@ -36,8 +36,8 @@ g.setFontAlign(-1, -1);
 
 g.on = function(o) {
   if (!o) this.isOn = true;
-  if (ew.def.dev.bl) g.bri.set(ew.def.face.bri);
-  else Bangle.setLCDBrightness(0);
+  if (ew.def.dev.bl || o) g.bri.set(ew.def.face.bri);
+  //else Bangle.setLCDBrightness(0);
   ew.UI.btn.ntfy(1, 0.5, 0, "_bar", 6, "AWAKE", "", 0, 15);
 
 };

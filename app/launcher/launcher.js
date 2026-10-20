@@ -3,6 +3,7 @@
 ew.apps.launcher = {
     state: {
         def: {
+            mem:0, // remember last position
             page: 0, // 0: custom apps, 1: bangle apps
             sort: "name",
             show: false,
@@ -32,7 +33,9 @@ ew.apps.launcher = {
     gEW() {
         this.state.ewA = [];
         for (let appName in ew.apps) {
-            if (appName === "state" || appName === "launcher" || appName === ew.def.face.main) continue;
+            if (!require("Storage").read("ew_i_" + appName + ".img")) continue;
+            //print("ew",appName)
+            if ((ew.apps.launcher.state.def.link.l && appName.toUpperCase() === ew.apps.launcher.state.def.link.l.name) || (ew.apps.launcher.state.def.link.c&&appName.toUpperCase() === ew.apps.launcher.state.def.link.c.name) || (ew.apps.launcher.state.def.link.r && appName.toUpperCase() === ew.apps.launcher.state.def.link.r.name)||appName === "launcher" || appName === ew.def.face.main) continue;
             if (typeof ew.apps[appName] === 'object' && ew.apps[appName] !== null) {
                 this.state.ewA.push({
                     id: appName,
@@ -60,8 +63,11 @@ ew.apps.launcher = {
         for (let file of files) {
             try {
                 let info = s.readJSON(file, true);
+                //print("bg",info)
                 if (info.type === "app" || info.type === "clock" || !info.type) {
-                    if (!info.id || info.name === "eucWatch") continue;
+                    if (!info.id || info.name === "eucWatch" || (ew.apps.launcher.state.def.link.l && info.name.toUpperCase() === ew.apps.launcher.state.def.link.l.name) || (ew.apps.launcher.state.def.link.c&&info.name.toUpperCase() === ew.apps.launcher.state.def.link.c.name) || (ew.apps.launcher.state.def.link.r && info.name.toUpperCase() === ew.apps.launcher.state.def.link.r.name)) continue;
+
+                    //if (!info.id || info.name === "eucWatch") continue;
                     this.state.bgA.push({
                         id: info.src,
                         name: info.name.toUpperCase() || "UNKNOWN",
@@ -156,12 +162,14 @@ ew.apps.launcher = {
             ew.UI.btn.ntfy(1, 1, 0, "_bar", 6, "HOLD", "TO SET", 0, 15);
             return false;
         }
-        let app = this.getA(link.id, link.type);
-        if (!app) {
+        //let app = this.getA(link.id, link.type);
+        
+        if (!link) {
+        //if (!app) {
             ew.UI.btn.ntfy(1, 1.5, 0, "_bar", 6, "ERROR", "NOT FOUND", 15, 13);
             return false;
         }
-        return this.goA(app);
+        return this.goA(link);
     },
 
     // Navigation

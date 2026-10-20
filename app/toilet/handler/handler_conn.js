@@ -37,13 +37,13 @@ ew.do.update.bluetooth = function() {
 			if (ew.is.btsl == 1) {
 				NRF.wake();
 				ew.is.btsl = 0;
-				if (!ew.def.face.info) ew.notify.alert("info", { "src": "BT", "title": "BT", "body": "WAKE" }, 1);
+				if (!ew.def.face.info) ew.notify.alert("info", { "src": "BT", "title": "BT", "body": "Wake" }, 1);
 			}
 		}
 		else if (!ew.def.cli) { //if (ew.is.bt) NRF.disconnect();
 			NRF.sleep();
 			ew.is.btsl = 1;
-			if (!ew.def.face.info) ew.notify.alert("info", { "src": "BT", "title": "BT", "body": "SLEEP" }, 1);
+			if (!ew.def.face.info) ew.notify.alert("info", { "src": "BT", "title": "BT", "body": "Sleep" }, 1);
 
 		}
 
@@ -55,13 +55,13 @@ ew.do.update.bluetooth = function() {
 
 ew.sys.BLEcon = () => {
 		ew.is.bt=1;
-		ew.notify.alert("info",{"src":"BT","title":"BT","body":"CLIENT IN"},1);
+		ew.notify.alert("info",{"src":"BT","title":"BT","body":"Client In"},1);
 		E.setConsole(Bluetooth,{force:true});
 		ew.sys.emit('BLE_con');
 }
 //
 ew.sys.BLEdis = () => {
-	if (ew.is.bt==1 && ew.def.face.info) ew.notify.alert("info",{"src":"BT","title":"BT","body":"CLIENT OUT"},1);
+	if (ew.is.bt==1 && ew.def.face.info) ew.notify.alert("info",{"src":"BT","title":"BT","body":"Client Out"},1);
 	E.setConsole(null,{force:true});
 	ew.is.bt=0; 
     if (!ew.def.cli){

@@ -30,15 +30,15 @@ ew.face[0] = {
         if (this.tidC) clearTimeout(this.tidC);
         
         // ---- tag type: itag ----
-        if (this.dev.board === undefined && !ew.apps.itag.state.connected && !ew.apps.itag.state.ble.gatt.connected) {
-            this.tidC = setTimeout(() => { ew.apps.itag.conn(this.dev.id,"0"); }, 800);
+        if (this.dev.brd === undefined && !ew.apps.itag.state.connected && !ew.apps.itag.state.ble.gatt.connected) {
+            this.tidC = setTimeout(() => { ew.apps.itag.conn(ew.apps.itag.state.ble.id,"0"); }, 800);
             ew.UI.btn.ntfy(1, 10, 0, "_bar", 6, "CONNECTING", "", 0, 15);
         }
          // ---- tag type: ewtag ----
-        else if (this.dev.board != undefined && (!ew.comm.mstr.connection || (ew.comm.mstr.connection && !ew.comm.mstr.connection.connected))) {
+        else if (this.dev.brd != undefined && (!ew.comm.mstr.connection || (ew.comm.mstr.connection && !ew.comm.mstr.connection.connected))) {
             this.tidC = setTimeout(() => {
                 //  ---- connect(deviceId, phy, mtu, rssiHandler) ----
-                ew.comm.mstr.connect(this.dev.id,(this.dev.phy===2?"coded":"1mbps"),this.dev.board===3?45:0, ew.apps.itag.state.def.set.rssiHandler).then(response => {
+                ew.comm.mstr.connect(ew.apps.itag.state.ble.id,(this.dev.phy===2?"coded":"1mbps"),this.dev.brd===3?45:0, ew.apps.itag.state.def.set.rssiHandler).then(response => {
                     if (ew.face.appCurr === "itag-connect") {
                         ew.UI.btn.ntfy(1, 0.5, 0, "_bar", 6, "CONNECTED", "", 0, 15);
                     }
@@ -52,7 +52,7 @@ ew.face[0] = {
         else this.bar();
         ew.UI.ele.ind(0, 0, 0, 0);
 
-        this.info(this.dev.batt, this.dev.id.split(" ")[0]);
+        this.info(this.dev.batt, ew.apps.itag.state.ble.id.split(" ")[0]);
         this.run=true;
     },
     show: function() {
@@ -80,7 +80,7 @@ ew.face[0] = {
 
     },
     bar: function() {
-        if (ew.is.UIpri) { ew.notify.alert("error", ew.notify.log.error[0], 1, 1); return; }
+        //if (ew.is.UIpri) { ew.notify.alert("error", ew.notify.log.error[0], 1, 1); return; }
         //"ram";
         if ((ew.UI.ntid)) {
             clearTimeout(ew.UI.ntid);
@@ -108,7 +108,7 @@ ew.face[0] = {
             ew.sys.buzz.nav(ew.sys.buzz.type.ok);
             if (i == 4) {
 
-                if (this.dev.board != undefined) {
+                if (this.dev.brd != undefined) {
 
                     if (ew.def.face.info) ew.UI.btn.ntfy(1, 0.6, 0, "_bar", 6, "SENT", "", 0, 15);
 
@@ -126,7 +126,7 @@ ew.face[0] = {
             }
             if (i == 5 || i == 6) {
                 if (ew.def.face.info) ew.UI.btn.ntfy(1, 1, 0, "_bar", 6, "DISCONNECTING", "", 0, 15);
-                if (this.dev.board != undefined) {
+                if (this.dev.brd != undefined) {
                     if (l) {
                         ew.comm.mstr.disconnect().then(r => {
                             ew.face.go("itag", 0);

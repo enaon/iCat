@@ -1,3 +1,5 @@
+// heart rate
+
 ew.UI.nav.next.replaceWith(() => {
     if (ew.UI.ntid) {clearTimeout(ew.UI.ntid);ew.UI.ntid=0}
     ew.sys.buzz.nav(ew.sys.buzz.type.ok);
@@ -22,30 +24,25 @@ ew.face[0] = {
         loading: true, // loading state
         key: "bpm", // current key for graph
         pos: 0, // current position
-        maxBpm: 100, // default max bpm
+        max: 100, // default max bpm
         realtime: {
             bpm: 0,
-            //confidence: 0,
-            //lastUpdate: 0
-        }
+        },
+        size:ew.UI.loc("_bar", 6)
     },
+    cnt:9,
+    beat:1,
     run: false,
     offms: (ew.def.face.off[ew.face.appCurr]) ? ew.def.face.off[ew.face.appCurr] : 60000,
-    pendingReads: 0, // αριθμός εκκρεμών αναγνώσεων
-
 
     init: function() {
         if (!ew.def.face.off[ew.face.appCurr]) ew.def.face.off[ew.face.appCurr] = this.offms;
 
         // Start real time HR monitor
-        Bangle.setOptions({hrmPollInterval:40});
         Bangle.setHRMPower(1,"ew");
-        //Bangle.setOptions({hrmPollInterval:40});
-        Bangle.setOptions({hrmStaticSampleTime:true});
-        //print("hrm mode",Bangle.getOptions().hrmStaticSampleTime);
-        //print("hrm mode",Bangle.getOptions().hrmPollInterval);
-        //print("ew.face.appPrev",ew.face.appPrev)
         if (ew.face.appPrev !== "hr") Bangle.on("HRM", this.hrmRT);
+
+        if (ew.def.face.info) ew.UI.btn.ntfy(1, 1.5, 0, "_bar", 6, "HEART RATE", "", 15, 1);
 
         // UI control Start
         ew.UI.c.start(1, 1);
@@ -74,21 +71,30 @@ ew.face[0] = {
             face.data.realtime.bpm = hrm.bpm || 0;
             face.data.realtime.conf = hrm.confidence || 0;
             //face.data.realtime.lastUpdate = Date.now();
-            //print(hrm);
-            //print("bpm,confidence",hrm.bpm,hrm.confidence)
             if (!hrm.bpm ) {
-                ew.UI.btn.i2l("main", "_main",9, "MEASURING", "", 15, 4,1, 8);
+                face.anim();
+                //ew.UI.btn.i2l("main", "_main",9, "MEASURING", "", 15, 4,1, 8);
             }
             face.tid1=setTimeout(()=>{
-                    ew.face[0].tid1=0;
-                    ew.UI.btn.i2l("main", "_main",9, "WEAR PROPERLY", "", 15, 4,1, 8);
+                    face.tid1=0;
+                    ew.UI.btn.i2l("main", "_main",9, "WEAR PROPERLY", "", 15, 6, 1, 8);
             },3000)
             
             
-            if (!ew.UI.ntid) face.dRTI();
+            face.dRTI();
         }
     },
 
+    anim:function(){
+        if (this.hr) clearTimeout(this.hr); 
+        this.hr=setTimeout(()=>{
+            this.hr=0;
+            this.cnt--;
+            if (this.cnt<8) { if (this.beat) {this.beat=0;this.cnt=13;return;} else {this.beat=1;this.cnt=11;} }
+            ew.UI.btn.img("main", "_main", 9, "ew_i_hr.img", "MEASURING", 14, 6, 1.2+(this.cnt/10));this.anim();
+
+        },5);
+    },
     mode: function(page) {
         ew.apps.hr.state.def.page = page;
 
@@ -98,9 +104,8 @@ ew.face[0] = {
             this.data.loading = false;
             this.data.source = [];
             ew.UI.ele.ind(1, 4, 0, 15); // 1/4
-            ew.UI.btn.c2l("main", "_header", 6, "HEART RATE", "", 15, 0, 1.15, 1);
-            ew.UI.btn.i2l("main", "_main",9, "STAY STILL", "", 15, 4,1, 8);
-            ew.UI.ele.fill("_bar", 6, 0, 1); 
+            ew.UI.btn.c2l("main", "_header", 6, "LIVE VIEW", "", 15, 0, 1, 1);
+            ew.UI.btn.i2l("main", "_main",9, "STAY STILL", "", 15, 6,1, 8);
             if (this.tid1){
                 clearTimeout(this.tid1);
                 this.tid1=0;
@@ -114,11 +119,15 @@ ew.face[0] = {
             this.bar();
             return;
         }
-
+        
+        if (this.hr) clearTimeout(this.hr);
+        this.hr=0;
         this.data.source = [];
         this.data.loading = true;
-
-        ew.UI.btn.i2l("main", "_main", 9, "LOADING", "", 15, 1, 1.3);
+        
+        
+        ew.UI.btn.img("main", "_main", 9, "ew_i_scan.img", "", 14, 1, 1.4);
+        //ew.UI.btn.i2l("main", "_main", 9, "LOADING", "", 15, 1, 1.3);
         if (!ew.UI.ntid) ew.UI.ele.fill("_bar", 6, 0);
 
         let time = new Date();
@@ -146,7 +155,7 @@ ew.face[0] = {
             type = "Month";
         }
 
-        ew.UI.btn.c2l("main", "_header", 6, title, "", 15, 0, 1.15, 1);
+        ew.UI.btn.c2l("main", "_header", 6, title, "", 15, 0, 1.1, 1);
         
         // create data source
         if (!this.data["source" + page]) {
@@ -219,7 +228,7 @@ ew.face[0] = {
         else 
             this.data.source = this.data["source" + page];
 
-        this.pHD();
+        this.pMax();
     },
 
     dRTI: function() {
@@ -229,8 +238,10 @@ ew.face[0] = {
         let conf = rt.conf || 0;
 
         //let bpmStr = bpm > 0 ? bpm.toString() : "WAIT";
-        if (bpm) ew.UI.btn.c2l("main", "_main",9,  bpm.toString(), "", 15, 90<conf?4:1,3, 8,"LECO1976Regular22");
-
+        if (bpm) {
+            if (this.hr) { clearTimeout(this.hr); this.hr=0;}   
+            ew.UI.btn.c2l("main", "_main",9,  bpm.toString(), "", 15, 90<conf?4:1,3, 8,"LECO1976Regular22");
+        }
         //if (70 < confidence) 
         this.uRTG(bpm,conf);
     },
@@ -272,9 +283,9 @@ ew.face[0] = {
         for (let i = 0; i < tempSource.length; i++) {
             if (tempSource[i].bpm > maxVal) maxVal = tempSource[i].bpm;
         }
-        this.data.maxBpm = maxVal + 10;
+        this.data.max = maxVal + 10;
 
-        if(!ew.UI.ntid) this.dRTG();
+        this.dRTG();
         
         this.data.source = originalSource;
     },
@@ -299,27 +310,27 @@ ew.face[0] = {
 
         for (let offset = 23; offset >= 0; offset--) {
             let displayHour = (currentHour - offset + 24) % 24;
-            if (counts[displayHour] > 0) {
+            //if (counts[displayHour] > 0) {
                 hourlyData.push({
-                    bpm: sums[displayHour] / counts[displayHour] | 0,
+                    bpm: (counts[displayHour] > 0) ? sums[displayHour] / counts[displayHour] |0  : 0,
                     hr: displayHour,
                     min: 0,
                     count: counts[displayHour]
                 });
-            }
+            //}
         }
 
         this.data.source = hourlyData;
     },
 
-    pHD: function() {
-        this.data.maxBpm = 60;
+    pMax: function() {
+        this.data.max = 60;
         for (let i = 0; i < this.data.source.length; i++) {
-            if (this.data.source[i].bpm > this.data.maxBpm) {
-                this.data.maxBpm = this.data.source[i].bpm;
+            if (this.data.source[i].bpm > this.data.max) {
+                this.data.max = this.data.source[i].bpm;
             }
         }
-        if (this.data.maxBpm < 60) this.data.maxBpm = 100;
+        if (this.data.max < 60) this.data.max = 100;
 
         this.data.pos = this.data.source.length - 1;
         this.data.loading = false;
@@ -339,27 +350,29 @@ ew.face[0] = {
         let entry = this.data.source[this.data.pos];
         let bpmStr = entry.bpm.toString();
         //ew.UI.btn.i2l("main", "_main", 9, bpmStr, "bpm", 15, 6, 2);
-        ew.UI.btn.c2l("main", "_main", 3, bpmStr, "", 15, 6, 1, 8, "LECO1976Regular42");
+        ew.UI.btn.c2l("main", "_main", 3, bpmStr, "", 15, 6, 1, 10, "LECO1976Regular42");
         
 
         // Time
         let hours = entry.hr.toString().padStart(2, '0');
         let mins = entry.min.toString().padStart(2, '0');
         let timeStr = "time: " + hours + ":" + mins;
-        ew.UI.btn.c2l("main", "_main", 6,timeStr, "", 15, 1,18,2, "Vector");
+        ew.UI.btn.c2l("main", "_main", 6,timeStr, "", 15, 1,20,2, "Vector");
         //ew.UI.btn.c2l("main", "_header", 6, timeStr, "", 15, 0, 1.3, 1);
     },
     dG: function(update, newPos) {
+        if (ew.UI.ntid) return;
 
         const margin = 2;
         const width = g.getWidth() - margin;
-        const graphTop = 130;
-        const graphHeight = 45;
+        const bottom = g.getHeight();
+        const graphTop = this.data.size.y-this.data.size.szY+5;
+        const graphHeight = this.data.size.szY*2;
         const fields = this.data.source.length;
         const space = 3;
-        const topL = this.data.topL; 
-        const btmL = this.data.btmL; 
-        
+        const topL = this.data.topL;
+        const btmL = this.data.btmL;
+
         if (fields === 0) return;
 
         const MAX_BAR_WIDTH = 30;
@@ -375,28 +388,64 @@ ew.face[0] = {
             startX = margin;
         }
 
-        let scale = graphHeight / this.data.maxBpm;
+        // Scale for bars
+        let scale = graphHeight / this.data.max;
 
-        for (let i = 0; i < fields; i++) {
-            let entry = this.data.source[i];
-            let barH = entry.bpm * scale;
-            let x = startX + i * (bw + space);
-            let isSelected = (i === this.data.pos);
+        if (update) {
+            let oldPos = this.data.posL; 
+            newPos; 
 
-            let color =  topL < entry.bpm ? 13 : entry.bpm < btmL? 9: 4;
+            let oldX = startX + oldPos * (bw + space);
+            let oldEntry = this.data.source[oldPos];
+            let oldBarH = oldEntry.bpm * scale;
 
-            g.setCol(1, isSelected ? 15 : color);
-            g.fillRect(x, graphTop + graphHeight - barH, x + bw, graphTop + graphHeight);
+            let color = topL < oldEntry.bpm ? 13 : oldEntry.bpm < btmL ? 9 : 4;
+            
+            // revert old pos
+            g.setCol(1, color);
+            g.fillRect(oldX, graphTop + graphHeight - oldBarH, oldX + bw, graphTop + graphHeight);
+            g.setCol(1, 0);
+            g.fillRect(oldX, graphTop -5, oldX + bw, graphTop-2 );
+            // highlight new pos
+            let newX = startX + newPos * (bw + space);
+            let newEntry = this.data.source[newPos];
+            let newBarH = newEntry.bpm * scale;
+
+            g.setCol(1, 15); // highlight color
+            g.fillRect(newX, graphTop + graphHeight - newBarH, newX + bw, graphTop + graphHeight);
+            g.fillRect(newX, graphTop -5, newX + bw, graphTop-2 );
+
+        }
+        else {
+
+            // Draw bars
+            for (let i = 0; i < fields; i++) {
+                let entry = this.data.source[i];
+                let barH = entry.bpm * scale;
+                let x = startX + i * (bw + space);
+                let isSelected = (i === this.data.pos);
+
+                let color = topL < entry.bpm ? 13 : entry.bpm < btmL ? 9 : 4;
+
+                g.setCol(1, isSelected ? 15 : color);
+                if (isSelected) g.fillRect(x, graphTop -5, x + bw, graphTop-2 );
+                g.fillRect(x, graphTop + graphHeight - barH, x + bw, graphTop + graphHeight);
+                
+
+            }
+            
         }
 
         if (this.tid) clearTimeout(this.tid);
         this.tid = setTimeout(() => {
             this.tid = 0;
-            this.dI();
-        }, 50);
+            this.dI()
+        }, 25)
+
     },
 
     dRTG: function() {
+        if(ew.UI.ntid) return;
 
         const margin = 2;
         const width = g.getWidth() - margin;
@@ -422,7 +471,7 @@ ew.face[0] = {
             startX = margin;
         }
 
-        let scale = graphHeight / this.data.maxBpm;
+        let scale = graphHeight / this.data.max;
 
         // Καθάρισε περιοχή
         g.setCol(0, 0);
@@ -432,7 +481,6 @@ ew.face[0] = {
             let entry = this.data.source[i];
             let barH = entry.bpm * scale;
             let x = startX + i * (bw + space);
-            //print(entry)
             // Highlight μόνο την τελευταία μπάρα (δεξιά)
             let isSelected = (i === fields - 1);
             let color =  topL < entry.bpm ? 13 : entry.bpm < btmL? 9: 4;
@@ -442,10 +490,9 @@ ew.face[0] = {
         }
     },
     bar: function() {
-        if (ew.is.UIpri || ew.UI.ntid) return;
+        if (ew.UI.ntid) return;
         ew.UI.c.start(0, 1);
         ew.UI.c.end();
-        ew.UI.ele.fill("_bar", 6, 0);
 
 
         if (ew.apps.hr.state.def.page === 0) {
@@ -454,6 +501,7 @@ ew.face[0] = {
             return;
         }
         
+        ew.UI.ele.fill("_bar", 6, 0);
         if (!this.data.loading && this.data.source.length > 0) {
             ew.sys.TC.val = {
                 cur: this.data.pos,
@@ -485,6 +533,8 @@ ew.face[0] = {
         ew.is.slide = 0;
         if (this.tid) clearTimeout(this.tid);
         this.tid = 0;
+        if (this.hr) clearTimeout(this.hr);
+        this.hr=0;
         if (this.tid1) clearTimeout(this.tid1);
         this.tid1 = 0;
         if (ew.face.appCurr!=="hr"){ 

@@ -238,7 +238,7 @@ ew.face[0] = {
 
     },
     bar: function() {
-        if (ew.is.UIpri) { ew.notify.alert("error",ew.notify.log.error[0], 1, 1);return;}
+        //if (ew.is.UIpri) { ew.notify.alert("error",ew.notify.log.error[0], 1, 1);return;}
         g.setCol(0, 0);
         g.fillRect({ x: 0, y: 180, x2: 250, y2: 280, });
 
@@ -264,7 +264,7 @@ ew.face[0] = {
             this.graph(this.data.graph, this.data.lastPosition, 0);
 
             // set the bar control
-            ew.sys.TC.val = { cur: this.data.lastPosition, dn: 0, up: this.data.fields - 1, tmp: 0, reverce: 0, loop: this.data.loop };
+            ew.sys.TC.val = { cur: this.data.lastPosition, dn: 0, up: this.data.fields - 1, tmp: 0, reverce: 0, loop: this.data.loop, fire:1 };
             ew.UI.c.tcBar = (a, b) => {
                 let v = this.graph(this.data.graph, b, 1);
                 if (!v) { return; }
@@ -272,7 +272,7 @@ ew.face[0] = {
                 if (this.view === "history") this.fixed(this.page);
                 g.flip();
             };
-            ew.is.bar = 1;
+            ew.is.slide = 1;
         }
         // reset UI control, bar only
         ew.UI.c.start(0, 1);
@@ -360,7 +360,7 @@ ew.face[0] = {
         return [pos, data[pos]];
     },
     clear: function(o) {
-        ew.is.bar = 0; /*TC.removeAllListeners();*/
+        ew.is.slide = 0; /*TC.removeAllListeners();*/
         if (this.tid) clearTimeout(this.tid);
         this.tid = 0;
         return true;

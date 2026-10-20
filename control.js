@@ -28,6 +28,8 @@ document.addEventListener('DOMContentLoaded', function() {
     let isProcessingQueue = false;
     let isFirstLoad = true;
     let currentApp = null;
+    let headerTitleElement = document.querySelector('.header-title');
+
 
     // UUIDs για UART
     const UART_SERVICE_UUID = '6e400001-b5a3-f393-e0a9-e50e24dcca9e';
@@ -156,17 +158,12 @@ document.addEventListener('DOMContentLoaded', function() {
             statusTextHeader.textContent = t.statusConnecting;
 
             currentDevice = await navigator.bluetooth.requestDevice({
-                filters: [{ namePrefix: 'eW' },{ namePrefix: 'eL' }],
+                filters: [{ namePrefix: 'eC' },{ namePrefix: 'eW' },{ namePrefix: 'eL' },{ namePrefix: 'eT' }],
                 optionalServices: [UART_SERVICE_UUID]
             });
 
-            if (!currentDevice) {
-                statusText.textContent = t.deviceNotSelected;
-                statusTextHeader.textContent = t.deviceNotSelected;
-                return;
-            }
-
             statusText.textContent = t.statusConnecting;
+
             statusTextHeader.textContent = t.statusConnecting;
             const server = await currentDevice.gatt.connect();
 
@@ -183,6 +180,10 @@ document.addEventListener('DOMContentLoaded', function() {
             statusText.textContent = t.statusConnected;
             statusTextHeader.textContent = t.statusConnected;
             connectBtn.innerHTML = `<i class="fas fa-bluetooth-b"></i> ${t.disconnect}`;
+
+            if (headerTitleElement && currentDevice && currentDevice.name) {
+                headerTitleElement.textContent = currentDevice.name;
+            }
 
             currentDevice.addEventListener('gattserverdisconnected', onDisconnected);
 
@@ -218,6 +219,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
         appFrame.onload = null;
         appFrame.src = 'about:blank';
+
+        if (headerTitleElement) {
+            headerTitleElement.textContent = 'eW';
+        }
 
         appList.innerHTML = `
             <div class="empty-state">
@@ -381,18 +386,19 @@ document.addEventListener('DOMContentLoaded', function() {
                 end = (start !== -1) ? dataBuffer.indexOf(endTag, start + startTag.length) : -1;
             }
 
+            /*
             if (dataBuffer.length > 8 * 1024) {
                 console.warn("⚠️ dataBuffer too large, trimming to last 2KB");
                 dataBuffer = dataBuffer.slice(-2048);
             }
-
+            */
             if (appFrame && appFrame.contentWindow) {
                 try {
                     appFrame.contentWindow.postMessage({
                         type: 'BLUETOOTH_RAW_DATA',
                         data: rawData
                     }, '*');
-                    console.log("📤 Forwarded data to iframe");
+                    console.log("📤 OK. Forwarded data to iframe");
                 }
                 catch (e) {
                     console.log("❌ Could not post message to iframe:", e);
@@ -407,11 +413,14 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function processAppsObject(appsObject) {
         let appNames = [];
+        console.log("in processAppsObject");
         if (Array.isArray(appsObject) && appsObject.every(item => typeof item === 'string')) {
             appNames = appsObject;
+             console.log("in processAppsObject, 1",appsObject);
         }
         else if (typeof appsObject === 'object' && appsObject !== null) {
             appNames = Object.keys(appsObject);
+             console.log("in processAppsObject, 2");
         }
         else {
             console.error("Μη αναμενόμενο format apps:", appsObject);
@@ -422,12 +431,13 @@ document.addEventListener('DOMContentLoaded', function() {
         statusText.textContent = t.statusAppsFound.replace('{count}', appNames.length);
         statusTextHeader.textContent = t.statusAppsFound.replace('{count}', appNames.length);
 
-        if (appNames.length === 0) {
+        /*if (appNames.length === 0) {
+             console.log("in processAppsObject, no apps");
             appList.innerHTML = `<div class="empty-state"><i class="fas fa-exclamation-triangle"></i><p>${t.noAppsFound}</p></div>`;
             statusTextHeader.textContent = t.noWebApps;
             return;
         }
-
+        */
         checkAppsExistence(appNames);
     }
 
@@ -448,17 +458,18 @@ document.addEventListener('DOMContentLoaded', function() {
                 console.log(`App ${appName} not found:`, e);
             }
         }
-
+        console.log("in checkAppsExistence");
         displayAvailableApps(availableApps);
     }
 
     function displayAvailableApps(apps) {
         const t = launcherTranslations[currentLanguage];
-
+        console.log("apps:",apps)
         if (apps.length === 0) {
             appList.innerHTML = `<div class="empty-state"><i class="fas fa-folder-open"></i><p>${t.noAppsFound}</p></div>`;
             statusText.textContent = t.noAppsFound;
             statusTextHeader.textContent = t.noWebApps;
+            console.log("no apps")
             return;
         }
 

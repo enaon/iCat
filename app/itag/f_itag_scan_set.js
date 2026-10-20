@@ -117,6 +117,7 @@ ew.face[0] = {
         ew.UI.c.start(1, 1);
         ew.UI.ele.fill("_main", 12, 0);
         ew.UI.btn.c2l("main", "_2x3", 1, "AUTO", ew.apps.itag.state.def.set.auto ? ew.apps.itag.state.def.set.auto : "OFF", 15, ew.apps.itag.state.def.set.auto ? 4 : 1);
+        ew.UI.btn.c2l("main", "_2x3", 2, "NewG", ew.apps.itag.state.def.set.newG? "ON" : "OFF", 15, ew.apps.itag.state.def.set.newG ? 4 : 1);
         ew.UI.btn.c2l("main", "_2x3", 3, "RSSI", ew.apps.itag.state.def.set.rssiHandler ? "ON" : "OFF", 15, ew.apps.itag.state.def.set.rssiHandler ? 4 : 1);
         ew.UI.btn.c2l("main", "_2x3", 4, "MIN", ew.apps.itag.state.def.set.minInterval, 15, 1);
         ew.UI.btn.c2l("main", "_2x3", 5, "MAX", ew.apps.itag.state.def.set.maxInterval, 15, 1);
@@ -140,16 +141,16 @@ ew.face[0] = {
                     ew.apps.itag.state.def.set.auto = val;
                 };
             }
-            /*
             
-            if (i == 1) {
+            
+            if (i == 2) {
                 ew.sys.buzz.nav(ew.sys.buzz.type.ok);
-                ew.apps.itag.state.def.set.auto = !ew.apps.itag.state.def.set.auto? 15:0;
-                if (ew.def.face.info) ew.UI.btn.ntfy(1, 1.5, 0, "_bar", 6, "AUTO SCAN", ew.apps.itag.state.def.set.auto ? "ENABLED" : "DISABLED", 0, 15);
-                ew.UI.btn.c2l("main", "_2x3", 1, "AUTO", ew.apps.itag.state.def.set.auto ? "ON" : "OFF", 15, ew.apps.itag.state.def.set.auto ? 4 : 1);
-                ew.apps.itag.auto(ew.apps.itag.state.def.set.auto);
+                ew.apps.itag.state.def.set.newG = !ew.apps.itag.state.def.set.newG;
+                if (ew.def.face.info) ew.UI.btn.ntfy(1, 1.5, 0, "_bar", 6, "NEW GOOGLE", ew.apps.itag.state.def.set.newG ? "ENABLED" : "DISABLED", 0, 15);
+                ew.UI.btn.c2l("main", "_2x3", 2, "NewG", ew.apps.itag.state.def.set.newG? "ON" : "OFF", 15, ew.apps.itag.state.def.set.newG ? 4 : 1);
+
             }
-            */
+            
             if (i == 3) {
                 ew.sys.buzz.nav(ew.sys.buzz.type.ok);
                 if (ew.apps.itag.state.def.set.rssiHandler == undefined) ew.apps.itag.state.def.set.rssiHandler = 0;

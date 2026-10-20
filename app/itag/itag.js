@@ -2,15 +2,16 @@
 
 ew.apps.itag = {
 
-    tid: { con: 0, rssi: 0, checker: 0, alarm: 0, auto: 0, focus:0 },
+    tid: { con: 0, rssi: 0, checker: 0, alarm: 0, auto: 0, focus: 0 },
 
     state: {
+        time: 0,
         lost: 0,
         move: -1,
         focus: 0,
         alert: 0,
         ble: { scan: 0, next: 0, gatt: {} },
-        def: { store: {}, storeOrder: [], hiddenOrder: [], pos: 0, set: { phy: 0, autoPhy: 1, minInterval: 50, maxInterval: 100, slaveLatency: 4, persist: 0, rssi: 1, pos: 0, keepFor: 5, storeLock: 0, scanAll: 0, checker: 1, showHidden: 0, rssiHandler: 1, auto: 60 } },
+        def: { store: {}, storeOrder: [], hiddenOrder: [], pos: 0, set: { phy: 0, autoPhy: 1, minInterval: 50, maxInterval: 100, slaveLatency: 4, persist: 0, rssi: 1, pos: 0, keepFor: 5, storeLock: 0, scanAll: 0, checker: 1, showHidden: 0, rssiHandler: 1, auto: 15, newG: 1 }, devices: { lBox: {}, light: {} } },
         dev: {},
         devA: [],
         scanAll: {},
@@ -20,7 +21,7 @@ ew.apps.itag = {
     scan(phyR) {
 
         if (this.google.pendingBond) {
-            ew.UI.btn.ntfy(1, 25, 0, "_bar", 6, "SCAN PAUSED", "BONDING", 15, 13);
+            if (ew.UI) ew.UI.btn.ntfy(1, 25, 0, "_bar", 6, "SCAN PAUSED", "BONDING", 15, 13);
             return;
         }
         this.auto();
@@ -34,24 +35,29 @@ ew.apps.itag = {
 
         NRF.setTxPower(ew.def.bt.rfTX);
         phyR = phyR || ew.apps.itag.state.def.set.phy;
-
+        
+        // set sstart time
+        ew.apps.itag.state.time = (Date.now() / 1000) | 0;
+            
         // ---- start checker ----
         ew.apps.itag.checker();
 
         // ---- start scan ----
-        NRF.setScan(function(device) {
+        NRF.setScan(function(device) { 
 
             // check if Espuino
             let ewD = false;
             if (!all && device.manufacturer === 1424) {
-                // is it an eW device ?
-                if (device.manufacturerData[0] & 4) ewD = device.manufacturerData;
-                else return;
+                // route by role bitmask
+                let rb = device.manufacturerData[0];
+                if (rb & 4) ewD = device.manufacturerData; // tag
+                else if (rb & 2) { ew.apps.itag.devUpd("lBox", device); return; } // toilet
+                else if (rb & 16) { ew.apps.itag.devUpd("light", device); return; } // light
+                else return; // other roles
             }
 
             // check if device exists
-            const id = device.id;
-            const devE = dev[id];
+            const devE = dev[device.id];
 
             // device exists
             if (devE !== undefined) {
@@ -59,15 +65,18 @@ ew.apps.itag = {
                 devE.rssi = device.rssi;
                 return;
             }
+            if ( device.manufacturer === 76) return; //return apple, only update if device exists
+            if ( device.manufacturer === 43724) return; //return custom google, only update if device exists
 
             // new device
-            setTimeout(() => { ew.apps.itag.newD(device, ewD) }, 10);
-
+            //setTimeout(() => { ew.apps.itag.newD(device, ewD) }, 10);
+            ew.apps.itag.newD(device, ewD)
         }, {
             filters: [
                 ew.apps.itag.state.def.set.scanAll ? {} : // no filter
                 { manufacturerData: { 0x0105: {} } }, // itag
                 { manufacturerData: { 0x0590: {} } }, //espruino
+                { manufacturerData: { 0x004C: {} } }, //apple
                 { serviceData: { "feaa": {} } }, // google tags
                 //{ serviceData: { uuid: 0xfe2c } }, // google
             ],
@@ -85,7 +94,6 @@ ew.apps.itag = {
 
         // new device object
         let newD = {
-            //id: id,
             rssi: device.rssi,
             live: true,
             oflc: 0,
@@ -95,16 +103,18 @@ ew.apps.itag = {
         // check if google tag         
         let Google = (device.serviceData && device.serviceData.feaa) ? 1 : 0;
         if (Google) {
+
             newD.name = "Google";
-            if (2 < ew.apps.itag.dbg) print("itag: found google tag");
+            if (2 < ew.apps.itag.dbg) console.log("itag: found google tag");
 
             // check if bond info exists
             if (!this.google.isBond(id)) {
-                //schedule bonding   
-                if (!this.google.pendingBond) {
+                console.log("is not bond");
+                //schedule bonding  -drop if no new google is allowed
+                if (ew.apps.itag.state.def.set.newG && !this.google.pendingBond) {
                     this.google.pendingBond = true;
                     ew.apps.itag.stopScan();
-                    ew.UI.btn.ntfy(1, 25, 0, "_bar", 6, "SCAN PAUSED", "BONDING", 15, 13);
+                    if (ew.UI) ew.UI.btn.ntfy(1, 25, 0, "_bar", 6, "SCAN PAUSED", "BONDING", 15, 13);
                     setTimeout(() => {
                         ew.apps.itag.google.startBonding(device);
                     }, 1500);
@@ -120,7 +130,7 @@ ew.apps.itag = {
 
         // ---- Store handling ---
 
-        // itag mode
+        // ewtag mode
         if (!this.state.def.set.scanAll) {
             let stor = this.state.def.store[id];
 
@@ -128,11 +138,10 @@ ew.apps.itag = {
             if (!this.state.def.set.lock && !stor) {
 
                 newD = {
-                    id: id,
                     name: device.name || "No Name",
                     batt: 100,
-                    silent: 1,
-                    alert: 0
+                    sil: 1,
+                    alr: 0
                 };
 
                 // device is eW
@@ -141,12 +150,12 @@ ew.apps.itag = {
                     //newD.rfTX = (device.manufacturerData[1] >> 5) & 0x07;
                     newD.batt = ewD[2];
                     newD.volt = ewD[3];
-                    newD.board = (ewD[4]) & 0x0F;
+                    newD.brd = (ewD[4]) & 0x0F;
                     newD.name = newD.name.substr(3);
                 }
 
                 if (Google) {
-                    newD.google = true;
+                    newD.ggl = true;
                     newD.name = "Google";
                 }
 
@@ -155,14 +164,15 @@ ew.apps.itag = {
                 this.state.def.storeOrder.push(id);
 
                 return;
-            }
 
+            }
             // entry exists
             if (stor && ewD) {
                 stor.phy = (ewD[1] >> 2) & 0x07;
                 stor.batt = ewD[2];
                 stor.volt = ewD[3];
-                if (ewD[4] & 16) stor.name = device.name.substr(3); ///if (ewD[4] & (1 << 4))
+                stor.name = device.name.substr(3); ///if (ewD[4] & (1 << 4))
+                //if (ewD[4] & 16) stor.name = device.name.substr(3); ///if (ewD[4] & (1 << 4))
             }
             return;
         }
@@ -179,6 +189,29 @@ ew.apps.itag = {
             };
             this.state.scanAll[id] = newD;
             this.state.scanAllA.push(id);
+        }
+    },
+
+    devUpd(role, device) {
+        const store = this.state.def.devices[role];
+        const id = device.id;
+        const m = device.manufacturerData;
+        const now = ew.apps.itag.state.time;
+        const d = store[id];
+        if (d) {
+            d.batt = m[2];
+            d.volt = m[3];
+            d.last = now;
+            if (m[4] & 16) d.name=device.name.substr(3); 
+        }
+        else {
+            store[id] = {
+                name: device.name ? device.name.substr(3) : "?",
+                batt: m[2],
+                volt: m[3],
+                brd: m[4] & 0x0F,
+                last: now
+            };
         }
     },
 
@@ -205,7 +238,7 @@ ew.apps.itag = {
                 // check if ephemeral id is in store       
                 for (let savedId in store) {
 
-                    if (!store[savedId].google) continue;
+                    if (!store[savedId].ggl) continue;
 
                     let resolvedSaved = NRF.resolveAddress(savedId);
                     if (resolvedSaved && resolvedSaved === resolved) {
@@ -220,7 +253,7 @@ ew.apps.itag = {
                         return true;
                     }
                 }
-                
+
                 if (2 < ew.apps.itag.dbg) console.log("itag: google bond exists, but no entry on store, create new");
                 return true
             }
@@ -256,12 +289,12 @@ ew.apps.itag = {
 
 
                 this.pendingBond = false;
-                ew.UI.btn.ntfy(1, 2, 0, "_bar", 6, "BOND OK", "SCANNING", 15, 6);
-                if (ew.face.appCurr === "itag") ew.apps.itag.scan();
+                if (ew.UI) ew.UI.btn.ntfy(1, 2, 0, "_bar", 6, "BOND OK", "SCANNING", 15, 6);
+                if (ew.face && ew.face.appCurr === "itag") ew.apps.itag.scan();
 
             }).catch((e) => {
                 if (2 < ew.apps.itag.dbg) console.log("itag: google bond failed:", e);
-                ew.UI.btn.ntfy(1, 2, 0, "_bar", 6, "BOND FAIL", "SCANNING", 15, 13);
+                if (ew.UI) ew.UI.btn.ntfy(1, 2, 0, "_bar", 6, "BOND FAIL", "SCANNING", 15, 13);
 
                 if (this.pendingGatt) {
                     try { this.pendingGatt.disconnect(); }
@@ -269,7 +302,7 @@ ew.apps.itag = {
                     this.pendingGatt = null;
                 }
                 this.pendingBond = false;
-                if (ew.face.appCurr === "itag") ew.apps.itag.scan();
+                if (ew.face && ew.face.appCurr === "itag") ew.apps.itag.scan();
             });
         },
         renameKey(oldKey, newKey) {
@@ -290,7 +323,6 @@ ew.apps.itag = {
 
             // update store
             store[newKey] = store[oldKey];
-            store[newKey].id = newKey;
             delete store[oldKey];
 
             if (this.dbg) console.log(`rename: ${oldKey} -> ${newKey} at position ${index}`);
@@ -329,20 +361,19 @@ ew.apps.itag = {
                     device.rfrs = false;
                     device.live = true;
                     device.oflc = 0; // reset            
-                    device.lastseen = now;
+                    device.last = now;
                     if (!all && store[id])
-                        store[id].lastseen = now;
+                        store[id].last = now;
 
                     if (!tid.alarm && id === focus) {
                         tid.alarm = setTimeout(function() {
-                            ew.sys.buzz.nav([100, 50, 100, 50, 100]);
-                            ew.UI.btn.ntfy(1, 3, 0, "_bar", 6, store[id].name.toUpperCase(), "FOUND", 15, 4);
+                            ew.notify.alert("info", { "id": id, "src": "itag", "title": store[id].name, "body": "FOUND" }, 1, 1);
                             tid.alarm = 0;
                         }, 50);
                     }
 
                 }
-                else if (maxOfflineTime < now - device.lastseen) {
+                else if (maxOfflineTime < now - device.last) {
                     if (3 < ew.apps.itag.dbg) console.log("checker id offline:", id);
 
                     device.live = false;
@@ -367,7 +398,7 @@ ew.apps.itag = {
                 }
             }
 
-            if (ew.face.appCurr === "itag") ew.face[0].update();
+            if (ew.face && ew.face.appCurr === "itag") ew.face[0].update();
 
             if (3 < ew.apps.itag.dbg) console.log("checker counter:", counter);
             if (!counter && !ew.apps.itag.state.ble.scan) {
@@ -384,8 +415,9 @@ ew.apps.itag = {
         if (!min) return;
         if (3 < ew.apps.itag.dbg) console.log("itag: auto scan start");
         this.tid.auto = setTimeout(() => {
-            if (ew.sys.batt(1) < 25 )
-                 ew.UI.btn.ntfy(1, 2, 0, "_bar", 6, "ITAG SCAN", "LOW BAT", 15, 13);
+            if (ew.sys.batt(1) < 25) {
+                if (ew.UI) ew.UI.btn.ntfy(1, 2, 0, "_bar", 6, "ITAG SCAN", "LOW BAT", 15, 13);
+            }
             else
                 this.scan(2);
             this.tid.auto = setTimeout(() => {
@@ -397,21 +429,45 @@ ew.apps.itag = {
 
     },
     alert() {
-        let store=ew.apps.itag.state.def.store;
-        for (let tag in ew.apps.itag.state.def.store){
-            let bat=store[tag].batt;
-            let now=(Date.now()/1000)|0;
-            if (bat < 20 ) {
-                ew.notify.alert("error", {title: "ITAG:"+store[tag].name.toUpperCase() , body: "BAT LOW"  }, 1, 1);
-                print ("itag low",store[tag].name)
-                
-            }else if (bat < 40 ){
-                print ("itag medium",store[tag].name)
-                 ew.notify.alert("info", {title: "ITAG:"+store[tag].name.toUpperCase() , body: "BAT MEDIUM"  }, 1, 1);
-            }    
+        const store = ew.apps.itag.state.def.store;
+        for (let tag in store) {
+            const bat = store[tag].batt;
+            const now = (Date.now() / 1000) | 0;
+            // if over 5 hours old, ignore
+            if (5 < ((now - store[tag].last) / 3600 | 0)) continue;
+
+            const indx = ew.apps.itag.state.def.storeOrder.indexOf(tag)
+            if (bat < 20) {
+                ew.notify.alert("error", { "id": "1" + indx + "0", "src": "itag", "title": store[tag].name, "body": "Battery: " + bat + "%" }, 1, 1);
+                //print("itag low", store[tag].name)
+
+            }
+            else if (bat < 40) {
+                //print("itag medium", store[tag].name)
+                ew.notify.alert("info", { "id": "1" + indx + "1", src: "itag", title: store[tag].name, body: "Battery: " + bat + "%" }, 1, 1);
+            }
         }
 
-    },    
+        // devices (toilets / lights)
+        this.devAlert("lBox");
+        this.devAlert("light");
+
+    },
+    devAlert(role) {
+        const store = this.state.def.devices[role];
+        const now = (Date.now() / 1000) | 0;
+        for (let mac in store) {
+            const d = store[mac];
+            // if over 5 hours old, ignore
+            if (5 < ((now - d.last) / 3600 | 0)) continue;
+            if (d.batt < 20) {
+                ew.notify.alert("error", { "id": mac, "src": role, "title": d.name, "body": "Battery: " + d.batt + "%" }, 1, 1);
+            }
+            else if (d.batt < 40) {
+                ew.notify.alert("info", { "id": mac, "src": role, "title": d.name, "body": "Battery: " + d.batt + "%" }, 1, 1);
+            }
+        }
+    },
     stopScan() {
         if (3 < ew.apps.itag.dbg) console.log("itag: stop scan");
         NRF.setScan();
@@ -424,15 +480,15 @@ ew.apps.itag = {
     },
     conn(id, phyR) {
 
-        if (ew.face.appCurr === "itag") ew.face.go("itag-connect", 0);
+        if (ew.face && ew.face.appCurr === "itag") ew.face.go("itag-connect", 0);
         if (ew.apps.itag.tid.con) {
             clearTimeout(ew.apps.itag.tid.con);
             ew.apps.itag.tid.con = false;
         }
         ew.apps.itag.tid.con = setTimeout(() => {
             ew.apps.itag.tid.con = false;
-            ew.UI.btn.ntfy(1, 2, 0, "_bar", 6, "NOT FOUND", "", 15, 13);
-            setTimeout(() => { if (ew.face.appCurr === "itag-connect") ew.face.go("itag", 0); }, 1500);
+            if (ew.UI) ew.UI.btn.ntfy(1, 2, 0, "_bar", 6, "NOT FOUND", "", 15, 13);
+            setTimeout(() => { if (ew.face && ew.face.appCurr === "itag-connect") ew.face.go("itag", 0); }, 1500);
         }, 10000);
         var phy = ["1mbps", "coded", "both", "2mbps"];
         phyR = phyR || ew.apps.itag.state.def.set.phy;
@@ -450,9 +506,9 @@ ew.apps.itag = {
             if (ew.apps.itag.tid.rssi) clearTimeout(ew.apps.itag.tid.rssi)
             ew.apps.itag.tid.rssi = 0;
             ew.apps.itag.state.ble.gatt.setRSSIHandler(function(rssi) {
-                if (!ew.face.pageCurr && ew.face.appCurr === "itag-connect" && !ew.apps.itag.tid.rssi) {
+                if (ew.face && !ew.face.pageCurr && ew.face.appCurr === "itag-connect" && !ew.apps.itag.tid.rssi) {
                     ew.apps.itag.tid.rssi = setTimeout(() => {
-                        if (ew.face.appCurr === "itag-connect") ew.UI.btn.c1l("main", "_main", 9, rssi + " ", "", 15, 1, 4);
+                        if (ew.face && ew.face.appCurr === "itag-connect") ew.UI.btn.c1l("main", "_main", 9, rssi + " ", "", 15, 1, 4);
                         ew.apps.itag.tid.rssi = 0;
                     }, 330);
                 }
@@ -475,24 +531,24 @@ ew.apps.itag = {
 
                 if (3 < ew.apps.itag.dbg) console.log("disconnected: " + reason);
 
-                if (reason === 62 && ew.face.appCurr === "itag-connect") {
-                    ew.UI.btn.ntfy(1, 2, 0, "_bar", 6, "TOO FAR", "", 15, 13);
+                if (reason === 62 && ew.face && ew.face.appCurr === "itag-connect") {
+                    if (ew.UI) ew.UI.btn.ntfy(1, 2, 0, "_bar", 6, "TOO FAR", "", 15, 13);
                 }
-                else if (reason === 8 && ew.face.appCurr === "itag-connect") {
-                    ew.UI.btn.ntfy(1, 2, 0, "_bar", 6, "LOST", "", 15, 13);
+                else if (reason === 8 && ew.face && ew.face.appCurr === "itag-connect") {
+                    if (ew.UI) ew.UI.btn.ntfy(1, 2, 0, "_bar", 6, "LOST", "", 15, 13);
                 }
-                else if (ew.face.appCurr === "itag-connect") {
-                    ew.UI.btn.ntfy(1, 2, 0, "_bar", 6, "DISCONNECTED", "", 0, 15);
+                else if (ew.face && ew.face.appCurr === "itag-connect") {
+                    if (ew.UI) ew.UI.btn.ntfy(1, 2, 0, "_bar", 6, "DISCONNECTED", "", 0, 15);
                 }
 
                 if (ew.apps.itag.state.ble.next) {
                     ew.apps.itag.conn(ew.apps.itag.state.ble.next);
-                    if (ew.face.appCurr === "itag-connect") ew.UI.btn.ntfy(1, 1.5, 0, "_bar", 6, "CONNECTING", "", 0, 15);
+                    if (ew.face && ew.face.appCurr === "itag-connect" && ew.UI) ew.UI.btn.ntfy(1, 1.5, 0, "_bar", 6, "CONNECTING", "", 0, 15);
                     ew.apps.itag.state.ble.next = 0;
                 }
                 else {
                     setTimeout(() => {
-                        if (ew.face.appCurr === "itag-connect") ew.face.go("itag", 0);
+                        if (ew.face && ew.face.appCurr === "itag-connect") ew.face.go("itag", 0);
                     }, 1500);
                 }
             });
@@ -503,7 +559,7 @@ ew.apps.itag = {
                 clearTimeout(ew.apps.itag.tid.con);
                 ew.apps.itag.tid.con = 0;
             }
-            if (ew.face.appCurr === "itag-connect") ew.UI.btn.ntfy(1, 10, 0, "_bar", 6, "PRIMARY", "SERVICE", 0, 15);
+            if (ew.face && ew.face.appCurr === "itag-connect" && ew.UI) ew.UI.btn.ntfy(1, 10, 0, "_bar", 6, "PRIMARY", "SERVICE", 0, 15);
             if (3 < ew.apps.itag.dbg) console.log("getting characteristic...");
             ew.apps.itag.state.ble.ser_sil = service;
 
@@ -514,7 +570,7 @@ ew.apps.itag = {
             });
         }).then(function(characteristic) {
             if (characteristic) {
-                if (ew.face.appCurr === "itag-connect") ew.UI.btn.ntfy(1, 10, 0, "_bar", 6, "BUTTON", "CHARACTERISTIC", 0, 15);
+                if (ew.face && ew.face.appCurr === "itag-connect" && ew.UI) ew.UI.btn.ntfy(1, 10, 0, "_bar", 6, "BUTTON", "CHARACTERISTIC", 0, 15);
                 ew.apps.itag.state.ble.ffe1 = characteristic;
 
                 // incomming
@@ -522,7 +578,7 @@ ew.apps.itag = {
 
                 if (3 < ew.apps.itag.dbg) console.log("starting notifications...");
                 return characteristic.startNotifications().then(function() {
-                    if (ew.face.appCurr === "itag-connect") ew.UI.btn.ntfy(1, 10, 0, "_bar", 6, "START", "NOTIFICATIONS", 0, 15);
+                    if (ew.face && ew.face.appCurr === "itag-connect" && ew.UI) ew.UI.btn.ntfy(1, 10, 0, "_bar", 6, "START", "NOTIFICATIONS", 0, 15);
                     if (3 < ew.apps.itag.dbg) console.log("waiting for notifications");
                     return characteristic;
                 }).catch(function(e) {
@@ -538,7 +594,7 @@ ew.apps.itag = {
             // Προσπάθεια λήψης του χαρακτηριστικού 0xffe2
             if (ew.apps.itag.state.ble.ser_sil) {
                 return ew.apps.itag.state.ble.ser_sil.getCharacteristic(0xffe2).then(function(characteristic) {
-                    if (ew.face.appCurr === "itag-connect") ew.UI.btn.ntfy(1, 10, 0, "_bar", 6, "SILENCE", "CHARACTERISTIC", 0, 15);
+                    if (ew.face && ew.face.appCurr === "itag-connect" && ew.UI) ew.UI.btn.ntfy(1, 10, 0, "_bar", 6, "SILENCE", "CHARACTERISTIC", 0, 15);
                     if (3 < ew.apps.itag.dbg) console.log("got silence characteristic");
                     ew.apps.itag.state.ble.silence = characteristic;
                     return characteristic;
@@ -552,11 +608,11 @@ ew.apps.itag = {
         }).then(function() {
             // Προσπάθεια λήψης της υπηρεσίας ειδοποιήσεων (0x1802)
             return ew.apps.itag.state.ble.gatt.getPrimaryService(0x1802).then(function(service) {
-                if (ew.face.appCurr === "itag-connect") ew.UI.btn.ntfy(1, 10, 0, "_bar", 6, "ALERT", "SERVICE", 0, 15);
+                if (ew.face && ew.face.appCurr === "itag-connect" && ew.UI) ew.UI.btn.ntfy(1, 10, 0, "_bar", 6, "ALERT", "SERVICE", 0, 15);
                 if (3 < ew.apps.itag.dbg) console.log("got alert service");
                 return service.getCharacteristic(0x2A06);
             }).then(function(characteristic) {
-                if (ew.face.appCurr === "itag-connect") ew.UI.btn.ntfy(1, 10, 0, "_bar", 6, "ALERT", "CHARACTERISTIC", 0, 15);
+                if (ew.face && ew.face.appCurr === "itag-connect" && ew.UI) ew.UI.btn.ntfy(1, 10, 0, "_bar", 6, "ALERT", "CHARACTERISTIC", 0, 15);
                 if (3 < ew.apps.itag.dbg) console.log("got alert characteristic");
                 ew.apps.itag.state.ble.alert = characteristic;
                 return characteristic;
@@ -568,11 +624,11 @@ ew.apps.itag = {
         }).then(function() {
             // Προσπάθεια λήψης της υπηρεσίας μπαταρίας (0x180F)
             return ew.apps.itag.state.ble.gatt.getPrimaryService(0x180F).then(function(service) {
-                if (ew.face.appCurr === "itag-connect") ew.UI.btn.ntfy(1, 10, 0, "_bar", 6, "BATTERY", "SERVICE", 0, 15);
+                if (ew.face && ew.face.appCurr === "itag-connect" && ew.UI) ew.UI.btn.ntfy(1, 10, 0, "_bar", 6, "BATTERY", "SERVICE", 0, 15);
                 if (3 < ew.apps.itag.dbg) console.log("got battery service");
                 return service.getCharacteristic(0x2A19);
             }).then(function(characteristic) {
-                if (ew.face.appCurr === "itag-connect") ew.UI.btn.ntfy(1, 10, 0, "_bar", 6, "BATTERY", "CHARACTERISTIC", 0, 15);
+                if (ew.face && ew.face.appCurr === "itag-connect" && ew.UI) ew.UI.btn.ntfy(1, 10, 0, "_bar", 6, "BATTERY", "CHARACTERISTIC", 0, 15);
                 if (3 < ew.apps.itag.dbg) console.log("got battery characteristic");
                 ew.apps.itag.state.ble.battery = characteristic;
                 return characteristic.readValue();
@@ -589,16 +645,16 @@ ew.apps.itag = {
             // Τελική ρύθμιση σιγήματος (αν υπάρχει το χαρακτηριστικό)
             if (ew.apps.itag.state.ble.silence) {
                 ew.apps.itag.state.ble.silence.writeValue(
-                    (ew.apps.itag.state.def.store[ew.apps.itag.state.ble.id].silent) ? 0 : 1
+                    (ew.apps.itag.state.def.store[ew.apps.itag.state.ble.id].sil) ? 0 : 1
                 );
             }
 
             ew.apps.itag.state.connected = 1;
-            if (ew.face.appCurr === "itag-connect") ew.face[0].bar(); //ew.face.go("itag-connect", 0);
+            if (ew.face && ew.face.appCurr === "itag-connect") ew.face[0].bar(); //ew.face.go("itag-connect", 0);
         }).catch(function(e) {
             if (3 < ew.apps.itag.dbg) console.log("itag: catch Error: " + e);
             if (e === "ERR 0x12 (CONN_COUNT)") {
-                if (ew.face.appCurr === "itag-connect") ew.UI.btn.ntfy(1, 1.5, 0, "_bar", 6, "MAX 2", "CONNECTIONS", 13, 15);
+                if (ew.face && ew.face.appCurr === "itag-connect" && ew.UI) ew.UI.btn.ntfy(1, 1.5, 0, "_bar", 6, "MAX 2", "CONNECTIONS", 13, 15);
             }
             else {
                 if (3 < ew.apps.itag.dbg) console.log("itag: disconnected");
@@ -612,39 +668,30 @@ ew.apps.itag = {
         if (3 < ew.apps.itag.dbg) console.log("notification incoming data length: ", data.length);
         if (data.length === 1) {
             ew.sys.buzz.alrm(ew.sys.buzz.type.alert);
-            if (ew.face.appCurr === "itag-connect") ew.UI.btn.ntfy(1, 1, 0, "_bar", 6, "BUTTON", "PRESSED", 15, 4);
+            if (ew.face && ew.face.appCurr === "itag-connect" && ew.UI) ew.UI.btn.ntfy(1, 1, 0, "_bar", 6, "BUTTON", "PRESSED", 15, 4);
         }
         else {
             data = JSON.parse(E.toString(data));
-            if (ew.face.appCurr === "itag-connect") ew.UI.btn.ntfy(1, 1, 0, "_bar", 6, data.s.toUpperCase(), "", 0, 15);
+            if (ew.face && ew.face.appCurr === "itag-connect" && ew.UI) ew.UI.btn.ntfy(1, 1, 0, "_bar", 6, data.s.toUpperCase(), "", 0, 15);
         }
     },
 
 
 };
 
-// defaults
-if (require('Storage').readJSON('ew.json', 1).itag) {
-    ew.apps.itag.state.def = require('Storage').readJSON('ew.json', 1).itag;
-    if (!ew.apps.itag.state.def) ew.apps.itag.state.def = { store: {}, storeOrder: [], hiddenOrder: [], pos: 0, set: { phy: 0, autoPhy: 1, minInterval: 50, maxInterval: 100, slaveLatency: 4, persist: 0, rssi: 1, pos: 0, keepFor: 5, storeLock: 0, scanAll: 0, checker: 1, showHidden: 0, rssiHandler: 1, auto: 60 } };
-    //ew.apps.itag.state.def.storeOrder=  Object.values(ew.apps.itag.state.def.store).map(item => item.id);
-}
 
-// icons
-//ew.UI.icon.scan="mEwwIcZg/+Aocfx+AAoV4gPgAoQDBuAEBgPAgE4AoQVBjgFBgYCBhgoCAQMGAQUgAolACggFL6AFGGQQFJEZsGsAFEIIhNFLIplFgBxBnwFCPYP/AoU8gf/BwKVB/+/SAUD/kf+CjDh/4V4n8AoYeBAoq1DgIqDAAP/XYcAv4qEn4qEGwsfC4kPEYkHF4Z1DACA=";
-//ew.UI.icon.trash="mEwwI1yg/4AocP/gFDhkMApE//4ABAo4PCAUIACAv4FQATkGAQMYXwSgBYAUBAoPgdsg";
-//ew.UI.icon.move="mEwwIYWAok4Aok8Aok+Aok/AouAAonAAongAonwAon4Aon8AQP/AAP+gF/AoX/AovAAongAonwAon4Aon8AoqldFJZZDLQMfAokPAokHAokDDokBJopQFRowFEh4FEg4FEgYFEgIFEgB6FvjoKjgFEhB9IA=";
-//ew.UI.icon.alarm="mEwwIKH/ACBh8Agf+AoN/4EH/+AgH/+EP//AgP//EfAoMDAo38n4dDAoIpCj4FB8E//kHAoPA///wIFBwYFB8AFBGAI0BvkeFQIuBnkcn/wDgM4FgOAgIyC/41CAQIICn4OB/kB4EfAoP4AoMPKAPwAo8H8ABBAo8DAoJ2BAo5EBAYIFF8AFE+AFE/gFC8BMBEYQFBh+DAocHw4fCL4IJBAoZTBL4IFE/inCZAJ3EQYzaBR4abBh4aDU4QFEBYU/AoIXCvwFB3wFBvjbBjwFBXYMAAoQAEA=";
-//ew.UI.icon.power="lkuwIKHgP4AocfwAKN+P4+AJCz+fBYMH/P5/wKB/4KBCAMfBQP/wED/0fw/8gF/4P4n/gg/wFYIbB/w2BBAXABQM/wP8BQMD/AIBAIWD/BMC/k/JgUP4fwBQd+BQUH8/gBQV+BSJwCBQQABBQw2BAAI2CAoRBBRgUfNYKbDMQIFBMQQEBMQMPEwV/AIQlBQYIQBSIIXBCAN/4EB//An4pBh//AAIdCAgISBCAP/HIQQCaoa5BAoU/IYQAEA=";
+// --- defaults ---
+ew.apps.itag.state.def = Object.assign(
+    ew.apps.itag.state.def,
+    (require("Storage").readJSON("ew.json", true) || {}).itag || {}
+);
+if (ew.apps.itag.state.def.set.newG == undefined) ew.apps.itag.state.def.set.newG = true;
 
-//ew.UI.icon.itag="mUywIROh8Aj4FD8Ef8AFBg/8h/8AoMD/+D/+AAwP/8P/CQU//l/CQUf/8//4eC//P//AgEB//z//wBgIWB/4YOGIIYEn/4v/4CQX+j/+AoIrBw4eCvE/4H/4Pgv8H8E/8H8MwPwg/wv+PHQX4n/nDYRBB/pmDh///40CPIP/GggABP4V/AoPgh+ALwIYBh/wDwO//xRBDwIxBAYJLB+JNBCgKYC8AtBh4BBNwIOCgJYBCQWAjhHCg6JBAoTNDJohTCBgRTDOYRTCLQRTCVAQkCCQQeDQwQFDG4JDBFYY3CRgYiBZIKYCa4QAHA==";
-//ew.UI.icon.itag="mEwwg63h//+AHE///CxwABDAYGCDBgPDCAQeDHAwXMAwgXKE4gQCAwhIKC4wGFC/4X/C+TvXC6g9BJAoPCC44bECI4FCMAgMEFQ4FCJ4wLEAoRqMCQJNGTYyCKWgwXXZSCUFC9JGLC4iqGC57yGC43wC5AfLX5QOGBA4GFcgwgKeoxtIC4woGQpIQICIZGJEQyXDAAIWLPIjjUfRQuKDBj6MDBQWNOowXRGBAX/C76nOR5AwGA5IwLf5YAaA"
-//ew.UI.icon.itag="lEowIOLh+A/AEBj/B/gEBn/D/wEBv/jAgfn/4Ean/nEQQsDgkf4f8jEfh+B/l8n+HgP4/1/4EAoP/AgUB///AgMDAhEHAgV8AgXB/0H/3/4f/AgN/wf/w/8v+HAgP4n8PCAPwh0f//g8BZB//wKgIkBKgI9CMYIEDwAED4BCCAgIOIwAiCQwcAvi8FA=";
 
 // install icon
-if (!require('Storage').read("ew_i_itag.img"))  {
-    let icon="lEowIOLh+A/AEBj/B/gEBn/D/wEBv/jAgfn/4Ean/nEQQsDgkf4f8jEfh+B/l8n+HgP4/1/4EAoP/AgUB///AgMDAhEHAgV8AgXB/0H/3/4f/AgN/wf/w/8v+HAgP4n8PCAPwh0f//g8BZB//wKgIkBKgI9CMYIEDwAED4BCCAgIOIwAiCQwcAvi8FA=";
-    require('Storage').write("ew_i_itag.img", require("heatshrink").decompress(atob(icon)) );
+if (!require('Storage').read("ew_i_itag.img")) {
+    let icon = "lEowIOLh+A/AEBj/B/gEBn/D/wEBv/jAgfn/4Ean/nEQQsDgkf4f8jEfh+B/l8n+HgP4/1/4EAoP/AgUB///AgMDAhEHAgV8AgXB/0H/3/4f/AgN/wf/w/8v+HAgP4n8PCAPwh0f//g8BZB//wKgIkBKgI9CMYIEDwAED4BCCAgIOIwAiCQwcAvi8FA=";
+    require('Storage').write("ew_i_itag.img", require("heatshrink").decompress(atob(icon)));
     require('Storage').write("ew_i_itag-dev.img", require("heatshrink").decompress(atob(icon)));
     require('Storage').write("ew_i_itag-connect.img", require("heatshrink").decompress(atob(icon)));
 }
@@ -652,4 +699,3 @@ if (!require('Storage').read("ew_i_itag.img"))  {
 
 // start auto scan if enabled
 ew.apps.itag.stopScan();
-

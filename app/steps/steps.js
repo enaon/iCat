@@ -1,8 +1,13 @@
 ew.apps.steps={
-    state:{def:{page:0, topL:6000, btmL:500}}};
+    state:{def:{page:0, topL:6000, btmL:500, tare:0, strd: 145, dist: 0}}};
 
 if (require('Storage').readJSON('ew.json', 1).steps) {
     ew.apps.steps.state.def = require('Storage').readJSON('ew.json', 1).steps;
+    ew.apps.steps.state.myprofile = require("Storage").readJSON("myprofile.json",1)||{};
+    if (ew.apps.steps.state.myprofile.strideLength) ew.apps.steps.state.def.strd=ew.apps.steps.state.myprofile.strideLength;
+    if (!ew.apps.steps.state.myprofile.strideLength) ew.apps.steps.state.def.strd = 145;
+    delete ew.apps.steps.state.myprofile;
+    if (ew.apps.steps.state.def.dist = "NaN") ew.apps.steps.state.def.dist=0;
     
 }
 

@@ -290,11 +290,15 @@ document.addEventListener('DOMContentLoaded', function() {
                 catsDataMap = data.store;
 
                 if (data.storeOrder && Array.isArray(data.storeOrder)) {
-                    catsData = data.storeOrder.map(id => data.store[id]).filter(cat => cat);
+                    catsData = data.storeOrder.map(id => {
+                        const cat = data.store[id];
+                        if (cat) cat.id = id;
+                        return cat;
+                    }).filter(cat => cat);
                 }
                 else {
 
-                    catsData = Object.values(data.store);
+                    catsData = Object.entries(data.store).map(e => { e[1].id = e[0]; return e[1]; });
                 }
             }
 
@@ -334,7 +338,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         displayCats.forEach(cat => {
             const now = (Date.now() / 1000 | 0);
-            const diffMins = (now - cat.lastseen) / 60 | 0;
+            const diffMins = (now - cat.last) / 60 | 0;
 
             let locationStatus = translations[currentLanguage].walking;
             let locationIcon = 'fa-walking';
@@ -346,8 +350,8 @@ document.addEventListener('DOMContentLoaded', function() {
             const batteryIcon = cat.batt > 70 ? 'fa-battery-full' :
                 cat.batt > 40 ? 'fa-battery-half' : 'fa-battery-quarter';
 
-            const silentStatus = cat.silent ? translations[currentLanguage].silentInactive : translations[currentLanguage].silentActive;
-            const silentIcon = cat.silent ? 'fa-volume-mute' : 'fa-volume-up';
+            const silentStatus = cat.sil ? translations[currentLanguage].silentInactive : translations[currentLanguage].silentActive;
+            const silentIcon = cat.sil ? 'fa-volume-mute' : 'fa-volume-up';
 
             const t = translations[currentLanguage];
             const lastSeenText = ewCommon.formatTimeDiff(diffMins, t);
@@ -568,6 +572,12 @@ document.addEventListener('DOMContentLoaded', function() {
         return merged;
     }
 
+    function catForStore(cat) {
+        const s = Object.assign({}, cat);
+        delete s.id;
+        return s;
+    }
+
     async function updateEspruinoWithImportedData(catsArray) {
         try {
             const t = translations[currentLanguage];
@@ -593,7 +603,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 let firstItem = true;
                 for (const cat of catsArray) {
                     if (!firstItem) storeCommand += ',';
-                    storeCommand += `"${cat.id}": ${JSON.stringify(cat)}`;
+                    storeCommand += `"${cat.id}": ${JSON.stringify(catForStore(cat))}`;
                     firstItem = false;
                 }
                 storeCommand += '};\n';
@@ -714,7 +724,7 @@ document.addEventListener('DOMContentLoaded', function() {
         editingCatId = catId;
         catIdInput.value = catId;
         catNameInput.value = cat.name;
-        catSilentInput.value = cat.silent ? "1" : "0";
+        catSilentInput.value = cat.sil ? "1" : "0";
 
         editModal.style.display = 'flex';
     }
@@ -748,17 +758,17 @@ document.addEventListener('DOMContentLoaded', function() {
         const catIndex = catsData.findIndex(c => c.id === editingCatId);
         if (catIndex !== -1) {
             catsData[catIndex].name = newName;
-            catsData[catIndex].silent = newSilent;
+            catsData[catIndex].sil = newSilent;
         }
 
         try {
             if (dataFormat === 'array') {
                 await sendCommand(`ew.apps.itag.state.def.store.find(cat => cat.id === "${editingCatId}").name = "${newName}";\n`);
-                await sendCommand(`ew.apps.itag.state.def.store.find(cat => cat.id === "${editingCatId}").silent = ${newSilent};\n`);
+                await sendCommand(`ew.apps.itag.state.def.store.find(cat => cat.id === "${editingCatId}").sil = ${newSilent};\n`);
             }
             else {
                 await sendCommand(`ew.apps.itag.state.def.store["${editingCatId}"].name = "${newName}";\n`);
-                await sendCommand(`ew.apps.itag.state.def.store["${editingCatId}"].silent = ${newSilent};\n`);
+                await sendCommand(`ew.apps.itag.state.def.store["${editingCatId}"].sil = ${newSilent};\n`);
             }
 
             const t = translations[currentLanguage];
@@ -846,9 +856,9 @@ document.addEventListener('DOMContentLoaded', function() {
         setTextIfExists('editTitleText', t.editTitle);
         setTextIfExists('catNameLabel', t.catName);
         setTextIfExists('catIdLabel', t.catId);
-        setTextIfExists('silentModeLabel', t.silentMode);
-        setTextIfExists('silentActiveOption', t.silentActive);
-        setTextIfExists('silentInactiveOption', t.silentInactive);
+        setTextIfExists('silentModeLabel', t.silMode);
+        setTextIfExists('silentActiveOption', t.silActive);
+        setTextIfExists('silentInactiveOption', t.silInactive);
         setTextIfExists('saveText', t.save);
         setTextIfExists('cancelText', t.cancel);
         setTextIfExists('deleteConfirmTitle', t.deleteConfirmTitle);
@@ -909,13 +919,13 @@ document.addEventListener('DOMContentLoaded', function() {
         xAxis.innerHTML = '';
         
         // Ταξινόμηση γατών από πιο πρόσφατη στην πιο παλιά
-        const sortedCats = [...catsData].sort((a, b) => b.lastseen - a.lastseen);
+        const sortedCats = [...catsData].sort((a, b) => b.last - a.last);
         
         const now = Math.floor(Date.now() / 1000);
         
         // Δημιουργία κάθετης μπάρας για κάθε γάτα
         sortedCats.forEach((cat, index) => {
-            const daysSinceSeen = Math.floor((now - cat.lastseen) / (24 * 60 * 60));
+            const daysSinceSeen = Math.floor((now - cat.last) / (24 * 60 * 60));
             
             const bar = document.createElement('div');
             bar.className = 'cat-bar-vertical';
@@ -981,7 +991,7 @@ document.addEventListener('DOMContentLoaded', function() {
         showCatPopup(catName, days);
     }
     
-    function showCatPopup(catName, lastseen) {
+    function showCatPopup(catName, last) {
         // Αφαίρεση υπάρχοντος popup αν υπάρχει
         const existingPopup = document.querySelector('.cat-popup');
         if (existingPopup) {
@@ -990,7 +1000,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
         // Υπολογισμός ακριβούς χρόνου (όπως στην κάρτα)
         const now = Math.floor(Date.now() / 1000);
-        const diffMins = Math.floor((now - lastseen) / 60);
+        const diffMins = Math.floor((now - last) / 60);
         const t = translations[currentLanguage];
         const timeText = ewCommon.formatTimeDiff(diffMins, t);
     
@@ -1035,7 +1045,7 @@ document.addEventListener('DOMContentLoaded', function() {
         // Βρες την πλήρη πληροφορία της γάτας για το lastseen
         const cat = catsData.find(c => c.id === catId);
         if (cat) {
-            showCatPopup(catName, cat.lastseen);
+            showCatPopup(catName, cat.last);
         }
     }
     initializeVisualization();

@@ -5643,6 +5643,7 @@ To add a new serial device, you must add an object to
 
   function isBuiltIn(module) {
     var d = Espruino.Core.Env.getData();
+    console.log("eW- isBuildIn?:",d);
     // If we got data from the device itself, use that as the
     // definitive answer
     if ("string" == typeof d.MODULES)

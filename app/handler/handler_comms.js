@@ -1,6 +1,47 @@
+ew.comm.init = function() {
+  
+  let service = function() {
+    return {
+      0xffe0: {
+        0xffe1: {
+          value: [0x01],
+          maxLen: 128,
+          writable: true,
+          onWrite: function(evt) {
+            //evt.target.value.buffer
+            ew.comm.prfr.RX(evt.data);
+            //ew.comm.emit("BTRX", evt.data);
+          },
+          security: {
+            read: {
+              mitm: ew.def.bt.pair ? true : false,
+              encrypted: ew.def.bt.pair ? true : false
+            },
+            write: {
+              mitm: ew.def.bt.pair ? true : false,
+              encrypted: ew.def.bt.pair ? true : false
+            },
+          },
+          readable: true,
+          notify: true,
+          description: "eW"
+        }
+      }
+    }
+
+  };
+
+  let secureMode = ew.def.bt.pair ? { passkey: ew.def.bt.code, mitm: 1, display: 1 } : {};
+  NRF.setSecurity(secureMode);
+  NRF.setScanResponse();
+  NRF.setServices(ew.apps.ewtag?(ew.apps.ewtag.state.def.eTag?service():undefined):service(), { uart: (ew.def.bt.uart) ? true : false });
+
+  ew.comm.updt();
+}
+
 ew.comm.updt = function() {
 
-  let updateAdv = function() {
+  let options = function() {
     const role = { "watch": [0, "eW"], "litterBox": [1, "eL"], "tag": [2, "eC"], "pb": [3, "eR"], "light": [4, "eT"], "blind": [5, "eB"], "pir": [6, "eP"] };
     const phy = ["1mbps", "2mbps", "coded", "coded,1mbps", "1mbps,coded"];
     const board = ["MAGIC3", "ROCK", "BANGLEJS2", "DSD6", "NANO", "P8", "P22"];
@@ -19,16 +60,12 @@ ew.comm.updt = function() {
       roleByte = (1 << role[ew.def.role][0]);
     }
 
-    // ---- to be removed ----
-    if (ew.def.frce === undefined) ew.def.frce = 0;
-
     return {
       name: (Array.isArray(ew.def.role) ? role[ew.def.role[0]][1] : role[ew.def.role][1]) + "-" + ew.def.name,
       showName: true,
       manufacturer: 0x0590,
       manufacturerData: [
         roleByte,
-        //(role[ew.def.role][0]) | ((board.indexOf(process.env.BOARD)) << 4), //role
         (ew.def.bt.conn ? 1 : 0) | (ew.def.bt.uart ? 2 : 0) | ((phy.indexOf(ew.def.bt.phyA)) << 2) | ((txPower.indexOf(ew.def.bt.rfTX)) << 5), //bt info
         ew.sys.batt(1),
         ew.sys.batt() * 100 / 2 | 0,
@@ -42,65 +79,42 @@ ew.comm.updt = function() {
     };
 
   }
-  let secureMode=ew.def.bt.pair?{passkey:ew.def.bt.code, mitm:1, display:1}:{};
 
   try {
-    
-    NRF.setAddress(`${NRF.getAddress()} random`);
-    NRF.setSecurity(secureMode);
-
-    if (ew.def.bt.conn)
-      NRF.setServices({
-        0xffe0: {
-          0xffe1: {
-            value: [0x01],
-            maxLen: 128,
-            writable: true,
-            onWrite: function(evt) {
-              //evt.target.value.buffer
-              ew.comm.prfr.RX(evt.data);
-              //ew.comm.emit("BTRX", evt.data);
-            },
-            security: {
-              read: {
-                mitm: ew.def.bt.pair1?true:false,
-                encrypted: ew.def.bt.pair1?true:false
-              },
-              write: {
-                mitm: ew.def.bt.pair1?true:false,
-                encrypted: ew.def.bt.pair1?true:false
-              },
-            },
-            readable: true,
-            notify: true,
-            description: "eW"
-          }
-        }
-      }, { uart: (ew.def.bt.uart) ? true : false });
-
+    NRF.setScanResponse();
 
     if (ew.def.bt.adv) {
 
-      NRF.setAdvertising({}, updateAdv());
+      if (ew.apps.ewtag) {
+        if (ew.apps.ewtag.state.addr) NRF.setAddress(ew.apps.ewtag.state.addr)
+        //else NRF.setAddress(NRF.getAddress());
+        else NRF.setAddress(`${NRF.getAddress()} random`);
 
-      if (ew.is.btsl == 1) {
-        NRF.wake();
-        ew.is.btsl = 0;
-        //if (!ew.def.face.info) ew.notify.alert("info", { "src": "BT", "title": "BT", "body": "WAKE" }, 1);
+        var packets = [];
+
+        if (ew.apps.ewtag.state.def.eTag)
+          packets.push({});
+
+        if (ew.apps.ewtag.state.def.gTag)
+          packets.push(ew.apps.ewtag.state.gPay);
+
+        if (ew.apps.ewtag.state.def.iTag){
+          ew.apps.ewtag.updt();
+          packets.push(ew.apps.ewtag.state.iPay);
+        }
+        if (packets == []) return;
+
+        NRF.setAdvertising(packets, options());
+
       }
-      NRF.setConnectionInterval(ew.def.bt.intC);
+      else
+        NRF.setAdvertising({}, options());
+
+      NRF.wake();
+      if (ew.apps.ewtag && ew.apps.ewtag.state.def.iTag) NRF.setScanResponse([]);
       NRF.setTxPower(ew.def.bt.rfTX);
-    }
-    else {
-      //if (ew.is.bt) NRF.disconnect();
-      NRF.sleep();
-      ew.is.btsl = 1;
-      //NRF.setAdvertising({}, { name: "eW-" + ew.def.name, connectable: false, scannable: false });
-
-      //if (!ew.def.face.info) ew.notify.alert("info", { "src": "BT", "title": "BT", "body": "SLEEP" }, 1);
-
-    }
-
+      
+    }else NRF.sleep()
   }
   catch (e) {
     if (ew.dbg) console.log("comms: Bt update error: ", e);
@@ -116,15 +130,313 @@ ew.comm.common = {
   chunkTimeout: 10000,
   dbg: false,
   chunkBuffer: {},
+  binaryHeaderLength: 8,
+  binaryMagic: 0x7E,
+  binaryIDRanges: {
+    watch: [0, 9],
+    light: [10, 59],
+    litterBox: [60, 79],
+    blind: [80, 99],
+    tag: [100, 119],
+    pb: [120, 129],
+    pir: [130, 139],
+    other: [200, 255]
+  },
+  routing: {
+    parent: null,
+    children: [],
+    peers: {},
+    table: {},
+    maxChildren: 2,
 
-  // Initialize chunk buffer
-  initChunkBuffer() {
-    if (!this.chunkBuffer) this.chunkBuffer = {};
+    addChild(peerId) {
+      if (this.children.indexOf(peerId) !== -1) return true;
+      if (this.children.length >= this.maxChildren) return false;
+      this.children.push(peerId);
+      return true;
+    },
+
+    removeChild(peerId) {
+      this.children = this.children.filter(id => id !== peerId);
+      this.clearRoutesByNextHop(peerId);
+    },
+
+    setParent(peerId) {
+      this.parent = peerId;
+    },
+
+    clearParent() {
+      this.parent = null;
+    },
+
+    getPeer(peerId) {
+      return this.peers[peerId];
+    },
+
+    registerPeer(peerId, meta) {
+      if (typeof peerId !== 'number' || peerId < 0 || peerId > 255) return;
+      if (!this.peers[peerId]) {
+        this.peers[peerId] = { role: null, name: null, ranges: [], lastSeen: Date.now() };
+        if (this.parent === null) this.parent = peerId;
+        else if (this.children.indexOf(peerId) === -1) this.addChild(peerId);
+      }
+      Object.assign(this.peers[peerId], meta, { lastSeen: Date.now() });
+    },
+
+    unregisterPeer(peerId) {
+      if (typeof peerId !== 'number' || peerId < 0 || peerId > 255) return;
+      delete this.peers[peerId];
+      if (this.parent === peerId) this.parent = null;
+      this.children = this.children.filter(id => id !== peerId);
+      this.clearRoutesByNextHop(peerId);
+    },
+
+    refreshPeerRoutes(peerId, ranges, nextHopId, meta) {
+      if (!Array.isArray(ranges) || ranges.length === 0) return;
+      this.registerPeer(peerId, Object.assign({}, meta, { ranges: ranges }));
+      this.clearRoutesByNextHop(nextHopId);
+      for (let i = 0; i < ranges.length; i++) {
+        const range = ranges[i];
+        if (!Array.isArray(range) || range.length < 2) continue;
+        this.addRouteRange(range[0], range[1], nextHopId);
+      }
+    },
+
+    addRoute(targetId, nextHopId) {
+      if (typeof targetId !== 'number' || targetId < 0 || targetId > 255) return;
+      this.table[targetId] = nextHopId;
+    },
+
+    addRouteRange(start, end, nextHopId) {
+      start = Math.max(0, start);
+      end = Math.min(255, end);
+      for (let t = start; t <= end; t++) {
+        this.table[t] = nextHopId;
+      }
+    },
+
+    removeRoute(targetId) {
+      delete this.table[targetId];
+    },
+
+    removeRouteRange(start, end, nextHopId) {
+      start = Math.max(0, start);
+      end = Math.min(255, end);
+      for (let t = start; t <= end; t++) {
+        if (nextHopId === undefined || this.table[t] === nextHopId) {
+          delete this.table[t];
+        }
+      }
+    },
+
+    removeRouteRanges(ranges, nextHopId) {
+      if (!Array.isArray(ranges)) return;
+      ranges.forEach(range => {
+        if (Array.isArray(range) && range.length >= 2) {
+          this.removeRouteRange(range[0], range[1], nextHopId);
+        }
+      });
+    },
+
+    clearRoutesByNextHop(nextHopId) {
+      for (const targetId in this.table) {
+        if (this.table[targetId] === nextHopId) {
+          delete this.table[targetId];
+        }
+      }
+    },
+
+    getRouteRangesByNextHop(nextHopId) {
+      const targets = [];
+      for (const targetId in this.table) {
+        if (this.table[targetId] === nextHopId) {
+          targets.push(Number(targetId));
+        }
+      }
+      targets.sort((a, b) => a - b);
+      const ranges = [];
+      let rangeStart = null;
+      let rangeEnd = null;
+      targets.forEach(t => {
+        if (rangeStart === null) {
+          rangeStart = t;
+          rangeEnd = t;
+          return;
+        }
+        if (t === rangeEnd + 1) {
+          rangeEnd = t;
+          return;
+        }
+        ranges.push([rangeStart, rangeEnd]);
+        rangeStart = t;
+        rangeEnd = t;
+      });
+      if (rangeStart !== null) ranges.push([rangeStart, rangeEnd]);
+      return ranges;
+    },
+
+    getNextHop(targetId) {
+      if (typeof targetId !== 'number' || targetId < 0 || targetId > 255) return undefined;
+      return this.table[targetId];
+    }
+  },
+
+  seenRouteMessages: {},
+  routeMessageTimeout: 60000,
+
+  hasSeenRouteMessage(msgId) {
+    return !!this.seenRouteMessages[msgId];
+  },
+
+  markRouteMessageSeen(msgId) {
+    if (!msgId) return;
+    this.seenRouteMessages[msgId] = Date.now();
+  },
+
+  cleanupRouteMessages() {
+    const now = Date.now();
+    for (const id in this.seenRouteMessages) {
+      if (now - this.seenRouteMessages[id] > this.routeMessageTimeout) {
+        delete this.seenRouteMessages[id];
+      }
+    }
+  },
+
+  getRouteRanges(includeLocal) {
+    const numbers = Object.keys(this.routing.table).map(Number).filter(n => n >= 0 && n <= 255);
+    const localId = this.getBinaryID();
+    if (includeLocal && numbers.indexOf(localId) === -1) {
+      numbers.push(localId);
+    }
+    numbers.sort((a, b) => a - b);
+    const ranges = [];
+    let rangeStart = null;
+    let rangeEnd = null;
+
+    numbers.forEach(n => {
+      if (rangeStart === null) {
+        rangeStart = n;
+        rangeEnd = n;
+        return;
+      }
+      if (n === rangeEnd + 1) {
+        rangeEnd = n;
+        return;
+      }
+      ranges.push([rangeStart, rangeEnd]);
+      rangeStart = n;
+      rangeEnd = n;
+    });
+
+    if (rangeStart !== null) ranges.push([rangeStart, rangeEnd]);
+    return ranges;
+  },
+
+  getBinaryID() {
+    const role = Array.isArray(ew.def.role) ? ew.def.role[0] : ew.def.role;
+    const name = String(ew.def.name || '');
+    const digits = name.replace(/\D/g, '');
+    const num = digits.length ? parseInt(digits, 10) : NaN;
+    const id = isNaN(num) ? 0 : num;
+
+    switch (role) {
+      case 'watch':
+        return Math.min(this.binaryIDRanges.watch[1], Math.max(this.binaryIDRanges.watch[0], id));
+      case 'light':
+        return Math.min(this.binaryIDRanges.light[1], Math.max(this.binaryIDRanges.light[0], id + this.binaryIDRanges.light[0]));
+      case 'litterBox':
+        return Math.min(this.binaryIDRanges.litterBox[1], Math.max(this.binaryIDRanges.litterBox[0], id + this.binaryIDRanges.litterBox[0]));
+      case 'blind':
+        return Math.min(this.binaryIDRanges.blind[1], Math.max(this.binaryIDRanges.blind[0], id + this.binaryIDRanges.blind[0]));
+      case 'tag':
+        return Math.min(this.binaryIDRanges.tag[1], Math.max(this.binaryIDRanges.tag[0], id + this.binaryIDRanges.tag[0]));
+      case 'pb':
+        return Math.min(this.binaryIDRanges.pb[1], Math.max(this.binaryIDRanges.pb[0], id + this.binaryIDRanges.pb[0]));
+      case 'pir':
+        return Math.min(this.binaryIDRanges.pir[1], Math.max(this.binaryIDRanges.pir[0], id + this.binaryIDRanges.pir[0]));
+      default:
+        return this.binaryIDRanges.other[0];
+    }
+  },
+
+  toUint8Array(str) {
+    return E.toUint8Array(str);
+  },
+
+  concatUint8Arrays(arrays) {
+    let totalLength = 0;
+    for (let i = 0; i < arrays.length; i++) {
+      totalLength += arrays[i].length;
+    }
+    const result = new Uint8Array(totalLength);
+    let offset = 0;
+    for (let i = 0; i < arrays.length; i++) {
+      result.set(arrays[i], offset);
+      offset += arrays[i].length;
+    }
+    return result;
+  },
+
+  parseBinaryChunk(packet) {
+    const data = packet instanceof Uint8Array ? packet : new Uint8Array(packet.buffer || packet);
+    if (data.length < this.binaryHeaderLength || data[7] !== this.binaryMagic) {
+      throw new Error("Not a binary chunk");
+    }
+    return {
+      targetId: data[0],
+      sourceId: data[1],
+      id: data[2],
+      tc: data[3],
+      i: data[4],
+      type: data[5],
+      reserved: data[6],
+      d: data.subarray(this.binaryHeaderLength)
+    };
+  },
+
+  assembleBinaryChunks(packet) {
+    let chunk;
+    try {
+      chunk = this.parseBinaryChunk(packet);
+    }
+    catch (e) {
+      if (this.dbg) console.log("comms: common invalid binary chunk", e);
+      return null;
+    }
+
+    const messageId = `${chunk.targetId}:${chunk.sourceId}:${chunk.id}`;
+
+    if (!this.chunkBuffer[messageId]) {
+      this.chunkBuffer[messageId] = {
+        chunks: [],
+        total: chunk.tc,
+        received: 0,
+        timestamp: Date.now()
+      };
+      if (this.dbg) console.log("comms: common Created binary buffer for", messageId);
+    }
+
+    const buffer = this.chunkBuffer[messageId];
+
+    if (buffer.chunks[chunk.i] === undefined) {
+      buffer.chunks[chunk.i] = chunk.d;
+      buffer.received++;
+      if (this.dbg) console.log("comms: common Binary chunk", chunk.i, "received for", messageId, "- total:", buffer.received + "/" + buffer.total);
+    }
+
+    if (buffer.received === buffer.total) {
+      if (this.dbg) console.log("comms: common All binary chunks received for", messageId);
+
+      const fullData = this.concatUint8Arrays(buffer.chunks);
+      delete this.chunkBuffer[messageId];
+      return E.toString(fullData);
+    }
+
+    return null;
   },
 
   // Assemble chunks into complete message
   assembleChunk(chunk) {
-    this.initChunkBuffer();
     const messageId = chunk.id;
 
     if (!this.chunkBuffer[messageId]) {
@@ -180,6 +492,43 @@ ew.comm.common = {
         delete this.chunkBuffer[id];
       }
     }
+    this.cleanupRouteMessages();
+  },
+
+  createBinaryChunks(dataStr, targetId, sourceId, messageId, type) {
+    targetId = targetId || 0;
+    sourceId = sourceId || 0;
+    messageId = Number(messageId) & 0xFF;
+    type = type || 0;
+
+    const payload = this.toUint8Array(dataStr);
+    const payloadSize = Math.max(1, this.mtu - this.binaryHeaderLength - 1);
+    const totalChunks = Math.ceil(payload.length / payloadSize);
+
+    if (totalChunks > 255) {
+      throw new Error("Binary chunk count exceeds 255");
+    }
+
+    const chunks = [];
+    if (this.dbg) console.log("comms: common Creating binary", totalChunks, "chunks for", messageId, "byte length:", payload.length, "payload size:", payloadSize);
+
+    for (let i = 0; i < totalChunks; i++) {
+      const start = i * payloadSize;
+      const end = Math.min(start + payloadSize, payload.length);
+      const packet = new Uint8Array(this.binaryHeaderLength + (end - start));
+      packet[0] = targetId;
+      packet[1] = sourceId;
+      packet[2] = messageId;
+      packet[3] = totalChunks;
+      packet[4] = i;
+      packet[5] = type;
+      packet[6] = 0;
+      packet[7] = this.binaryMagic;
+      packet.set(payload.subarray(start, end), this.binaryHeaderLength);
+      chunks.push(packet);
+    }
+
+    return chunks;
   },
 
   // Create chunks from data
@@ -257,21 +606,206 @@ ew.comm.mstr = {
   isSending: false,
   connection: null,
   char: null,
+  connections: {},
+  peerConnectionKeys: {},
   rssi: 0,
   responses: {},
   timeout: 30000,
   isFullyConnected: false,
 
+  getConnection(peerId) {
+    if (peerId === undefined || peerId === null) return null;
+    if (this.connections[peerId]) return this.connections[peerId];
+    const key = this.peerConnectionKeys[peerId];
+    return key ? this.connections[key] : null;
+  },
+
+  registerPeerConnection(peerId, routeKey) {
+    if (typeof peerId !== 'number' || isNaN(peerId)) return;
+    this.peerConnectionKeys[peerId] = routeKey;
+    if (this.connections[routeKey]) {
+      this.connections[routeKey].peerId = peerId;
+    }
+  },
+
+  sendRawTo(peerId, data) {
+    const connEntry = this.getConnection(peerId);
+    if (!connEntry || !connEntry.char) {
+      return Promise.reject("No connection for peer " + peerId);
+    }
+    return connEntry.char.writeValue(data);
+  },
+
+  sendRawChunks(chunks, peerId, index) {
+    if (index >= chunks.length) return Promise.resolve();
+    const connEntry = this.getConnection(peerId);
+    if (!connEntry || !connEntry.char) {
+      return Promise.reject("No connection for peer " + peerId);
+    }
+    return connEntry.char.writeValue(chunks[index]).then(() => {
+      if (this.dbg) console.log("comms: master sent route chunk", index + 1, "/", chunks.length, "to", peerId);
+      return this.sendRawChunks(chunks, peerId, index + 1);
+    });
+  },
+
+  createRouteMessage(payload) {
+    return JSON.stringify(payload);
+  },
+
+  sendRouteMessage(peerId, payload) {
+    const dataStr = this.createRouteMessage(payload);
+    const sourceId = ew.comm.common.getBinaryID();
+    const numericPeerId = Number(peerId);
+    const targetId = (!isNaN(numericPeerId) ? numericPeerId : 0);
+    const chunks = ew.comm.common.createBinaryChunks(dataStr, targetId, sourceId, this.nextBinaryId(), 1);
+    return this.sendRawChunks(chunks, peerId, 0);
+  },
+
+  getSenderId(routeKey) {
+    if (typeof routeKey === 'number' && !isNaN(routeKey)) return routeKey;
+    if (routeKey && this.peerConnectionKeys[routeKey] !== undefined) {
+      return this.peerConnectionKeys[routeKey];
+    }
+    return null;
+  },
+
+  processIncomingRouteMessage(message, routeKey) {
+    if (!message || typeof message !== 'object') return false;
+    if (message.type === "PEER_REGISTER") {
+      this.handlePeerRegister(message, routeKey);
+      return true;
+    }
+    if (message.type === "ROUTE_ANNOUNCE") {
+      this.handleRouteAnnounce(message, routeKey);
+      return true;
+    }
+    if (message.type === "ROUTE_WITHDRAW") {
+      this.handleRouteWithdraw(message, routeKey);
+      return true;
+    }
+    if (message.type === "PEER_REGISTER_ACK") {
+      if (this.dbg) console.log("comms: master peer register acknowledged from", this.getSenderId(routeKey));
+      return true;
+    }
+    return false;
+  },
+
+  handlePeerRegister(m, routeKey) {
+    const peerId = Number(m.peerId);
+    if (isNaN(peerId)) return;
+    const sourceId = this.getSenderId(routeKey) || peerId;
+    ew.comm.common.routing.registerPeer(peerId, { role: m.role, name: m.name, ranges: Array.isArray(m.ranges) ? m.ranges : [] });
+    ew.comm.common.routing.refreshPeerRoutes(peerId, Array.isArray(m.ranges) ? m.ranges : [], sourceId, { role: m.role, name: m.name });
+
+    if (this.dbg) console.log("comms: master registered peer", peerId, m.role, m.name, "from", sourceId);
+
+    const routeRanges = ew.comm.common.getRouteRanges(true);
+    Object.keys(this.connections).forEach(routeKey => {
+      const numericPeerId = Number(routeKey);
+      if (!isNaN(numericPeerId) && numericPeerId === sourceId) return;
+      this.sendRouteAnnounce(routeKey, ew.comm.common.getBinaryID(), routeRanges).catch(e => {
+        if (this.dbg) console.log("comms: master announce failed:", e);
+      });
+    });
+  },
+
+  handleRouteAnnounce(m, routeKey) {
+    if (!m.announceId || !Array.isArray(m.ranges) || (m.ttl !== undefined && m.ttl <= 0)) return;
+    if (ew.comm.common.hasSeenRouteMessage(m.announceId)) return;
+    ew.comm.common.markRouteMessageSeen(m.announceId);
+
+    const sourceId = this.getSenderId(routeKey) || Number(m.originId);
+    if (isNaN(sourceId)) return;
+
+    ew.comm.common.routing.refreshPeerRoutes(sourceId, m.ranges, sourceId);
+    if (this.dbg) console.log("comms: master route announce from", sourceId, m.ranges);
+    this.propagateRouteMessage(m, sourceId);
+  },
+
+  handleRouteWithdraw(m, routeKey) {
+    if (!m.announceId || !Array.isArray(m.ranges) || (m.ttl !== undefined && m.ttl <= 0)) return;
+    if (ew.comm.common.hasSeenRouteMessage(m.announceId)) return;
+    ew.comm.common.markRouteMessageSeen(m.announceId);
+
+    const sourceId = this.getSenderId(routeKey) || Number(m.originId);
+    if (isNaN(sourceId)) return;
+
+    if (m.ranges.length) {
+      ew.comm.common.routing.removeRouteRanges(m.ranges, sourceId);
+    }
+    else {
+      ew.comm.common.routing.clearRoutesByNextHop(sourceId);
+    }
+    if (this.dbg) console.log("comms: master route withdraw from", sourceId, m.ranges);
+    this.propagateRouteMessage(m, sourceId);
+  },
+
+  propagateRouteMessage(m, excludeSourceId) {
+    if (!m.ttl) m.ttl = 10; // Initialize TTL if not provided
+    if (m.ttl !== undefined) {
+      m.ttl -= 1;
+      if (m.ttl <= 0) return;
+    }
+
+    const forward = Object.assign({}, m);
+    Object.keys(this.connections).forEach(routeKey => {
+      const numericPeerId = Number(routeKey);
+      if (numericPeerId === excludeSourceId) return;
+      const connEntry = this.connections[routeKey];
+      if (!connEntry || !connEntry.char) return;
+      this.sendRouteMessage(routeKey, forward).catch(e => {
+        if (this.dbg) console.log("comms: master propagate route to", routeKey, "failed:", e);
+      });
+    });
+  },
+
+  sendPeerRegister(peerId, peerInfo) {
+    const payload = {
+      type: "PEER_REGISTER",
+      peerId: peerInfo.peerId,
+      role: peerInfo.role,
+      name: peerInfo.name,
+      ranges: peerInfo.ranges || []
+    };
+    return this.sendRouteMessage(peerId, payload);
+  },
+
+  sendRouteAnnounce(peerId, originId, ranges) {
+    const payload = {
+      type: "ROUTE_ANNOUNCE",
+      originId: originId,
+      announceId: originId + ":" + Date.now() + ":" + Math.round(Math.random() * 1000),
+      ranges: ranges || [],
+      ttl: 10 // Max hops to prevent flooding in large networks
+    };
+    return this.sendRouteMessage(peerId, payload);
+  },
+
+  sendRouteWithdraw(peerId, originId, ranges) {
+    const payload = {
+      type: "ROUTE_WITHDRAW",
+      originId: originId,
+      announceId: originId + ":withdraw:" + Date.now() + ":" + Math.round(Math.random() * 1000),
+      ranges: ranges || [],
+      ttl: 10 // Max hops to prevent flooding
+    };
+    return this.sendRouteMessage(peerId, payload);
+  },
+
   // Use common functions
   get mtu() { return ew.comm.common.mtu; },
   get dbg() { return ew.comm.common.dbg; },
   set dbg(value) { ew.comm.common.dbg = value; },
+  _binaryIdCounter: 0,
+  nextBinaryId() { return (this._binaryIdCounter = (this._binaryIdCounter + 1) & 0xFF) || 1; },
 
   // Connect to peripheral
-  connect(deviceId, phy, mtu, rssiHandler) {
-    if (this.connection && this.connection.connected) {
-      if (this.dbg) console.log("comms: master already connected");
-      return Promise.resolve(this.connection);
+  connect(deviceId, phy, mtu, rssiHandler, peerId) {
+    const routeKey = (typeof peerId !== 'undefined' && peerId !== null) ? peerId : deviceId;
+    const existing = this.connections[routeKey];
+    if (existing && existing.connection && existing.connection.connected) {
+      if (this.dbg) console.log("comms: master already connected to route", routeKey);
+      return Promise.resolve(existing.connection);
     }
 
     if (mtu) ew.comm.common.mtu = mtu;
@@ -283,14 +817,31 @@ ew.comm.mstr = {
         this.connection = c;
         c.device.on('gattserverdisconnected', (reason) => this.disconnected(reason));
         if (rssiHandler) c.setRSSIHandler((rssi) => { this.rssi = rssi; });
+        this.connections[routeKey] = { connection: c, char: null };
+        if (typeof peerId === 'number' && !isNaN(peerId)) {
+          this.registerPeerConnection(peerId, routeKey);
+        }
         return c.getPrimaryService("0xffe0");
       }).then(s => s.getCharacteristic("0xffe1")).then(ch => {
         this.char = ch;
+        this.connections[routeKey].char = ch;
         ch.on('characteristicvaluechanged', e => {
-          this.handleResponseChunk(E.toString(e.target.value.buffer));
+          const buf = e.target.value.buffer || e.target.value;
+          this.handleResponseChunk(buf, routeKey);
         });
         return ch.startNotifications();
       }).then(() => {
+        if (typeof peerId === 'number' && !isNaN(peerId)) {
+          const selfId = ew.comm.common.getBinaryID();
+          const routeRanges = ew.comm.common.getRouteRanges(true);
+          this.sendPeerRegister(peerId, {
+            peerId: selfId,
+            role: Array.isArray(ew.def.role) ? ew.def.role[0] : ew.def.role,
+            name: ew.def.name || "",
+            ranges: routeRanges
+          }).catch(e => { if (this.dbg) console.log("comms: master peer register failed:", e); });
+          this.sendRouteAnnounce(peerId, selfId, routeRanges).catch(e => { if (this.dbg) console.log("comms: master announce failed:", e); });
+        }
         this.isFullyConnected = true;
         if (this.dbg) console.log("comms: master fully connected");
         resolve(this.connection);
@@ -303,8 +854,45 @@ ew.comm.mstr = {
     });
   },
   // Disconnect
-  disconnect() {
+  disconnect(peerId) {
     return new Promise((resolve) => {
+      if (peerId) {
+        const connEntry = this.connections[peerId];
+        if (connEntry && connEntry.connection) {
+          try {
+            const removedRanges = ew.comm.common.routing.getRouteRangesByNextHop(peerId);
+            const routeWithdraws = removedRanges.length ? Object.keys(this.connections).filter(k => k !== String(peerId)).map(targetKey => {
+              const targetId = Number(targetKey);
+              return this.sendRouteWithdraw(targetId, ew.comm.common.getBinaryID(), removedRanges).catch(() => {});
+            }) : [];
+            connEntry.connection.setRSSIHandler();
+            connEntry.connection.disconnect();
+            if (this.connection === connEntry.connection) {
+              this.connection = null;
+              this.char = null;
+              this.isFullyConnected = false;
+            }
+            Promise.all(routeWithdraws).finally(() => {
+              delete this.connections[peerId];
+              ew.comm.common.routing.clearRoutesByNextHop(peerId);
+              this.queue = [];
+              this.isSending = false;
+              this.responses = {};
+              if (this.dbg) console.log("comms: master disconnected peer", peerId);
+              resolve({ s: "ok", m: "DISCONNECTED" });
+            });
+            return;
+          }
+          catch (error) {
+            if (this.dbg) console.log("comms: master disconnect failed", error);
+            resolve({ s: "err", m: "FAILED" });
+            return;
+          }
+        }
+        resolve({ s: "ok", m: "NO_PEER" });
+        return;
+      }
+
       if (this.connection) {
         try {
           this.connection.setRSSIHandler();
@@ -314,6 +902,8 @@ ew.comm.mstr = {
           this.queue = [];
           this.isSending = false;
           this.responses = {};
+          this.connections = {};
+          ew.comm.common.routing.table = {};
           if (this.dbg) console.log("comms: master disconnected");
           resolve({ s: "ok", m: "DISCONNECTED" });
         }
@@ -425,7 +1015,10 @@ ew.comm.mstr = {
   },
 
   sendChunkedData(dataStr, item) {
-    const chunks = ew.comm.common.createChunks(dataStr, item.command.id, 30);
+    const binaryMsgId = this.nextBinaryId();
+    const targetId = Number(item.command.targetId) || 0;
+    const sourceId = Number(item.command.sourceId) || 0;
+    const chunks = ew.comm.common.createBinaryChunks(dataStr, targetId, sourceId, binaryMsgId, 0);
     this.sendChunksSequentially(chunks, 0, item);
   },
 
@@ -433,10 +1026,20 @@ ew.comm.mstr = {
     if (index >= chunks.length) return;
 
     const chunk = chunks[index];
-    const chunkStr = JSON.stringify(chunk);
 
-    this.char.writeValue(chunkStr).then(() => {
-      if (this.dbg) console.log("comms: master sent chunk", chunk.i + 1, "/", chunk.tc);
+    this.char.writeValue(chunk).then(() => {
+      if (this.dbg) console.log("comms: master sent binary chunk", index + 1, "/", chunks.length);
+      if (item.command.noResponse && index + 1 === chunks.length) {
+        if (this.tid.timeout) {
+          clearTimeout(this.tid.timeout);
+          this.tid.timeout = 0;
+        }
+        this.queue.shift();
+        item.resolve({ s: "ok" });
+        this.isSending = false;
+        this.processQueue();
+        return;
+      }
       setTimeout(() => this.sendChunksSequentially(chunks, index + 1, item), 50);
     }).catch(e => this.handleSendError(e, item));
   },
@@ -450,16 +1053,27 @@ ew.comm.mstr = {
     this.processQueue();
   },
 
-  handleResponseChunk(data) {
+  handleResponseChunk(data, routeKey) {
     try {
+      if (typeof data !== 'string') {
+        const bytes = data instanceof Uint8Array ? data : new Uint8Array(data.buffer || data);
+        if (bytes.length > 7 && bytes[7] === ew.comm.common.binaryMagic) {
+          const fullData = ew.comm.common.assembleBinaryChunks(bytes);
+          if (fullData) this.handleResponse(fullData, routeKey);
+          ew.comm.common.cleanupChunkBuffers();
+          return;
+        }
+        data = E.toString(bytes);
+      }
+
       const parsed = JSON.parse(data);
       if (parsed.t === "c") {
         const fullData = ew.comm.common.assembleChunk(parsed);
-        if (fullData) this.handleResponse(fullData);
+        if (fullData) this.handleResponse(fullData, routeKey);
         ew.comm.common.cleanupChunkBuffers();
       }
       else {
-        this.handleResponse(data);
+        this.handleResponse(data, routeKey);
       }
     }
     catch (e) {
@@ -467,9 +1081,10 @@ ew.comm.mstr = {
     }
   },
 
-  handleResponse(data) {
+  handleResponse(data, routeKey) {
     try {
       const response = JSON.parse(data);
+      if (this.processIncomingRouteMessage(response, routeKey)) return;
       if (this.dbg) console.log("comms: master received:", response.id);
 
       if (this.tid.timeout) {
@@ -512,7 +1127,7 @@ ew.comm.mstr = {
   // Batch commands
   batch(commands) {
     return new Promise((resolve) => {
-      const batchId = ew.comm.common.generateId('batch');
+      const batchId = ew.comm.common.generateId();
       const results = [];
       let completed = 0;
 
@@ -574,19 +1189,26 @@ ew.comm.prfr = {
   // Handle incoming data
   RX(d) {
     try {
-      const s = typeof d === 'string' ? d : E.toString(d);
+      if (typeof d !== 'string') {
+        const bytes = d instanceof Uint8Array ? d : new Uint8Array(d.buffer || d);
+        if (bytes.length > 7 && bytes[7] === ew.comm.common.binaryMagic) {
+          this.handleBinaryChunk(bytes);
+          return;
+        }
+        d = E.toString(bytes);
+      }
 
-      if (this.dbg) console.log("comms: peripheral RX:", s.substring(0, 100));
+      if (this.dbg) console.log("comms: peripheral RX:", d.substring(0, 100));
 
       // Direct processing for non-chunk messages
-      if (!s.includes('"t":"c"')) {
-        const m = JSON.parse(s);
+      if (!d.includes('"t":"c"')) {
+        const m = JSON.parse(d);
         this.processMessage(m);
         return;
       }
 
       // Process chunk
-      const chunk = JSON.parse(s);
+      const chunk = JSON.parse(d);
       this.handleChunk(chunk);
 
     }
@@ -594,6 +1216,57 @@ ew.comm.prfr = {
       if (this.dbg) console.log("comms: peripheral RX error:", e);
       this.TX({ s: "err", m: "parse_err", e: e.toString() });
     }
+  },
+
+  handleBinaryChunk(bytes) {
+    if (this.dbg) console.log("comms: peripheral processing binary chunk", bytes.length);
+    let chunkInfo;
+    try {
+      chunkInfo = ew.comm.common.parseBinaryChunk(bytes);
+    }
+    catch (e) {
+      if (this.dbg) console.log("comms: peripheral binary parse error:", e);
+      return;
+    }
+
+    const myId = ew.comm.common.getBinaryID();
+    if (chunkInfo.targetId !== myId) {
+      if (typeof chunkInfo.targetId !== 'number' || chunkInfo.targetId < 0 || chunkInfo.targetId > 255) {
+        if (this.dbg) console.log("comms: peripheral invalid targetId", chunkInfo.targetId);
+        return;
+      }
+      const nextHop = ew.comm.common.routing.getNextHop(chunkInfo.targetId);
+      if (nextHop !== undefined) {
+        if (this.dbg) console.log("comms: peripheral forwarding binary chunk to", nextHop);
+        this.forwardBinaryChunk(bytes, nextHop);
+      }
+      else if (this.dbg) console.log("comms: peripheral no route for", chunkInfo.targetId);
+      return;
+    }
+
+    const fullData = ew.comm.common.assembleBinaryChunks(bytes);
+
+    if (fullData) {
+      if (this.dbg) console.log("comms: peripheral binary chunk assembly complete");
+      if (this.dbg) console.log("comms: peripheral FULL ASSEMBLED DATA:", fullData);
+      try {
+        const m = JSON.parse(fullData);
+        this.processMessage(m, chunkInfo.sourceId);
+      }
+      catch (e) {
+        if (this.dbg) console.log("comms: peripheral binary chunk parse error:", e);
+        this.TX({ s: "err", m: "chunk_parse_err" });
+      }
+    }
+
+    ew.comm.common.cleanupChunkBuffers();
+  },
+
+  forwardBinaryChunk(bytes, nextHopId) {
+    const raw = bytes;
+    ew.comm.mstr.sendRawTo(nextHopId, raw).catch(e => {
+      if (this.dbg) console.log("comms: peripheral forward failed:", e);
+    });
   },
 
   handleChunk(chunk) {
@@ -618,8 +1291,8 @@ ew.comm.prfr = {
     ew.comm.common.cleanupChunkBuffers();
   },
 
-  processMessage(m) {
-    if (this.dbg) console.log("comms: peripheral processing message:", m.id);
+  processMessage(m, senderId) {
+    if (this.dbg) console.log("comms: peripheral processing message:", m.id || m.type);
 
     const sendResponse = (data, originalMsg) => {
       const response = Object.assign({}, data);
@@ -628,7 +1301,23 @@ ew.comm.prfr = {
       this.TX(response);
     };
 
-    if (m.eW || m.G) {
+    if (m.type === "PEER_REGISTER") {
+      this.handlePeerRegister(m, senderId);
+      sendResponse({ s: "ok" }, m);
+    }
+    else if (m.type === "ROUTE_ANNOUNCE") {
+      this.handleRouteAnnounce(m, senderId);
+      sendResponse({ s: "ok" }, m);
+    }
+    else if (m.type === "ROUTE_WITHDRAW") {
+      this.handleRouteWithdraw(m, senderId);
+      sendResponse({ s: "ok" }, m);
+    }
+    else if (m.type === "PEER_REGISTER_ACK") {
+      if (this.dbg) console.log("comms: peripheral peer register acknowledged from", senderId);
+      sendResponse({ s: "ok" }, m);
+    }
+    else if (m.eW || m.G) {
       this.handleEWGMessage(m, sendResponse);
     }
     else if (m.batch && Array.isArray(m.batch)) {
@@ -642,6 +1331,74 @@ ew.comm.prfr = {
     }
     else {
       sendResponse({ s: "err", m: "bad_format" }, m);
+    }
+  },
+
+  handlePeerRegister(m, senderId) {
+    const peerId = Number(m.peerId);
+    if (isNaN(peerId)) return;
+    ew.comm.common.routing.registerPeer(peerId, { role: m.role, name: m.name, ranges: Array.isArray(m.ranges) ? m.ranges : [] });
+    const routeSource = (senderId !== undefined && senderId !== null) ? senderId : peerId;
+    ew.comm.common.routing.refreshPeerRoutes(peerId, Array.isArray(m.ranges) ? m.ranges : [], routeSource, { role: m.role, name: m.name });
+
+    if (this.dbg) console.log("comms: peripheral registered peer", peerId, m.role, m.name);
+
+    const routeRanges = ew.comm.common.getRouteRanges(true);
+    this.TX({ type: "ROUTE_ANNOUNCE", originId: ew.comm.common.getBinaryID(), announceId: ew.comm.common.getBinaryID() + ":" + Date.now(), ranges: routeRanges, ttl: 10 });
+  },
+
+  handleRouteAnnounce(m, senderId) {
+    if (!m.announceId || !Array.isArray(m.ranges) || (m.ttl !== undefined && m.ttl <= 0)) return;
+    if (ew.comm.common.hasSeenRouteMessage(m.announceId)) return;
+    ew.comm.common.markRouteMessageSeen(m.announceId);
+
+    const fromId = (senderId !== undefined && senderId !== null) ? senderId : Number(m.originId);
+    if (isNaN(fromId)) return;
+
+    ew.comm.common.routing.refreshPeerRoutes(fromId, m.ranges, fromId);
+    if (this.dbg) console.log("comms: peripheral route announce from", fromId, m.ranges);
+    this.propagateRouteMessage(m, fromId);
+  },
+
+  handleRouteWithdraw(m, senderId) {
+    if (!m.announceId || !Array.isArray(m.ranges) || (m.ttl !== undefined && m.ttl <= 0)) return;
+    if (ew.comm.common.hasSeenRouteMessage(m.announceId)) return;
+    ew.comm.common.markRouteMessageSeen(m.announceId);
+
+    const fromId = (senderId !== undefined && senderId !== null) ? senderId : Number(m.originId);
+    if (isNaN(fromId)) return;
+
+    if (m.ranges.length) {
+      ew.comm.common.routing.removeRouteRanges(m.ranges, fromId);
+    }
+    else {
+      ew.comm.common.routing.clearRoutesByNextHop(fromId);
+    }
+    if (this.dbg) console.log("comms: peripheral route withdraw from", fromId, m.ranges);
+    this.propagateRouteMessage(m, fromId);
+  },
+
+  propagateRouteMessage(m, excludeSourceId) {
+    if (!m.ttl) m.ttl = 10; // Initialize TTL if not provided
+    if (m.ttl !== undefined) {
+      m.ttl -= 1;
+      if (m.ttl <= 0) return; // Stop propagation if TTL expired
+    }
+    const forward = Object.assign({}, m);
+
+    if (ew.comm.mstr && ew.comm.mstr.connections) {
+      Object.keys(ew.comm.mstr.connections).forEach(routeKey => {
+        const connEntry = ew.comm.mstr.connections[routeKey];
+        const numericPeerId = Number(routeKey);
+        if (numericPeerId === excludeSourceId || !connEntry || !connEntry.char) return;
+        ew.comm.mstr.sendRouteMessage(numericPeerId, forward).catch(e => {
+          if (this.dbg) console.log("comms: peripheral propagate route to", numericPeerId, "failed:", e);
+        });
+      });
+    }
+
+    if (excludeSourceId !== null) {
+      this.TX(forward);
     }
   },
 
@@ -760,7 +1517,8 @@ ew.comm.prfr = {
   },
 
   sendChunkedResponse(dataStr, messageId) {
-    const chunks = ew.comm.common.createChunks(dataStr, messageId, 40);
+    const numericId = parseInt(messageId, 36) || 0;
+    const chunks = ew.comm.common.createBinaryChunks(dataStr, 0, 0, numericId, 0);
     this.sendChunksSequentially(chunks, 0);
   },
 
@@ -768,12 +1526,11 @@ ew.comm.prfr = {
     if (index >= chunks.length) return;
 
     const chunk = chunks[index];
-    const chunkStr = JSON.stringify(chunk);
 
     try {
       NRF.updateServices({
         0xFFE0: {
-          0xFFE1: { value: chunkStr, notify: true }
+          0xFFE1: { value: chunk, notify: true }
         }
       });
 
@@ -875,11 +1632,12 @@ ew.comm.prfr = {
 
 ew.comm.on('BTRX', ew.comm.prfr.RX);
 
-ew.comm.btC = () => {
+ew.comm.btC = (addr) => {
   ew.is.bt = 1;
   //ew.notify.alert("info", { "src": "BT", "title": "BT", "body": "CLIENT IN" }, 1);
   //E.setConsole(Bluetooth, { force: true });
-  ew.comm.emit('BLE_con');
+  ew.comm.emit('BLE_con', addr);
+
 };
 //
 ew.comm.btD = () => {
@@ -890,8 +1648,8 @@ ew.comm.btD = () => {
     //NRF.sleep();
     ew.is.btsl = 1;
   }
+  if (ew.apps.ewtag && ew.apps.ewtag.state.def.iTag) NRF.setScanResponse([]);
   ew.comm.emit('BLE_dis');
-
 };
 
 
@@ -899,11 +1657,11 @@ ew.comm.btD = () => {
 NRF.setTxPower(ew.def.bt.rfTX);
 NRF.on('disconnect', ew.comm.btD);
 NRF.on('connect', ew.comm.btC);
-ew.comm.updt();
+setTimeout(() => { ew.comm.init(); }, 2000);
 ew.sys.on('hour', ew.comm.updt);
 
 
-//ew.sys.on('hour', function() {print (Date())});
+//ew.sys.on('hour', function() {console.log (Date())});
 
 
 /*

@@ -94,8 +94,8 @@ ew.face[0].d1 = function() {
 		else if (i == 2) {
 			ew.sys.buzz.nav(ew.sys.buzz.type.ok);
 			ew.UI.btn.ntfy(1, 3, 0, "_bar", 6, "BALL", "CALIBRATION", 15, 6, 1);
-			ew.is.bar = 1;
-			ew.sys.TC.val = { cur: -ew.apps.kitty.state.def.is.clb * 100, dn: 0, up: 9, tmp: 0 };
+			ew.is.slide = 1;
+			ew.sys.TC.val = { cur: -ew.apps.kitty.state.def.is.clb * 100, dn: 0, up: 9};
 			ew.UI.c.tcBar = (a, b) => {
 				ew.UI.btn.ntfy(0, 2, 1);
 				ew.UI.btn.c2l("main", "_2x3", 2, "CLB", E.toJS(b), 15, 6);
@@ -170,8 +170,8 @@ ew.face[0].d2 = function() {
 		else if (i == 2) {
 			ew.sys.buzz.nav(ew.sys.buzz.type.ok);
 			ew.UI.btn.ntfy(1, 3, 0, "_bar", 6, "SET TOF", "FULL (CM)", 15, 6, 1);
-			ew.is.bar = 1;
-			ew.sys.TC.val = { cur: ew.apps.kitty.state.def.tof.full * 10, dn: 50, up: 450, tmp: 0 };
+			ew.is.slide = 1;
+			ew.sys.TC.val = { cur: ew.apps.kitty.state.def.tof.full * 10, dn: 50, up: 450 };
 			ew.UI.c.tcBar = (a, b) => {
 				ew.UI.btn.ntfy(0, 2, 1);
 				ew.UI.btn.c2l("main", "_2x3", 2, "FULL", b / 10, 15, ew.apps.kitty.state.def.is.tof ? 6 : 1);
@@ -181,8 +181,8 @@ ew.face[0].d2 = function() {
 		else if (i == 3) {
 			ew.sys.buzz.nav(ew.sys.buzz.type.ok);
 			ew.UI.btn.ntfy(1, 3, 0, "_bar", 6, "SET TOF", "EMPTY (CM)", 15, 6, 1);
-			ew.is.bar = 1;
-			ew.sys.TC.val = { cur: ew.apps.kitty.state.def.tof.empty * 10, dn: 50, up: 450, tmp: 0 };
+			ew.is.slide = 1;
+			ew.sys.TC.val = { cur: ew.apps.kitty.state.def.tof.empty * 10, dn: 50, up: 450 };
 			ew.UI.c.tcBar = (a, b) => {
 				ew.UI.btn.ntfy(0, 2, 1);
 				ew.UI.btn.c2l("main", "_2x3", 3, "EMPTY", b / 10, 15, ew.apps.kitty.state.def.is.tof ? 6 : 1);
@@ -224,8 +224,8 @@ ew.face[0].d2 = function() {
 			}
 			else {
 				ew.UI.btn.ntfy(1, 3, 0, "_bar", 6, "SET OPEN", "POSITION", 15, 6, 1);
-				ew.is.bar = 1;
-				ew.sys.TC.val = { cur: ew.apps.kitty.state.def.lid.open * 100, dn: 40, up: 60, tmp: 0 };
+				ew.is.slide = 1;
+				ew.sys.TC.val = { cur: ew.apps.kitty.state.def.lid.open * 100, dn: 40, up: 60 };
 				ew.UI.c.tcBar = (a, b) => {
 					ew.UI.btn.ntfy(0, 8, 1);
 					ew.UI.btn.c2l("main", "_2x3", 5, "OPEN", b / 100, 15, 6);
@@ -245,8 +245,8 @@ ew.face[0].d2 = function() {
 			}
 			else {
 				ew.UI.btn.ntfy(1, 3, 0, "_bar", 6, "SET SHUT", "POSITION", 15, 6, 1);
-				ew.is.bar = 1;
-				ew.sys.TC.val = { cur: ew.apps.kitty.state.def.lid.shut * 100, dn: 1, up: 20, tmp: 0 };
+				ew.is.slide = 1;
+				ew.sys.TC.val = { cur: ew.apps.kitty.state.def.lid.shut * 100, dn: 1, up: 20 };
 				ew.UI.c.tcBar = (a, b) => {
 					ew.UI.btn.ntfy(0, 8, 1);
 					ew.UI.btn.c2l("main", "_2x3", 6, "SHUT", b / 100, 15, 6);

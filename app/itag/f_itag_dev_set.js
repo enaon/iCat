@@ -8,7 +8,7 @@ ew.face[0] = {
     run: false,
     data:{
         img:{
-        trash:"mEwwI1yg/4AocP/gFDhkMApE//4ABAo4PCAUIACAv4FQATkGAQMYXwSgBYAUBAoPgdsg",
+        //trash:"mEwwI1yg/4AocP/gFDhkMApE//4ABAo4PCAUIACAv4FQATkGAQMYXwSgBYAUBAoPgdsg",
         move:"mEwwIYWAok4Aok8Aok+Aok/AouAAonAAongAonwAon4Aon8AQP/AAP+gF/AoX/AovAAongAonwAon4Aon8AoqldFJZZDLQMfAokPAokHAokDDokBJopQFRowFEh4FEg4FEgYFEgIFEgB6FvjoKjgFEhB9IA=",    
         }
     },    
@@ -35,8 +35,8 @@ ew.face[0] = {
         ew.UI.btn.c2l("main", "_2x3", 1, "ADD", ew.apps.itag.state.def.set.storeLock ? "OFF" : "ON", 15, ew.apps.itag.state.def.set.storeLock ? 1 : 4);
         ew.UI.btn.c2l("main", "_2x3", 2, "HIDDEN", ew.apps.itag.state.def.set.showHidden ? "ON" : "OFF", 15, ew.apps.itag.state.def.set.showHidden ? 4 : 1);
         ew.UI.btn.img("main", "_2x3", 3, "move.face", "MOVE", 15, 4);
-        ew.UI.btn.c2l("main", "_2x3", 4, ew.apps.itag.state.def.set.showHidden ? "UNHIDE" : "HIDE", "", ew.apps.itag.state.def.set.showHidden ?15:0, ew.apps.itag.state.def.set.showHidden ? 4 : 9, 0.8);
-        ew.UI.btn.img("main", "_2x3", 6, "trash.face", "DEL", 15, 13);
+        ew.UI.btn.c2l("main", "_2x3", 4, ew.apps.itag.state.def.set.showHidden ? "SHOW" : "HIDE", "", 15, 1, 0.8);
+        ew.UI.btn.img("main", "_2x3", 6, "ew_i_trash.img", "DEL", 15, 1);
         ew.UI.c.end();
 
         ew.UI.c.main._2x3 = (i, l) => {
@@ -64,48 +64,49 @@ ew.face[0] = {
                 ew.sys.buzz.nav(ew.sys.buzz.type.ok);
                 ew.apps.itag.state.move = ew.apps.itag.state.def.set.pos;
                 ew.face.go("itag-dev", 0, "move");
-                if (ew.def.face.info) ew.UI.btn.ntfy(0, 0.5, 0, "_bar", 6, "MOVE", "ENABLED", 0, 15);
+                if (ew.def.face.info) ew.UI.btn.ntfy(0, 0.8, 0, "_bar", 6, "MOVE", "ENABLED", 0, 15);
                 return;
             }
             if (i == 4) {
                 ew.sys.buzz.nav(ew.sys.buzz.type.ok);
                 ew.is.bar = 1;
                 ew.is.slide = 0;
+                let array = ew.apps.itag.state.def.set.showHidden ? ew.apps.itag.state.def.hiddenOrder : ew.apps.itag.state.def.storeOrder;
+                let devKey = array[ew.apps.itag.state.def.set.pos];
+                let dev = ew.apps.itag.state.def.store[devKey];
+                let name = dev.name;   
+                
                 ew.UI.btn.ntfy(0, 1.5, 1, "_bar", 6, "", "", 15, 0);
                 ew.UI.c.start(0, 1);
-                ew.UI.btn.c2l("bar", "_bar", 6, ew.apps.itag.state.def.set.showHidden ? "PRESS TO UNHIDE" : "PRESS TO HIDE", "", ew.apps.itag.state.def.set.showHidden ?15:0, ew.apps.itag.state.def.set.showHidden ? 4 : 9, 1.4);
+                ew.UI.btn.c2l("bar", "_bar", 6,  name.toUpperCase(), ew.apps.itag.state.def.set.showHidden ? "UNHIDE ?" : "HIDE ?", 15, 1, 1.4);
                 ew.UI.c.end();
                 ew.UI.c.bar._bar = (i) => {
                     ew.sys.buzz.nav(ew.sys.buzz.type.ok);
                     if (i == 6) {
-                        let array = ew.apps.itag.state.def.set.showHidden ? ew.apps.itag.state.def.hiddenOrder : ew.apps.itag.state.def.storeOrder;
-                        let dev = ew.apps.itag.state.def.store[array[ew.apps.itag.state.def.set.pos]];
-                        let name = dev.name;
-                        let id = dev.id;
+  
                         if (ew.apps.itag.state.def.set.showHidden) {
                             ew.apps.itag.state.def.hiddenOrder.splice(ew.apps.itag.state.def.set.pos, 1);
-                            ew.apps.itag.state.def.storeOrder.push(dev.id);
+                            ew.apps.itag.state.def.storeOrder.push(devKey);
                             if (!ew.apps.itag.state.def.hiddenOrder.length) ew.apps.itag.state.def.set.showHidden = 0;
                         }
                         else {
                             ew.apps.itag.state.def.storeOrder.splice(ew.apps.itag.state.def.set.pos, 1);
-                            ew.apps.itag.state.def.hiddenOrder.push(dev.id);
+                            ew.apps.itag.state.def.hiddenOrder.push(devKey);
                         }
                         ew.face.go("itag-dev", 0);
-                        ew.UI.btn.ntfy(1, 1, 0, "_bar", 6, name.toUpperCase(), ew.apps.itag.state.def.set.showHidden ? "UNHIDDEN" : "HIDEN", 0, 9);
+                        ew.UI.btn.ntfy(1, 1, 0, "_bar", 6, name.toUpperCase(), ew.apps.itag.state.def.set.showHidden ? "UNHIDDEN" : "HIDEN", 0, 15);
                     }
                 };
                 return;
             }
             if (i == 6) {
                 if (l) {
-                    ew.sys.buzz.nav(ew.sys.buzz.type.alert);
-                    ew.sys.buzz.nav(ew.sys.buzz.type.ok);
+                    ew.sys.buzz.nav(ew.sys.buzz.type.info);
                     ew.is.bar = 1;
                     ew.is.slide = 0;
                     ew.UI.btn.ntfy(0, 1.5, 1, "_bar", 6, "", "", 15, 0);
                     ew.UI.c.start(0, 1);
-                    ew.UI.btn.c2l("bar", "_bar", 6, "DELETE ALL ?", "", 15, 13, 1.5);
+                    ew.UI.btn.c2l("bar", "_bar", 6, "DELETE ALL ?", "", 15, 13);
                     ew.UI.c.end();
                     ew.UI.c.bar._bar = (i) => {
                         ew.sys.buzz.nav(ew.sys.buzz.type.ok);
@@ -123,19 +124,21 @@ ew.face[0] = {
                     ew.is.slide = 0;
                     ew.UI.btn.ntfy(0, 1.5, 1, "_bar", 6, "", "", 15, 0);
                     ew.UI.c.start(0, 1);
-                    ew.UI.btn.img("bar", "_bar", 6, "trash.face", "DELETE?", 15, 13);
+                    ew.UI.btn.c2l("bar", "_bar", 6, "DELETE ?", "", 15, 13);
+                    //ew.UI.btn.img("bar", "_bar", 6, "ew_i_trash.img", "DELETE?", 15, 1);
                     ew.UI.c.end();
                     ew.UI.c.bar._bar = (i) => {
                         ew.sys.buzz.nav(ew.sys.buzz.type.ok);
                         if (i == 6) {
                             let array = ew.apps.itag.state.def.set.showHidden ? ew.apps.itag.state.def.hiddenOrder : ew.apps.itag.state.def.storeOrder;
-                            let dev = ew.apps.itag.state.def.store[array[ew.apps.itag.state.def.set.pos]];
+                            let devKey = array[ew.apps.itag.state.def.set.pos];
+                            let dev = ew.apps.itag.state.def.store[devKey];
                             let name = dev.name;
-                            delete ew.apps.itag.state.def.store[dev.id];
+                            delete ew.apps.itag.state.def.store[devKey];
                             array.splice(ew.apps.itag.state.def.set.pos, 1);
                             //delete from scan dev list too
-                            delete ew.apps.itag.state.dev[dev.id];
-                            var index = ew.apps.itag.state.devA.indexOf(dev.id);
+                            delete ew.apps.itag.state.dev[devKey];
+                            var index = ew.apps.itag.state.devA.indexOf(devKey);
                             if (index !== -1)
                                 ew.apps.itag.state.devA.splice(index, 1);
                             ew.face.go("itag-dev", 0);

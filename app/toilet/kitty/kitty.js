@@ -28,11 +28,13 @@ ew.apps.kitty = {
     },
     msg: function(i) {
       if (i.type === "error") {
-        ew.notify.alert("error", { body: i.body || "", title: i.title }, i.alert, i.persist);
-        console.log("kitty error: ", i.title, i.body || "");
+        ew.notify.alert("error", { src:"kitty",  title: i.title , body: i.body || ""}, i.alert, i.persist);
+        //console.log("kitty error: ", i.title, i.body || "");
       }
       else {
-        ew.notify.alert("info", { body: i.body || "", title: i.title }, i.alert, i.persist);
+        ew.UI.btn.ntfy(1, i.persist?20:5, 0, "_bar", 6, i.title.toUpperCase(), i.body?i.body.toUpperCase():"" ,15, 13, true, false, false);
+
+        //ew.notify.alert("info", {src:"kitty", title: i.title, body: i.body || ""}, i.alert, i.persist);
 
         if (ew.apps.kitty.dbg || ew.dbg) console.log("kitty dbg: ", i.title);
       }
@@ -76,7 +78,7 @@ ew.apps.kitty = {
     active: 0,
     connect: (x) => {
       if (ew.apps.kitty.state.is.vibrator.connected) {
-        ew.apps.kitty.state.msg({ "type": "info", "title": "VIBRATOR", "body": "IS CONNECTED", "persist": 0 });
+        ew.apps.kitty.state.msg({ "type": "info", "title": "Vibrator", "body": "is connected", "persist": 0 });
         return;
       }
 
@@ -90,13 +92,13 @@ ew.apps.kitty = {
         //device.on('data', function(d) { print("Got:"+JSON.stringify(d)); });
       }).catch(function() {
         ew.apps.kitty.state.is.vibrator.connected = 0;
-        ew.apps.kitty.state.msg({ "type": "error", "title": "VIBRATOR", "body": "NOT FOUND", "persist": 0 });
+        ew.apps.kitty.state.msg({ "type": "error", "title": "Vibrator", "body": "not found", "persist": 0 });
       });
     },
     disconnect: (x) => {
       try { ew.apps.kitty.vibrator.device.disconnect(); }
       catch (error) {
-        ew.apps.kitty.state.msg({ "type": "error", "title": "VIBRATOR", "body": "DISCONNECT ERROR", "persist": 0 });
+        ew.apps.kitty.state.msg({ "type": "error", "title": "Vibrator", "body": "Disconnect error", "persist": 0 });
       }
       ew.apps.kitty.state.is.vibrator.connected = 0;
       if (ew.face[0].page == "more1")
@@ -105,7 +107,7 @@ ew.apps.kitty = {
     write: (action, repeat) => {
       ew.apps.kitty.vibrator.active = action == "turnOn" ? 1 : 0;
       ew.apps.kitty.vibrator.device.write(`powerbank.${action}(1,${repeat});\n`).catch(function() {
-        ew.apps.kitty.state.msg({ "type": "error", "title": "VIBRATOR", "body": "IS BUSY", "persist": 0 });
+        ew.apps.kitty.state.msg({ "type": "error", "title": "Vibraor", "body": "is busy", "persist": 0 });
       });
     }
   },
@@ -159,7 +161,7 @@ ew.apps.kitty = {
       pinMode(i.pin[i.servo], "af_output");
       //digitalWrite(i.pin[i.servo],1);
 
-      ew.apps.kitty.state.msg({ "type": "error", "title": "RECOVERY", "persist": 1 });
+      ew.apps.kitty.state.msg({ "type": "error", "title": "Recovery","persist": 1 });
 
       if (ew.tid.kittyT) clearTimeout(ew.tid.kittyT);
       ew.tid.kittyT = setTimeout(() => {
@@ -517,7 +519,7 @@ ew.apps.kitty = {
 	  }
 	  else if (mode == "power") {
 	    ew.apps.kitty.state.is.sys.manual = 1;
-	    ew.apps.kitty.state.msg({ "type": "info", "title":"POWERING", "body": (!ew.pin.CHRG.read()?"OFF":"ON"), "persist": 0 });
+	    ew.apps.kitty.state.msg({ "type": "info", "title":"Powering", "body": (!ew.pin.CHRG.read()?"OFF":"ON"), "persist": 0 });
 	    !ew.pin.CHRG.read() ? ew.apps.kitty.call.sleep() : ew.apps.kitty.call.wake();
 	  }
 	  else {
@@ -527,7 +529,7 @@ ew.apps.kitty = {
 	    ew.apps.kitty.state.is.sys.manual = 1;
 	    ew.apps.scale.clean(0); //cancel auto clean
 	    ew.apps.kitty.call.wake((mode == "empty") ? "empty" : "clean");
-	    ew.apps.kitty.state.msg({ "type": "info", "title": (mode == "empty") ? "EMPTY THE SAND" : "CLEAN CYCLE", "persist": 0 });
+	    ew.apps.kitty.state.msg({ "type": "info", "title": (mode == "empty") ? "Empty the sand" : "Clean cycle", "persist": 0 });
 	
 	  }
 	},
