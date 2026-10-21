@@ -233,7 +233,6 @@ ew.apps.lamp = {
             this.state.pirT = this.state.def.pir.loop;
             this.ys312();
         }
-
         ew.sys.sound[this.state.def.pir.en ? "on" : "off"]();
         return this.state.def.pir.en;
     },
@@ -679,6 +678,7 @@ if (ew.apps.lamp.state.def.oneB) {
                     ew.is.btn1dim = 1;
                     ew.apps.lamp.onButtonPress();
                 }
+                if (global.bw) setTimeout(()=>{bw.changed();},250);
 
             }, 500);
             return;
@@ -693,6 +693,7 @@ if (ew.apps.lamp.state.def.oneB) {
                 else ew.apps.lamp.tgl();
                 ew.tid.short1 = 0;
                 ew.is.btn1Press = 0;
+                if (global.bw) setTimeout(()=>{bw.changed();},250);
             }, 100);
         }
         else if (ew.is.btn1dim) {
@@ -726,11 +727,13 @@ else {
             ew.tid.btn1long = setTimeout(() => {
                 ew.tid.btn1long = 0;
                 ew.is.btn1Press = 0;
+                if (global.bw) setTimeout(()=>{bw.changed();},250);
                 if (!ew.apps.lamp.state.pin.dim.read()) {
                     ew.apps.lamp.auto();
                 }
                 else if (!ew.apps.lamp.state.isOn)
                     ew.apps.lamp.ldr("set");
+
 
             }, 1000);
         }
@@ -757,6 +760,7 @@ else {
         //if (x.pin === D22) x.state = !x.state;
         if (!x.state) {
             ew.apps.lamp.onButtonRelease();
+            if (global.bw) setTimeout(()=>{bw.changed();},250);
         }
         else {
             ew.apps.lamp.onButtonPress();
@@ -765,51 +769,16 @@ else {
     pinMode(ew.apps.lamp.state.pin.dim, "input_pulldown");
     ew.tid.btn2 = setWatch(ew.sys.btn2, ew.apps.lamp.state.pin.dim, { repeat: true, debounce: 50, edge: 0 });
 
-
-
     // toggle
     ew.is.btn3Press = 0;
-
-    /* if (ew.apps.lamp.state.def.isPB) {
-         ew.sys.btn3 = (x) => {
-              if (ew.sys.batt() < 3.30 && !ew.apps.lamp.state.isOn) { if (x.state) ew.sys.sound.alert(); return; }
-             if (ew.apps.lamp.state.isOn && ew.apps.lamp.state.tid.timer ) ew.apps.lamp.state.count = 0;
-
-             if (ew.tid.btn3long) {
-                 clearTimeout(ew.tid.btn3long);
-                 ew.tid.btn3long = 0;
-             }
-             if (x.state) {
-                 ew.is.lastBTN3time = x.time - x.lastTime;
-                 ew.is.btn3Press++;
-                 
-                 // toggle
-                 //if (ew.apps.lamp.state.isOn && ew.apps.lamp.state.tid.timer ) ew.apps.lamp.state.count = 0;
-                 //ew.apps.lamp.tgl();
-
-                 // toggle usb output
-                 ew.tid.btn3long = setTimeout(() => {
-                     ew.tid.btn3long = 0;
-                     ew.is.btn3Press = 0;
-                     ew.apps.lamp.pwrT();
-
-                 }, 1000);
-             }
-             // toggle light
-             else if (ew.is.btn3Press) {
-                 if (ew.apps.lamp.state.isOn && ew.apps.lamp.state.tid.timer ) ew.apps.lamp.state.count = 0;
-                 ew.apps.lamp.tgl();
-             }
-         };
-     }
-     else {
-     */
     ew.sys.btn3 = (x) => {
         if (ew.sys.batt() < 3.30 && !ew.apps.lamp.state.isOn) { if (x.state) ew.sys.sound.alert(); return; }
 
         if (x.state) {
             ew.apps.lamp.tgl();
+            if (global.bw) setTimeout(()=>{bw.changed();},250);
             ew.is.lastBTN3time = x.time - x.lastTime;
+            
             ew.tid.btn3long = setTimeout(() => {
                 ew.tid.btn3long = 0;
                 if (ew.apps.lamp.state.def.isPB) ew.apps.lamp.pwrT();
@@ -817,14 +786,11 @@ else {
             }, 1000);
         }
         else {
-
             if (ew.tid.btn3long) {
                 clearTimeout(ew.tid.btn3long);
                 ew.tid.btn3long = 0;
             }
         }
-
-
     };
     //  }
     pinMode(ew.apps.lamp.state.pin.tgl, "input_pulldown");

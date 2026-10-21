@@ -347,6 +347,10 @@ function readSensor(it, enc, entries, now) {
 let st = null;
 let listening = false; // whether NRF connect/disconnect handlers are attached
 
+const READ_SLACK = 100; /* ms added to every scheduled read (D-109).
+
+   @gfwilliams' number. See schedule(): it buys a wake that finds work. */
+
 const CTR_FILE = ".bwctr"; // the persisted counter high-water marks
 const CTR_STRIDE = 64; // persist every this many accepted writes, not each one
 const CTR_WINDOW = 0x80000000; /* how far ahead a write counter may jump (S5.3).
@@ -555,17 +559,27 @@ function encodeOne(e, v) {
   return adv[0xFCD2].slice(3);
 }
 
-/* Rebuild and publish sensors, settings revision and declaration. `cached`
-   skips the sensor reads, for a caller that has just done them itself. */
-function refreshAdvertising(cached) {
-  st.packetId = (st.packetId + 1) & 255;
-  let sd = renderServiceData(st.plan, st.packetId, cached ? null : encodeOne, st.entries, Date.now(), st.revision);
-  if (st.key) sd = sealAdvertising(sd);
-  // whenConnected: without it the device goes silent exactly when a receiver
-  // most wants to hear it.
-  const opts = { interval:st.advInterval, connectable:true, discoverable:true, whenConnected:st.whenConnected, showName:st.showName };
+/* The advertising options.
+
+   Everything in them is fixed by setup() except the interval, which moves
+   between idle and fast. whenConnected: without it the device goes silent
+   exactly when a receiver most wants to hear it. */
+function advOptions() {
+  return { interval:st.advInterval, connectable:true, discoverable:true, whenConnected:st.whenConnected, showName:st.showName };
+}
+
+/* Hand the radio a packet, and keep the bytes it accepted (D-108).
+
+   Kept because changing the advertising *rate* needs no new packet. The radio
+   repeats whatever it was last given, so republishing the same bytes with a
+   different interval is a 3 ms call where building them again is 92 ms on a
+   sealed device -- and those same bytes are exactly what BTHome wants repeated
+   while nothing in the data has moved. */
+function publish(sd) {
+  const opts = advOptions();
   try {
     NRF.setAdvertising({ 0xFCD2:sd }, opts);
+    st.lastSd = sd;
   } catch (e) {
     // The radio stops advertising to reconfigure, so a throw from here leaves
     // the device silent -- and a silent device cannot be connected to, which
@@ -581,8 +595,30 @@ function refreshAdvertising(cached) {
     // unsealed three did.
     if (st.key) small = sealAdvertising(small);
     NRF.setAdvertising({ 0xFCD2:small }, Object.assign({}, opts, { showName:false }));
+    // What is on air is what a later rate change has to republish.
+    st.lastSd = small;
     throw err("advertising_rejected", `the radio refused ${sd.length} bytes of service data: ${e.message}`);
   }
+}
+
+/* Rebuild and publish sensors, settings revision and declaration. `cached`
+   skips the sensor reads, for a caller that has just done them itself. */
+function refreshAdvertising(cached) {
+  st.packetId = (st.packetId + 1) & 255;
+  let sd = renderServiceData(st.plan, st.packetId, cached ? null : encodeOne, st.entries, getTime() * 1000, st.revision);
+  if (st.key) sd = sealAdvertising(sd);
+  publish(sd);
+}
+
+/* Publish the packet already on air, at whatever rate is now set (D-108).
+
+   The packet id does not move, because nothing in the data moved -- which is
+   the repetition BTHome's format explicitly allows -- and on a sealed device
+   the advertising counter does not move either, so no receiver has to
+   authenticate anything new to be told the same values twice. */
+function republishRate() {
+  if (st.lastSd === null) refreshAdvertising();
+  else publish(st.lastSd);
 }
 
 /* Re-read the advertised entries that are due.
@@ -601,6 +637,78 @@ function readAdvertised(now) {
   return moved;
 }
 
+/* How long until the next advertised entry falls due, in milliseconds.
+
+   Null when none ever does: a device whose advertised values are all static,
+   or one that advertises nothing but its declaration and what it accepts. It
+   then holds no read timer at all.
+
+   An entry with interval 0 is read at every wake (D-050), so for scheduling it
+   counts as the advertising interval -- which is the rate the old setInterval
+   gave it, and the same packet it still goes out in. */
+function nextDue(now) {
+  const ord = st.plan.ordered;
+  let wait = null;
+  for (let i = 0; i < ord.length; i++) {
+    const it = ord[i];
+    /* A clock that moved backwards leaves lastRead in the future. Nothing is
+       ever due again there, and the wake is armed for the length of the jump:
+       fifteen minutes of a device reading nothing, from one setTime() or one
+       RTC resynchronising (D-114). Treating it as read now puts the next read
+       one interval away rather than one jump. */
+    if (it.lastRead > now) it.lastRead = now;
+    const due = it.lastRead + (it.readInterval || st.interval) - now;
+    if (wait === null || due < wait) wait = due;
+  }
+  return wait;
+}
+
+/* Arm the read timer for the next entry that falls due, or leave none armed.
+
+   @gfwilliams' proposal, and his reason for it: with `interval: 1000` and a
+   battery at `interval: 300000`, a fixed interval timer woke 300 times to do
+   something once, and the 299 other wakes only established that there was
+   nothing to do (espruino#8024, D-109). What replaces it is this, re-armed by
+   every wake from whatever is due soonest.
+
+   The 100 ms of slack is his too. A timer that fires a hair early finds
+   nothing due, publishes nothing and arms itself again for a millisecond's
+   time -- two wakes where one would have done. An entry is therefore re-read
+   at its own interval plus about 100 ms, which is *less* than it cost before:
+   a deadline inspected once per advertising interval was only noticed at the
+   first wake past it, and a 30 s entry measured 31 000 ms between reads where
+   it now measures 30 104 (docs/measurements.md S11). */
+function schedule() {
+  if (st.timer !== undefined) { clearTimeout(st.timer); st.timer = undefined; }
+  const wait = nextDue(getTime() * 1000);
+  if (wait === null) return;
+  st.timer = setTimeout(wake, (wait > 0 ? wait : 0) + READ_SLACK);
+}
+
+/* What the timer calls, so that a wake always arms the next one.
+
+   A read can throw: a sensor that is not ready, a get() of its own, a packet
+   the radio refuses. Under the fixed timer that was survivable, since
+   setInterval fired again regardless. A timeout that re-arms itself from
+   inside the work does not, so one escaping exception stopped the device
+   reading for ever while the radio went on repeating the last packet: a
+   receiver sees a healthy device whose values never move again, and onError
+   hears nothing (D-114).
+
+   Retried at the advertising interval, which is the rate the fixed timer used
+   to retry at. Sooner would turn a sensor that throws every time into a busy
+   loop: the entry's lastRead has not moved, so it is due again at once. */
+function wake() {
+  try {
+    tick();
+  } catch (e) {
+    // Nothing to clear: the timeout that called this has been spent, and
+    // schedule() is exactly what did not run.
+    if (st.onError) st.onError(e);
+    st.timer = setTimeout(wake, st.interval + READ_SLACK);
+  }
+}
+
 /* The periodic rebuild (D-106). BTHome's own page says the packet id "should
    be increased on every change in data", that a receiver "should only process
    the advertisement if the packet id is different compared to the previous
@@ -609,9 +717,19 @@ function readAdvertised(now) {
    radio to repeat and the packet id stays where it is. Rebuilding on every
    interval instead cost ~29 ms of the one thread every second -- re-sealed
    with AES-CCM on an encrypted device, which @enaon measured at +135 uA -- and
-   it defeated the deduplication the packet id exists for. */
+   it defeated the deduplication the packet id exists for.
+
+   Says whether it published, so that a caller which also wants the advertising
+   rate changed can publish once rather than twice (D-108). Arms the next wake
+   itself (D-109), which is why handleWrite() and the timer can both call it. */
 function tick() {
-  if (readAdvertised(Date.now())) refreshAdvertising(true);
+  const moved = readAdvertised(getTime() * 1000);
+  if (moved) refreshAdvertising(true);
+  // Before returning, and whether or not anything moved: a wake that found
+  // nothing is still a wake, and the next one is computed from where the reads
+  // actually landed.
+  schedule();
+  return moved;
 }
 
 /* What a read of entry `w` returns.
@@ -630,35 +748,47 @@ function publishRead(w) {
   NRF.updateServices(svc);
 }
 
+/* Re-publish every readable entry in one updateServices call rather than one
+   per entry. The sealing is the same either way; what this cuts is the number
+   of softdevice reconfigurations, and with it the window in which a GATT
+   update can interleave with the radio (D-115). */
+function publishReads() {
+  const svc = {}, chr = {};
+  st.plan.writable.forEach(w => { if (w.readable) chr[w.uuid] = { value:readValue(w) }; });
+  svc[SERVICE_UUID] = chr;
+  NRF.updateServices(svc);
+}
+
+/* Run a reaction to a connection without letting it throw.
+
+   The Bluetooth stack's own callback is where it would land, and publishing an
+   advertisement can fail -- the radio may refuse the packet -- with nothing up
+   there prepared to catch it; `onError` is where a device's own code hears
+   about it. */
+function guarded(fn) {
+  try { fn(); } catch (e) { if (st && st.onError) st.onError(e); }
+}
+
 /* Advertise fast while someone is plainly interacting.
 
    From connect until fastTimeout after disconnect. A central can only begin a
    connection when it catches an advertising event, so the idle interval taxes
    the first write of a burst (D-013, D-024).
 
-   Rebuilds the packet only when the rate actually changes, and says whether it
-   did. Advertising fast only makes the radio repeat the packet it already has,
-   so a device already in fast mode has nothing to rebuild -- and rebuilding
-   anyway cost a packet per write: 112 rebuilds for 100 writes, measured, which
-   is what made a dimming burst stutter (D-106). What a write changed and does
-   advertise still goes out at once: handleWrite() re-reads the advertised
-   entries itself, which is the half of D-050 that mattered. */
-/* Run a reaction to a connection without letting it throw.
-
-   The Bluetooth stack's own callback is where it would land, and rebuilding
-   the advertising can fail -- the radio may refuse the packet -- with nothing
-   up there prepared to catch it; `onError` is where a device's own code hears
-   about it. */
-function guarded(fn) {
-  try { fn(); } catch (e) { if (st && st.onError) st.onError(e); }
-}
-
+   Moves the rate and says whether it moved; it publishes nothing itself. A
+   device already in fast mode has nothing to do at all -- rebuilding anyway
+   cost a packet per write, 112 rebuilds for 100 writes, which is what made a
+   dimming burst stutter (D-106) -- and when the rate does move, the caller
+   decides which single advertisement carries it (D-108). */
 function goFast() {
   if (st.fastTimer !== undefined) { clearTimeout(st.fastTimer); st.fastTimer = undefined; }
   if (st.advInterval === st.fastInterval) return false;
   st.advInterval = st.fastInterval;
-  refreshAdvertising();
   return true;
+}
+
+function onConnect() {
+  if (goFast()) republishRate();
 }
 
 function goIdleAfterTimeout() {
@@ -666,7 +796,7 @@ function goIdleAfterTimeout() {
   st.fastTimer = setTimeout(() => {
     st.fastTimer = undefined;
     st.advInterval = st.interval;
-    refreshAdvertising();
+    republishRate();
   }, st.fastTimeout);
 }
 
@@ -688,7 +818,19 @@ function handleWrite(k, pl) {
     if (st.onError) st.onError(e);
     return false;
   }
-  st.entries[w.entryIndex].set(decodeValue(value, w));
+  try {
+    st.entries[w.entryIndex].set(decodeValue(value, w));
+  } catch (e) {
+    /* The device's own set() threw. Espruino has already acknowledged the
+       write, so onError is the only place that can show, and it was not being
+       told: the exception went up into the Bluetooth stack's own onWrite
+       callback, where nothing catches it. It took goFast() and the re-read
+       with it, and left the characteristic holding the bytes the central
+       wrote, which is what D-092 exists to prevent (D-114). */
+    if (w.readable) setTimeout(() => { guarded(() => publishRead(w)); }, 0);
+    if (st.onError) st.onError(e);
+    return false;
+  }
   // Keep the readable value current, but do not bump the revision: the
   // receiver that wrote it already knows (S3.2).
   //
@@ -704,9 +846,16 @@ function handleWrite(k, pl) {
   // wait out the idle interval -- even if the connect event was missed. And
   // anything the write changed that *is* advertised goes out now rather than
   // at the next schedule: the entries are re-read here, and the packet is
-  // rebuilt if their bytes moved or if goFast() has not already done it.
-  try { if (!goFast()) tick(); }
-  catch (e) { if (st.onError) st.onError(e); }  // a refused packet must not escape into onWrite
+  // rebuilt if their bytes moved.
+  //
+  // One advertisement either way. A rebuild carries the new rate in its own
+  // options, so the rate needs publishing on its own only when nothing else
+  // published -- but goFast() still has to run first, because it is also what
+  // cancels a pending return to idle (D-108).
+  try {
+    const faster = goFast();
+    if (!tick() && faster) republishRate();
+  } catch (e) { if (st.onError) st.onError(e); }  // a refused packet must not escape into onWrite
   return true;
 }
 
@@ -734,7 +883,15 @@ function setup(opts) {
   const iv = checkInterval("interval", opts.interval || 2000);
   const key = toKey(opts.bindkey);
   const marks = key ? loadMarks() : { w: 0, a: 0 };
-  st = {
+  /* Disarm the previous run's timers before `st` is replaced, because that is
+     the only moment their handles still exist. A device being developed on is
+     a device whose setup() runs again and again (D-088), and each run used to
+     leave the one before it holding a live timer that went on calling into the
+     new state -- a second read timer on the old entry's schedule, and a return
+     to idle for a connection that belonged to a device that no longer exists.
+     The clearInterval() this replaces read `st.timer` after the assignment
+     below, where it is always undefined, so it had never cleared anything. */
+  const next = {
     entries : entries,
     key : key,
     mac : key ? macBytes() : null,
@@ -764,10 +921,25 @@ function setup(opts) {
     counterReport : opts.counterReport === true && key !== null,
     whenConnected : opts.whenConnected !== false,
     onError : opts.onError || null,
+    // A timeout, re-armed by every wake, not a fixed interval (D-109).
     timer : undefined,
     fastTimer : undefined,
-    advInterval : iv
+    advInterval : iv,
+    // The bytes the radio last accepted. Changing only the advertising rate
+    // hands these back rather than building a packet nobody needed (D-108).
+    lastSd : null
   };
+  /* Only now, because everything above can throw (D-114). planPacket()
+     refuses a packet that does not fit, an entry without a length, an interval
+     out of range; disarming before that left a device which had been working
+     with no timers at all, still advertising, frozen until the next setup()
+     that happened to succeed. The handles belong to the state being replaced,
+     so they have to be taken here, where it still exists. */
+  if (st) {
+    if (st.timer !== undefined) clearTimeout(st.timer);
+    if (st.fastTimer !== undefined) clearTimeout(st.fastTimer);
+  }
+  st = next;
   /* Claim the stride now rather than when the counter reaches it. A mark that
      is only written on the way past would never be written at all on a device
      that reboots more often than it sends a million packets -- which is every
@@ -795,36 +967,56 @@ function setup(opts) {
     // bytes, and the receiver finds us by our BTHome service data anyway.
     NRF.setServices(svcs);
   }
-  refreshAdvertising();
-  // Without this the packet is built once and never again: sensor values would
-  // freeze at their boot readings. The tick rebuilds only when one of them has
-  // moved (D-106).
-  if (st.timer !== undefined) clearInterval(st.timer);
-  st.timer = setInterval(tick, st.interval);
-  // Once per module load, not once per setup(). `st` is rebuilt by every
-  // setup() call, so this flag cannot live in it -- and a device being
-  // developed on is a device whose setup() runs again and again, each run
-  // stacking another reaction onto every connection (D-088).
-  if (!listening) {
-    NRF.on("connect", () => guarded(goFast));
-    NRF.on("disconnect", () => guarded(goIdleAfterTimeout));
-    listening = true;
+  try {
+    refreshAdvertising();
+  } finally {
+    /* Even when the radio refused that packet. publish() has put the small
+       fallback on air so that the device can still be found and connected to
+       (D-022, D-029) -- and a device that can be reached has to be a device
+       that still works: without the two below it would never read a sensor
+       again and never react to a connection, so the net only half caught it
+       (D-114). The error still reaches the caller.
+
+       Without the schedule the packet is built once and never again: sensor
+       values would freeze at their boot readings. The wake rebuilds only when
+       one of them has moved (D-106), and there is no wake at all unless
+       something is due (D-109). The handlers are subscribed once per module
+       load, not once per setup(): `st` is rebuilt by every setup() call, so
+       this flag cannot live in it, and a device being developed on is a device
+       whose setup() runs again and again (D-088). */
+    schedule();
+    if (!listening) {
+      NRF.on("connect", () => guarded(onConnect));
+      NRF.on("disconnect", () => guarded(goIdleAfterTimeout));
+      listening = true;
+    }
   }
   return exports;
 }
 
 /* Re-read every sensor and re-advertise now.
 
-   Without waiting for the next interval, and whether or not anything moved. */
-function update() { refreshAdvertising(); }
+   Without waiting for the next interval, and whether or not anything moved.
+   The intervals have to be cleared for that to be true: renderServiceData
+   skips an entry that is not due, so update() was publishing a packet with a
+   new packet id carrying values it had not re-read -- stale data a receiver
+   accepts as fresh, which is worse than not publishing at all, since the
+   packet id is what tells it the data is new (D-114). */
+function update() {
+  const ord = st.plan.ordered;
+  for (let i = 0; i < ord.length; i++) ord[i].lastRead = 0;
+  refreshAdvertising();
+  schedule();
+}
 
 /* A writable value changed without a write - a knob, a button, a schedule.
    Bumps the settings revision so receivers read it again (S3.2). */
 function changed() {
   if (!st.plan.settingsRevision) throw err("not_readable", "no writable entry has get(); nothing for a receiver to re-read");
   st.revision = (st.revision + 1) & 255;
-  st.plan.writable.forEach(w => { if (w.readable) publishRead(w); });
+  publishReads();
   refreshAdvertising();
+  schedule();
 }
 
 /* Change the advertising interval without re-running setup(). */
@@ -832,11 +1024,12 @@ function setAdvertisingInterval(ms) {
   st.interval = checkInterval("interval", ms);
   const ord = st.plan.ordered;
   for (let i = 0; i < ord.length; i++) if (ord[i].inheritsInterval) ord[i].readInterval = st.interval;
-  if (st.timer !== undefined) clearInterval(st.timer);
-  st.timer = setInterval(tick, st.interval);
+  // Re-armed, not just re-installed: this is also the interval an entry
+  // inherits and the one an `interval: 0` entry is read at.
+  schedule();
   if (st.fastTimer === undefined && st.advInterval !== st.fastInterval) {
     st.advInterval = st.interval;
-    refreshAdvertising();
+    republishRate();
   }
   return st.interval;
 }
